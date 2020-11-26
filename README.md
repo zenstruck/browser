@@ -90,7 +90,6 @@ $browser
     ->uncheckField('Accept Terms')
     ->selectFieldOption('Type', 'Employee')
     ->attachFile('Photo', '/path/to/photo.jpg')
-    ->interceptRedirects()
     ->press('Submit')
     ->followRedirect()
 ;
@@ -136,9 +135,17 @@ $browser
 
 // convenience methods
 $browser
+    // by default, redirects are followed, this disables that behaviour
+    ->interceptRedirects() 
+
+    // by default, exceptions are caught and converted to a response
+    // this disables that behaviour allowing you to use TestCase::expectException()
+    ->throwExceptions()
+ 
     ->with(function(\Zenstruck\Browser $browser) {
         // do something without breaking
     })
+
     ->dump() // dump() the html on the page (then continues)
     ->dump('h1') // dump() the h1 tag (then continues)
     ->dd() // dd() the html on the page

@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Tests\Fixture;
 
+use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -20,6 +21,11 @@ final class Kernel extends BaseKernel
     public function page1(): Response
     {
         return new Response('success');
+    }
+
+    public function exception(): void
+    {
+        throw new \Exception('exception thrown');
     }
 
     public function registerBundles(): iterable
@@ -44,10 +50,12 @@ final class Kernel extends BaseKernel
             'router' => ['utf8' => true],
             'test' => true,
         ]);
+        $c->register('logger', NullLogger::class); // disable logging
     }
 
     protected function configureRoutes(RouteCollectionBuilder $routes): void
     {
         $routes->add('/page1', 'kernel::page1');
+        $routes->add('/exception', 'kernel::exception');
     }
 }

@@ -8,6 +8,7 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
 
@@ -47,6 +48,24 @@ class Browser
     final public function documentElement(): DocumentElement
     {
         return $this->minkSession()->getPage();
+    }
+
+    final public function interceptRedirects(): self
+    {
+        $this->browser()->followRedirects(false);
+
+        return $this;
+    }
+
+    final public function throwExceptions(): self
+    {
+        if (!$this->browser instanceof HttpKernelBrowser) {
+            throw new \RuntimeException('Can only disable exception catching when using HttpKernelBrowser.');
+        }
+
+        $this->browser->catchExceptions(false);
+
+        return $this;
     }
 
     final public function with(callable $callback): self
