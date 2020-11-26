@@ -74,11 +74,11 @@ trait Email
      */
     private function mailerEvents(): array
     {
-        if (\method_exists($this, 'profile')) {
+        if (!\method_exists($this, 'profile')) {
             throw new \RuntimeException('The "Email" extension requires the "Profiler" extension.');
         }
 
-        if ($this->profile()->hasCollector('mailer')) {
+        if (!$this->profile()->hasCollector('mailer')) {
             throw new \RuntimeException('The profiler does not include the "mailer" collector. Is symfony/mailer installed?');
         }
 
