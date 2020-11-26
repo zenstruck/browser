@@ -114,7 +114,7 @@ class TestEmail
     /**
      * Ensure both html and text contents contain the expected string.
      */
-    final public function assertAllContains(string $expected): self
+    final public function assertContains(string $expected): self
     {
         return $this
             ->assertHtmlContains($expected)
