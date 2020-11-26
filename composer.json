@@ -27,5 +27,8 @@
     },
     "autoload": {
         "psr-4": { "Zenstruck\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Zenstruck\\Browser\\Tests\\": "tests/" }
     }
 }

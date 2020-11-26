@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 1,16 * *'
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [7.4, 8.0]
+        stability: [prefer-stable]
+        include:
+          - php: 7.4
+            stability: prefer-lowest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.3.3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@2.7.0
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Cache dependencies
+        uses: actions/cache@v2.1.2
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-${{ matrix.php }}-${{ matrix.stability }}-${{ hashFiles('composer.json') }}
+
+      - name: Install dependencies
+        run: |
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-suggest
+          vendor/bin/simple-phpunit install
+
+      - name: Configure PHPUnit annotations
+        uses: mheap/phpunit-matcher-action@v1
+
+      - name: Test
+        run: vendor/bin/simple-phpunit --teamcity
+
+  code-coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.3.3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@2.7.0
+        with:
+          php-version: 7.4
+          coverage: xdebug
+
+      - name: Cache dependencies
+        uses: actions/cache@v2.1.2
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-7.4-prefer-stable-${{ hashFiles('composer.json') }}
+
+      - name: Install dependencies
+        run: |
+          composer update --prefer-dist --no-interaction --no-suggest
+          vendor/bin/simple-phpunit install
+
+      - name: Test with coverage
+        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover coverage.xml
+
+#      - name: Publish coverage report to Codecov
+#        uses: codecov/codecov-action@v1
+#        with:
+#          file: ./coverage.xml
+
+  composer-validate:
+    name: Validate composer.json
+    runs-on: ubuntu-latest
+    steps:
+      -   name: Checkout code
+          uses: actions/checkout@v2.3.3
+
+      -   name: Setup PHP
+          uses: shivammathur/setup-php@2.7.0
+          with:
+            php-version: 7.4
+            coverage: none
+
+      -   name: Validate composer.json
+          run: composer validate --strict --no-check-lock
+
+  cs-check:
+    name: PHP Coding Standards
+    runs-on: ubuntu-latest
+    steps:
+      -   name: Checkout code
+          uses: actions/checkout@v2.3.3
+
+      -   name: Setup PHP
+          uses: shivammathur/setup-php@2.7.0
+          with:
+            php-version: 7.4
+            coverage: none
+
+      -   name: Install dependencies
+          run: |
+            wget https://cs.symfony.com/download/php-cs-fixer-v2.phar -O php-cs-fixer.phar
+            php php-cs-fixer.phar self-update
+
+      -   name: Check CS
+          run: php php-cs-fixer.phar fix --dry-run --diff --diff-format=udiff
