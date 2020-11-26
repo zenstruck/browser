@@ -92,6 +92,13 @@ trait Actions
         return $this;
     }
 
+    final public function interceptRedirects(): self
+    {
+        $this->browser()->followRedirects(false);
+
+        return $this;
+    }
+
     final public function followRedirect(): self
     {
         $this->browser()->followRedirect();

@@ -49,13 +49,6 @@ class Browser
         return $this->minkSession()->getPage();
     }
 
-    final public function interceptRedirects(): self
-    {
-        $this->browser()->followRedirects(false);
-
-        return $this;
-    }
-
     final public function with(callable $callback): self
     {
         $callback($this);

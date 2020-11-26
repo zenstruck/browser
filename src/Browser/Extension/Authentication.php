@@ -1,6 +1,9 @@
 <?php
 
-namespace Zenstruck\Browser;
+namespace Zenstruck\Browser\Extension;
+
+use Zenstruck\Browser\Actions;
+use Zenstruck\Browser\Assertions;
 
 /**
  * This is a basic authentication extension more for an example. You will
