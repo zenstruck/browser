@@ -31,14 +31,14 @@ public function testViewPostAndAddComment()
     $post = PostFactory::new()->create(['title' => 'My First Post']);
 
     $this->browser()
-        ->visit('/posts/'.$post->getId())
+        ->visit("/posts/{$post->getId()}")
         ->assertSuccessful()
         ->assertSeeIn('title', 'My First Post')
         ->assertSeeIn('h1', 'My First Post')
         ->assertNotSeeElement('#comments')
         ->fillField('Comment', 'My First Comment')
         ->press('Submit')
-        ->assertOn('/posts/'.$post->getId())
+        ->assertOn("/posts/{$post->getId()}")
         ->assertSeeIn('#comments', 'My First Comment')
     ;
 }
