@@ -12,7 +12,7 @@ use Zenstruck\Browser as DefaultBrowser;
  */
 trait Browser
 {
-    final public function browser(): DefaultBrowser
+    final protected function browser(): DefaultBrowser
     {
         if (!$this instanceof KernelTestCase) {
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
