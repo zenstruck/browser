@@ -1,0 +1,31 @@
+{
+    "name": "zenstruck/browser",
+    "description": "A fluent interface for your Symfony functional tests.",
+    "homepage": "https://github.com/zenstruck/browser",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["test", "symfony"],
+    "authors": [
+        {
+            "name": "Kevin Bond",
+            "email": "kevinbond@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "behat/mink": "^1.8",
+        "behat/mink-browserkit-driver": "^1.3",
+        "symfony/framework-bundle": "^4.4|^5.0"
+    },
+    "require-dev": {
+        "symfony/mailer": "^4.4|^5.0",
+        "symfony/phpunit-bridge": "^5.1"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": { "Zenstruck\\": "src/" }
+    }
+}
