@@ -15,10 +15,11 @@ final class BrowserTest extends KernelTestCase
     /**
      * @test
      */
-    public function visit(): void
+    public function redirects_are_followed_by_default(): void
     {
         $this->browser()
-            ->visit('/page1')
+            ->visit('/redirect1')
+            ->assertOn('/page1')
             ->assertSuccessful()
         ;
     }
@@ -26,17 +27,35 @@ final class BrowserTest extends KernelTestCase
     /**
      * @test
      */
-    public function redirects_are_followed_by_default(): void
+    public function can_intercept_redirects(): void
     {
-        $this->markTestIncomplete();
+        $this->browser()
+            ->interceptRedirects()
+            ->visit('/redirect1')
+            ->assertOn('/redirect1')
+            ->assertRedirected()
+            ->followRedirect()
+            ->assertOn('/redirect2')
+            ->assertRedirected()
+            ->followRedirect()
+            ->assertOn('/redirect3')
+            ->assertRedirected()
+            ->followRedirect()
+            ->assertOn('/page1')
+            ->assertSuccessful()
+        ;
     }
 
     /**
      * @test
      */
-    public function can_intercept_redirects(): void
+    public function can_assert_redirected_to(): void
     {
-        $this->markTestIncomplete();
+        $this->browser()
+            ->interceptRedirects()
+            ->visit('/redirect3')
+            ->assertRedirectedTo('/page1')
+        ;
     }
 
     /**

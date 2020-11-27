@@ -27,14 +27,18 @@ trait Assertions
 
     public function assertSuccessful(): self
     {
-        PHPUnit::assertTrue($this->minkSession()->getStatusCode() >= 200 && $this->minkSession()->getStatusCode() < 300);
+        $status = $this->minkSession()->getStatusCode();
+
+        PHPUnit::assertTrue($status >= 200 && $status < 300, "Expected successful status code (2xx), [{$status}] received.");
 
         return $this;
     }
 
     public function assertRedirected(): self
     {
-        PHPUnit::assertTrue($this->minkSession()->getStatusCode() >= 300 && $this->minkSession()->getStatusCode() < 400);
+        $status = $this->minkSession()->getStatusCode();
+
+        PHPUnit::assertTrue($status >= 300 && $status < 400, "Expected redirect status code (3xx), [{$status}] received.");
 
         return $this;
     }
@@ -44,7 +48,6 @@ trait Assertions
         $this->assertRedirected();
         $this->followRedirect();
         $this->assertOn($expected);
-        $this->assertSuccessful();
 
         return $this;
     }

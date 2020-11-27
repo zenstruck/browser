@@ -95,7 +95,6 @@ trait Actions
     final public function followRedirect(): self
     {
         $this->browser()->followRedirect();
-        $this->browser()->followRedirects(true);
 
         return $this;
     }

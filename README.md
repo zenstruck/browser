@@ -102,7 +102,7 @@ $browser
     ->assertOn('/my/page')
     ->assertHeader('Content-Type', 'text/html; charset=UTF-8')
 
-    // combination of assertRedirected(), followRedirect(), assertOn(), assertSuccessful()
+    // combination of assertRedirected(), followRedirect(), assertOn()
     ->assertRedirectedTo('/some/page')
 
     // these look in the entire response body (useful for non-html pages)

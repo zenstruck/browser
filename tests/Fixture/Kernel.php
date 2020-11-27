@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
@@ -26,6 +27,21 @@ final class Kernel extends BaseKernel
     public function exception(): void
     {
         throw new \Exception('exception thrown');
+    }
+
+    public function redirect1(): RedirectResponse
+    {
+        return new RedirectResponse('/redirect2');
+    }
+
+    public function redirect2(): RedirectResponse
+    {
+        return new RedirectResponse('/redirect3');
+    }
+
+    public function redirect3(): RedirectResponse
+    {
+        return new RedirectResponse('/page1');
     }
 
     public function registerBundles(): iterable
@@ -57,5 +73,8 @@ final class Kernel extends BaseKernel
     {
         $routes->add('/page1', 'kernel::page1');
         $routes->add('/exception', 'kernel::exception');
+        $routes->add('/redirect1', 'kernel::redirect1');
+        $routes->add('/redirect2', 'kernel::redirect2');
+        $routes->add('/redirect3', 'kernel::redirect3');
     }
 }
