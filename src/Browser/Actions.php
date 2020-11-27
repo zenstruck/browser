@@ -9,7 +9,7 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @method AbstractBrowser browser()
+ * @method AbstractBrowser inner()
  * @method Session         minkSession()
  * @method DocumentElement documentElement()
  */
@@ -24,21 +24,21 @@ trait Actions
 
     final public function get(string $url, array $parameters = [], array $files = [], array $server = []): self
     {
-        $this->browser()->request('GET', $url, $parameters, $files, $server);
+        $this->inner()->request('GET', $url, $parameters, $files, $server);
 
         return $this;
     }
 
     final public function post(string $url, array $parameters = [], array $files = [], array $server = []): self
     {
-        $this->browser()->request('POST', $url, $parameters, $files, $server);
+        $this->inner()->request('POST', $url, $parameters, $files, $server);
 
         return $this;
     }
 
     final public function delete(string $url, array $parameters = []): self
     {
-        $this->browser()->request('DELETE', $url, $parameters);
+        $this->inner()->request('DELETE', $url, $parameters);
 
         return $this;
     }
@@ -94,7 +94,7 @@ trait Actions
 
     final public function followRedirect(): self
     {
-        $this->browser()->followRedirect();
+        $this->inner()->followRedirect();
 
         return $this;
     }

@@ -21,18 +21,18 @@ class Browser
 
     private const SESSION = 'app';
 
-    private AbstractBrowser $browser;
+    private AbstractBrowser $inner;
     private Mink $mink;
 
-    final public function __construct(AbstractBrowser $browser)
+    final public function __construct(AbstractBrowser $inner)
     {
-        $this->browser = $browser;
-        $this->mink = new Mink([self::SESSION => new Session(new BrowserKitDriver($this->browser))]);
+        $this->inner = $inner;
+        $this->mink = new Mink([self::SESSION => new Session(new BrowserKitDriver($this->inner))]);
     }
 
-    final public function browser(): AbstractBrowser
+    final public function inner(): AbstractBrowser
     {
-        return $this->browser;
+        return $this->inner;
     }
 
     final public function minkSession(): Session
@@ -52,18 +52,18 @@ class Browser
 
     final public function interceptRedirects(): self
     {
-        $this->browser()->followRedirects(false);
+        $this->inner()->followRedirects(false);
 
         return $this;
     }
 
     final public function throwExceptions(): self
     {
-        if (!$this->browser instanceof HttpKernelBrowser) {
+        if (!$this->inner instanceof HttpKernelBrowser) {
             throw new \RuntimeException('Can only disable exception catching when using HttpKernelBrowser.');
         }
 
-        $this->browser->catchExceptions(false);
+        $this->inner->catchExceptions(false);
 
         return $this;
     }
