@@ -19,7 +19,7 @@ trait Profiler
             throw new \RuntimeException('KernelBrowser not being used.');
         }
 
-        if (false === $profile = $this->browser()->getProfile()) {
+        if (!$profile = $this->browser()->getProfile()) {
             throw new \RuntimeException('Profiler not enabled.');
         }
 
