@@ -146,6 +146,14 @@ $browser
         // do something without breaking
     })
 
+    // enable the profiler for the next request
+    ->withProfiling()
+
+    // access the profile for the last request
+    ->with(function(\Zenstruck\Browser $browser) {
+        $queryCount = $browser->profile()->getCollector('db')->getQueryCount();
+    })
+
     ->dump() // dump() the html on the page (then continues)
     ->dump('h1') // dump() the h1 tag (then continues)
     ->dd() // dd() the html on the page
@@ -268,45 +276,9 @@ public function testDemo(): void
 }
 ```
 
-#### Profiler
-
-Provides access to Symfony's `Profiler`. Allows you to enable profiling for the next
-request via `->withProfiling()` and access the profiler for the last request with
-`->profile()`.
-
-Add to your [Custom Browser](#custom-browser):
-
-```php
-namespace App\Tests;
-
-use Zenstruck\Browser;
-use Zenstruck\Browser\Extension\Profiler;
-
-class AppBrowser extends Browser
-{
-    use Profiler;
-}
-```
-
-Use in your tests:
-
-```php
-public function testDemo(): void
-{
-    $this->browser()
-        ->withProfiling() // enable profiling for the next request
-        ->visit('/my/page')
-        ->with(function(Browser $browser) {
-            // access the profiler
-            $this->assertSame(10, $browser->profile()->getCollector('db')->getQueryCount());
-        })
-    ;
-}
-```
-
 #### Email
 
-Provides useful email assertions for a request (requires the [Profiler Extension](#profiler)).
+Provides useful email assertions for a request.
 
 Add to your [Custom Browser](#custom-browser):
 
@@ -315,11 +287,10 @@ namespace App\Tests;
 
 use Zenstruck\Browser;
 use Zenstruck\Browser\Extension\Email;
-use Zenstruck\Browser\Extension\Profiler;
 
 class AppBrowser extends Browser
 {
-    use Profiler, Email;
+    use Email;
 }
 ```
 

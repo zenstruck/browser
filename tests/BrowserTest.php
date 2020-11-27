@@ -82,4 +82,18 @@ final class BrowserTest extends KernelTestCase
             ->visit('/exception')
         ;
     }
+
+    /**
+     * @test
+     */
+    public function can_access_the_profiler(): void
+    {
+        $profile = $this->browser()
+            ->withProfiling()
+            ->visit('/page1')
+            ->profile()
+        ;
+
+        $this->assertTrue($profile->hasCollector('request'));
+    }
 }
