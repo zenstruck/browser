@@ -3,14 +3,14 @@
 namespace Zenstruck\Browser\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Browser\Test\Browser;
+use Zenstruck\Browser\Test\HasBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class BrowserTest extends KernelTestCase
 {
-    use Browser;
+    use HasBrowser;
 
     /**
      * @test

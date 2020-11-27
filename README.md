@@ -52,18 +52,18 @@ $ composer require zenstruck/browser --dev
 
 ## Usage
 
-Have your functional test case use the `Browser` trait and call `->browser()` in
+Have your functional test case use the `HasBrowser` trait and call `->browser()` in
 your tests:
 
 ```php
 namespace App\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Browser\Test\Browser;
+use Zenstruck\Browser\Test\HasBrowser;
 
 class MyTest extends KernelTestCase
 {
-    use Browser;
+    use HasBrowser;
 
     public function testDemo(): void
     {
@@ -190,14 +190,14 @@ Then in your test case, overwrite the `->createBrowser()` method:
 namespace App\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Browser\Test\Browser;
+use Zenstruck\Browser\Test\HasBrowser;
 
 /**
  * @method AppBrowser browser() This will help your IDE with typehints
  */
 class MyTest extends KernelTestCase
 {
-    use Browser;
+    use HasBrowser;
 
     protected function createBrowser() : AppBrowser
     {

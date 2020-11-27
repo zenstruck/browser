@@ -10,7 +10,7 @@ use Zenstruck\Browser as DefaultBrowser;
  *
  * @mixin KernelTestCase
  */
-trait Browser
+trait HasBrowser
 {
     final protected function browser(): DefaultBrowser
     {
