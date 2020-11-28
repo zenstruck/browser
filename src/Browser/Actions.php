@@ -36,6 +36,13 @@ trait Actions
         return $this;
     }
 
+    final public function put(string $url, array $parameters = [], array $files = [], array $server = []): self
+    {
+        $this->inner()->request('PUT', $url, $parameters, $files, $server);
+
+        return $this;
+    }
+
     final public function delete(string $url, array $parameters = []): self
     {
         $this->inner()->request('DELETE', $url, $parameters);

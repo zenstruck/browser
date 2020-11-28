@@ -100,7 +100,7 @@ $browser
     ->assertSuccessful() // 2xx status code
     ->assertRedirected() // 3xx status code
     ->assertOn('/my/page')
-    ->assertHeader('Content-Type', 'text/html; charset=UTF-8')
+    ->assertHeaderContains('Content-Type', 'text/html; charset=UTF-8')
 
     // combination of assertRedirected(), followRedirect(), assertOn()
     ->assertRedirectedTo('/some/page')
@@ -121,7 +121,7 @@ $browser
     ->assertElementAttributeNotContains('head meta[name=description]', 'content', 'my description')
 
     // form assertions
-    ->assertFieldContains('Username', 'kevin')
+    ->assertFieldEquals('Username', 'kevin')
     ->assertChecked('Accept Terms')
     ->assertNotChecked('Accept Terms')
 ;

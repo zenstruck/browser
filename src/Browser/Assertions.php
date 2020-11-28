@@ -13,6 +13,25 @@ use PHPUnit\Framework\Assert as PHPUnit;
  */
 trait Assertions
 {
+    final public function assertOn(string $expected): self
+    {
+        $expected = \parse_url($expected);
+        $actual = \parse_url(\urldecode($this->minkSession()->getCurrentUrl()));
+
+        unset(
+            $expected['host'],
+            $expected['scheme'],
+            $expected['port'],
+            $actual['host'],
+            $actual['scheme'],
+            $actual['port']
+        );
+
+        PHPUnit::assertSame($expected, $actual);
+
+        return $this;
+    }
+
     final public function assertStatus(int $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -61,6 +80,20 @@ trait Assertions
         );
     }
 
+    final public function assertHeaderEquals(string $header, string $expected): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseHeaderEquals($header, $expected)
+        );
+    }
+
+    final public function assertHeaderContains(string $header, string $expected): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseHeaderContains($header, $expected)
+        );
+    }
+
     final public function assertSee(string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -89,25 +122,6 @@ trait Assertions
         );
     }
 
-    final public function assertOn(string $expected): self
-    {
-        $expected = \parse_url($expected);
-        $actual = \parse_url(\urldecode($this->minkSession()->getCurrentUrl()));
-
-        unset(
-            $expected['host'],
-            $expected['scheme'],
-            $expected['port'],
-            $actual['host'],
-            $actual['scheme'],
-            $actual['port']
-        );
-
-        PHPUnit::assertSame($expected, $actual);
-
-        return $this;
-    }
-
     final public function assertSeeElement(string $selector): self
     {
         return $this->wrapMinkExpectation(
@@ -129,7 +143,7 @@ trait Assertions
         );
     }
 
-    final public function assertFieldContains(string $selector, string $expected): self
+    final public function assertFieldEquals(string $selector, string $expected): self
     {
         return $this->wrapMinkExpectation(
             fn() => $this->webAssert()->fieldValueEquals($selector, $expected)
@@ -147,13 +161,6 @@ trait Assertions
     {
         return $this->wrapMinkExpectation(
             fn() => $this->webAssert()->checkboxNotChecked($selector)
-        );
-    }
-
-    final public function assertHeader(string $header, string $expected): self
-    {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseHeaderEquals($header, $expected)
         );
     }
 
