@@ -44,7 +44,7 @@ class TestEmail
             return $this;
         }
 
-        return $this;
+        PHPUnit::fail("Message does not have from [{$expectedEmail}]");
     }
 
     final public function assertTo(string $expectedEmail, string $expectedName = ''): self
@@ -60,7 +60,7 @@ class TestEmail
             return $this;
         }
 
-        return $this;
+        PHPUnit::fail("Message does not have to [{$expectedEmail}]");
     }
 
     final public function assertCc(string $expectedEmail, string $expectedName = ''): self
@@ -76,7 +76,7 @@ class TestEmail
             return $this;
         }
 
-        return $this;
+        PHPUnit::fail("Message does not have cc [{$expectedEmail}]");
     }
 
     final public function assertBcc(string $expectedEmail, string $expectedName = ''): self
@@ -92,7 +92,7 @@ class TestEmail
             return $this;
         }
 
-        return $this;
+        PHPUnit::fail("Message does not have bcc [{$expectedEmail}]");
     }
 
     final public function assertReplyTo(string $expectedEmail, string $expectedName = ''): self
@@ -108,7 +108,7 @@ class TestEmail
             return $this;
         }
 
-        return $this;
+        PHPUnit::fail("Message does not have reply-to [{$expectedEmail}]");
     }
 
     /**

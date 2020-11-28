@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
 /**
@@ -24,7 +27,7 @@ final class Kernel extends BaseKernel
 
     public function page1(): Response
     {
-        return new Response(\file_get_contents(__DIR__.'/templates/page1.html'));
+        return new Response(\file_get_contents(__DIR__.'/files/page1.html'));
     }
 
     public function page2(): Response
@@ -65,6 +68,23 @@ final class Kernel extends BaseKernel
         return new RedirectResponse('/page1');
     }
 
+    public function sendEmail(): Response
+    {
+        $this->container->get('mailer')->send((new Email())
+            ->from('webmaster@example.com')
+            ->to(new Address('kevin@example.com', 'Kevin'))
+            ->cc('cc@example.com')
+            ->bcc('bcc@example.com')
+            ->replyTo('reply@example.com')
+            ->attachFromPath(__DIR__.'/files/attachment.txt')
+            ->subject('email subject')
+            ->html('html body')
+            ->text('text body')
+        );
+
+        return new Response('success');
+    }
+
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
@@ -87,8 +107,10 @@ final class Kernel extends BaseKernel
             'router' => ['utf8' => true],
             'test' => true,
             'profiler' => ['enabled' => true, 'collect' => false],
+            'mailer' => ['dsn' => 'null://null'],
         ]);
         $c->register('logger', NullLogger::class); // disable logging
+        $c->setAlias('mailer', MailerInterface::class)->setPublic(true);
     }
 
     protected function configureRoutes(RouteCollectionBuilder $routes): void
@@ -101,5 +123,6 @@ final class Kernel extends BaseKernel
         $routes->add('/redirect1', 'kernel::redirect1');
         $routes->add('/redirect2', 'kernel::redirect2');
         $routes->add('/redirect3', 'kernel::redirect3');
+        $routes->add('/send-email', 'kernel::sendEmail');
     }
 }
