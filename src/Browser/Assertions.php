@@ -13,19 +13,14 @@ use PHPUnit\Framework\Assert as PHPUnit;
  */
 trait Assertions
 {
-    public function assertStatus(int $expected): self
+    final public function assertStatus(int $expected): self
     {
-        try {
-            $this->webAssert()->statusCodeEquals($expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->statusCodeEquals($expected)
+        );
     }
 
-    public function assertSuccessful(): self
+    final public function assertSuccessful(): self
     {
         $status = $this->minkSession()->getStatusCode();
 
@@ -34,7 +29,7 @@ trait Assertions
         return $this;
     }
 
-    public function assertRedirected(): self
+    final public function assertRedirected(): self
     {
         $status = $this->minkSession()->getStatusCode();
 
@@ -43,7 +38,7 @@ trait Assertions
         return $this;
     }
 
-    public function assertRedirectedTo(string $expected): self
+    final public function assertRedirectedTo(string $expected): self
     {
         $this->assertRedirected();
         $this->followRedirect();
@@ -52,79 +47,49 @@ trait Assertions
         return $this;
     }
 
-    public function assertResponseContains(string $expected): self
+    final public function assertResponseContains(string $expected): self
     {
-        try {
-            $this->webAssert()->responseContains($expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseContains($expected)
+        );
     }
 
-    public function assertResponseNotContains(string $expected): self
+    final public function assertResponseNotContains(string $expected): self
     {
-        try {
-            $this->webAssert()->responseNotContains($expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseNotContains($expected)
+        );
     }
 
-    public function assertSee(string $expected): self
+    final public function assertSee(string $expected): self
     {
-        try {
-            $this->webAssert()->pageTextContains($expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->pageTextContains($expected)
+        );
     }
 
-    public function assertNotSee(string $expected): self
+    final public function assertNotSee(string $expected): self
     {
-        try {
-            $this->webAssert()->pageTextNotContains($expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->pageTextNotContains($expected)
+        );
     }
 
-    public function assertSeeIn(string $selector, string $expected): self
+    final public function assertSeeIn(string $selector, string $expected): self
     {
-        try {
-            $this->webAssert()->elementTextContains('css', $selector, $expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->elementTextContains('css', $selector, $expected)
+        );
     }
 
-    public function assertNotSeeIn(string $selector, string $expected): self
+    final public function assertNotSeeIn(string $selector, string $expected): self
     {
-        try {
-            $this->webAssert()->elementTextNotContains('css', $selector, $expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->elementTextNotContains('css', $selector, $expected)
+        );
     }
 
-    public function assertOn(string $expected): self
+    final public function assertOn(string $expected): self
     {
         $expected = \parse_url($expected);
         $actual = \parse_url(\urldecode($this->minkSession()->getCurrentUrl()));
@@ -143,106 +108,73 @@ trait Assertions
         return $this;
     }
 
-    public function assertSeeElement(string $selector): self
+    final public function assertSeeElement(string $selector): self
     {
-        try {
-            $this->webAssert()->elementExists('css', $selector);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->elementExists('css', $selector)
+        );
     }
 
-    public function assertNotSeeElement(string $selector): self
+    final public function assertNotSeeElement(string $selector): self
     {
-        try {
-            $this->webAssert()->elementNotExists('css', $selector);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->elementNotExists('css', $selector)
+        );
     }
 
-    public function assertElementCount(string $selector, int $count): self
+    final public function assertElementCount(string $selector, int $count): self
     {
-        try {
-            $this->webAssert()->elementsCount('css', $selector, $count);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->elementsCount('css', $selector, $count)
+        );
     }
 
-    public function assertFieldContains(string $selector, string $expected): self
+    final public function assertFieldContains(string $selector, string $expected): self
     {
-        try {
-            $this->webAssert()->fieldValueEquals($selector, $expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->fieldValueEquals($selector, $expected)
+        );
     }
 
-    public function assertChecked(string $selector): self
+    final public function assertChecked(string $selector): self
     {
-        try {
-            $this->webAssert()->checkboxChecked($selector);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->checkboxChecked($selector)
+        );
     }
 
-    public function assertNotChecked(string $selector): self
+    final public function assertNotChecked(string $selector): self
     {
-        try {
-            $this->webAssert()->checkboxNotChecked($selector);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->checkboxNotChecked($selector)
+        );
     }
 
-    public function assertHeader(string $header, string $expected): self
+    final public function assertHeader(string $header, string $expected): self
     {
-        try {
-            $this->webAssert()->responseHeaderEquals($header, $expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseHeaderEquals($header, $expected)
+        );
     }
 
-    public function assertElementAttributeContains(string $selector, string $attribute, string $expected): self
+    final public function assertElementAttributeContains(string $selector, string $attribute, string $expected): self
     {
-        try {
-            $this->webAssert()->elementAttributeContains('css', $selector, $attribute, $expected);
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->elementAttributeContains('css', $selector, $attribute, $expected)
+        );
     }
 
-    public function assertElementAttributeNotContains(string $selector, string $attribute, string $expected): self
+    final public function assertElementAttributeNotContains(string $selector, string $attribute, string $expected): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->elementAttributeNotContains('css', $selector, $attribute, $expected)
+        );
+    }
+
+    final protected function wrapMinkExpectation(callable $callback): self
     {
         try {
-            $this->webAssert()->elementAttributeNotContains('css', $selector, $attribute, $expected);
+            $callback();
             PHPUnit::assertTrue(true);
         } catch (ExpectationException $e) {
             PHPUnit::fail($e->getMessage());

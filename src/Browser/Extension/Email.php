@@ -72,7 +72,7 @@ trait Email
     /**
      * @return MessageEvent[]
      */
-    private function mailerEvents(): array
+    final protected function mailerEvents(): array
     {
         if (!\method_exists($this, 'profile')) {
             throw new \RuntimeException('The "Email" extension requires the "Profiler" extension.');
