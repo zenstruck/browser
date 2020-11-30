@@ -2,14 +2,13 @@
 
 namespace Zenstruck\Browser\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Test\HasBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class BrowserTest extends KernelTestCase
+trait BrowserTests
 {
     use HasBrowser;
 
@@ -34,7 +33,6 @@ final class BrowserTest extends KernelTestCase
         $this->browser()
             ->visit('/redirect1')
             ->assertOn('/page1')
-            ->assertSuccessful()
         ;
     }
 
@@ -120,6 +118,16 @@ final class BrowserTest extends KernelTestCase
             ->visit('/page1')
             ->assertResponseContains('h1 title')
             ->assertResponseNotContains('invalid text')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function response_header_assertions(): void
+    {
+        $this->browser()
+            ->visit('/page1')
             ->assertHeaderEquals('Content-Type', 'text/html; charset=UTF-8')
             ->assertHeaderContains('Content-Type', 'text/html')
         ;
@@ -136,10 +144,20 @@ final class BrowserTest extends KernelTestCase
             ->assertNotSee('invalid text')
             ->assertSeeIn('h1', 'title')
             ->assertNotSeeIn('h1', 'invalid text')
-            ->assertSeeIn('title', 'meta title')
             ->assertSeeElement('h1')
             ->assertNotSeeElement('h2')
             ->assertElementCount('ul li', 2)
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function html_head_assertions(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->assertSeeIn('title', 'meta title')
             ->assertElementAttributeContains('meta[name="description"]', 'content', 'meta')
             ->assertElementAttributeNotContains('meta[name="description"]', 'content', 'invalid')
         ;
@@ -173,7 +191,6 @@ final class BrowserTest extends KernelTestCase
             ->visit('/page1')
             ->follow('a link')
             ->assertOn('/page2')
-            ->assertSuccessful()
         ;
     }
 
@@ -210,15 +227,26 @@ final class BrowserTest extends KernelTestCase
             ->uncheckField('input3')
             ->selectFieldOption('input4', 'option 2')
             ->attachFile('input5', __FILE__)
-            ->selectFieldOptions('input6', ['option 1', 'option 3'])
             ->press('Submit')
             ->assertOn('/submit-form')
-            ->assertSuccessful()
             ->assertResponseContains('"input_1":"Kevin"')
             ->assertResponseContains('"input_2":"on"')
             ->assertResponseNotContains('"input_3')
             ->assertResponseContains('"input_4":"option 2"')
             ->assertResponseContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function form_multiselect(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->selectFieldOptions('input6', ['option 1', 'option 3'])
+            ->press('Submit')
+            ->assertOn('/submit-form')
             ->assertResponseContains('"input_6":["option 1","option 3"]')
         ;
     }

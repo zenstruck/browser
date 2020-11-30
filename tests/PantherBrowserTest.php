@@ -1,0 +1,94 @@
+<?php
+
+namespace Zenstruck\Browser\Tests;
+
+use Symfony\Component\Panther\PantherTestCase;
+use Zenstruck\Browser;
+
+/**
+ * @author Kevin Bond <kevinbond@gmail.com>
+ */
+final class PantherBrowserTest extends PantherTestCase
+{
+    use BrowserTests;
+
+    /**
+     * @test
+     */
+    public function can_intercept_redirects(): void
+    {
+        $this->markTestSkipped('Redirects cannot be intercepted with panther.');
+    }
+
+    /**
+     * @test
+     */
+    public function can_assert_redirected_to(): void
+    {
+        $this->markTestSkipped('Redirects cannot be intercepted with panther.');
+    }
+
+    /**
+     * @test
+     */
+    public function exceptions_are_caught_by_default(): void
+    {
+        $this->markTestSkipped('Panther does not support response status codes.');
+    }
+
+    /**
+     * @test
+     */
+    public function can_access_the_profiler(): void
+    {
+        $this->markTestSkipped('Panther cannot access the profiler.');
+    }
+
+    /**
+     * @test
+     */
+    public function can_enable_exception_throwing(): void
+    {
+        $this->markTestSkipped('Panther cannot enable exception throwing.');
+    }
+
+    /**
+     * @test
+     */
+    public function response_header_assertions(): void
+    {
+        $this->markTestSkipped('Panther cannot access the response headers.');
+    }
+
+    /**
+     * @test
+     */
+    public function html_head_assertions(): void
+    {
+        $this->markTestSkipped('Panther cannot access <head>.');
+    }
+
+    /**
+     * @test
+     */
+    public function http_method_actions(): void
+    {
+        $this->markTestSkipped('Panther can only make "GET" requests.');
+    }
+
+    /**
+     * @test
+     */
+    public function form_multiselect(): void
+    {
+        $this->markTestIncomplete('Do not yet have multi-select working with Panther.');
+    }
+
+    protected function createBrowser(): Browser
+    {
+        return new Browser(static::createPantherClient([
+            'browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME,
+            'webServerDir' => __DIR__.'/Fixture/public',
+        ]));
+    }
+}

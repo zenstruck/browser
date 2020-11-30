@@ -19,6 +19,7 @@
     },
     "require-dev": {
         "symfony/mailer": "^4.4|^5.0",
+        "symfony/panther": "^0.8.0",
         "symfony/phpunit-bridge": "^5.1"
     },
     "config": {

@@ -11,8 +11,10 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\Panther\Client;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
+use Zenstruck\Browser\Mink\PantherBrowserKitDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -28,8 +30,10 @@ class Browser
 
     final public function __construct(AbstractBrowser $inner)
     {
+        $driver = $inner instanceof Client ? new PantherBrowserKitDriver($inner) : new BrowserKitDriver($inner);
+
         $this->inner = $inner;
-        $this->mink = new Mink([self::SESSION => new Session(new BrowserKitDriver($this->inner))]);
+        $this->mink = new Mink([self::SESSION => new Session($driver)]);
     }
 
     final public function inner(): AbstractBrowser
