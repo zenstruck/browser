@@ -88,7 +88,8 @@ $browser
     ->fillField('Name', 'Kevin')
     ->checkField('Accept Terms')
     ->uncheckField('Accept Terms')
-    ->selectFieldOption('Type', 'Employee')
+    ->selectFieldOption('Type', 'Employee') // single option select
+    ->selectFieldOptions('Notification', ['Email', 'SMS']) // multi-option select
     ->attachFile('Photo', '/path/to/photo.jpg')
     ->press('Submit')
     ->followRedirect()

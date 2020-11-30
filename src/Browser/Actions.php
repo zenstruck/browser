@@ -85,6 +85,15 @@ trait Actions
         return $this;
     }
 
+    public function selectFieldOptions(string $selector, array $values): self
+    {
+        foreach ($values as $value) {
+            $this->documentElement()->selectFieldOption($selector, $value, true);
+        }
+
+        return $this;
+    }
+
     final public function attachFile(string $selector, string $path): self
     {
         $this->documentElement()->attachFileToField($selector, $path);

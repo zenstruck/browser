@@ -210,6 +210,7 @@ final class BrowserTest extends KernelTestCase
             ->uncheckField('input3')
             ->selectFieldOption('input4', 'option 2')
             ->attachFile('input5', __FILE__)
+            ->selectFieldOptions('input6', ['option 1', 'option 3'])
             ->press('Submit')
             ->assertOn('/submit-form')
             ->assertSuccessful()
@@ -218,6 +219,7 @@ final class BrowserTest extends KernelTestCase
             ->assertResponseNotContains('"input_3')
             ->assertResponseContains('"input_4":"option 2"')
             ->assertResponseContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+            ->assertResponseContains('"input_6":["option 1","option 3"]')
         ;
     }
 }
