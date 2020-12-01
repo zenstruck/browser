@@ -107,7 +107,7 @@ class Browser
 
     final public function dump(?string $selector = null): self
     {
-        $context = 'URL: '.$this->minkSession()->getCurrentUrl().', STATUS: '.$this->minkSession()->getStatusCode();
+        $context = 'URL: '.$this->minkSession()->getCurrentUrl().', STATUS: '.$this->inner()->getInternalResponse()->getStatusCode();
 
         dump($context);
         dump($selector ? $this->documentElement()->find('css', $selector)->getText() : $this->documentElement()->getContent());
