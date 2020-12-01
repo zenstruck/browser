@@ -6,6 +6,8 @@ use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Browser;
 
 /**
+ * @group panther
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class PantherBrowserTest extends PantherTestCase
