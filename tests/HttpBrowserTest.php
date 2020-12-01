@@ -30,8 +30,6 @@ final class HttpBrowserTest extends PantherTestCase
 
     protected function createBrowser(): Browser
     {
-        return new Browser(static::createHttpBrowserClient([
-            'webServerDir' => __DIR__.'/Fixture/public',
-        ]));
+        return new Browser(static::createHttpBrowserClient());
     }
 }

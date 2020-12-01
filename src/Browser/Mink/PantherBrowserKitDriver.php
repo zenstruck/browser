@@ -7,8 +7,6 @@ use Behat\Mink\Exception\DriverException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates;
 use Facebook\WebDriver\Internal\WebDriverLocatable;
-use Facebook\WebDriver\WebDriver;
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverElement;
 use Facebook\WebDriver\WebDriverSelect;
 use Symfony\Component\DomCrawler\Field\FormField;
@@ -169,21 +167,6 @@ final class PantherBrowserKitDriver extends CoreDriver
     public function click($xpath): void
     {
         $this->client->getMouse()->click($this->toCoordinates($xpath));
-
-        /**
-         * @see \Symfony\Component\Panther\Client::submit()
-         */
-        $selector = WebDriverBy::cssSelector('html');
-        $previousId = $this->client->findElement($selector)->getID();
-        $this->client->wait(5)->until(function(WebDriver $driver) use ($previousId, $selector) {
-            try {
-                return $previousId !== $driver->findElement($selector)->getID();
-            } catch (NoSuchElementException $e) {
-                // The html element isn't already available
-                return false;
-            }
-        });
-
         $this->client->refreshCrawler();
     }
 

@@ -42,7 +42,10 @@ jobs:
         uses: mheap/phpunit-matcher-action@v1
 
       - name: Test
-        run: vendor/bin/simple-phpunit --teamcity
+        run: vendor/bin/simple-phpunit --teamcity --exclude-group panther
+
+      - name: Test Panther Browser
+        run: vendor/bin/simple-phpunit --teamcity --group panther
 
   code-coverage:
     name: Code Coverage

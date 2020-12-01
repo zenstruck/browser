@@ -90,7 +90,6 @@ final class PantherBrowserTest extends PantherTestCase
     {
         return new Browser(static::createPantherClient([
             'browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME,
-            'webServerDir' => __DIR__.'/Fixture/public',
         ]));
     }
 }

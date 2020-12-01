@@ -13,6 +13,7 @@
         <server name="KERNEL_CLASS" value="Zenstruck\Browser\Tests\Fixture\Kernel" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0"/>
+        <server name="PANTHER_WEB_SERVER_DIR" value="./tests/Fixture/public"/>
     </php>
 
     <testsuites>
