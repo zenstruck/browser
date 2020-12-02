@@ -5,6 +5,8 @@ namespace Zenstruck\Browser\Tests;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Zenstruck\Browser;
 use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Tests\Fixture\TestComponent1;
+use Zenstruck\Browser\Tests\Fixture\TestComponent2;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -32,6 +34,57 @@ trait BrowserTests
             })
             ->assertOn('/page1')
         ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_components(): void
+    {
+        $this->browser()
+            ->with(function(TestComponent1 $component) {
+                $component->assertTitle('h1 title');
+            })
+            ->assertOn('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function component_pre_assertions_and_actions_are_called(): void
+    {
+        $this->browser()
+            ->with(function(TestComponent2 $component) {
+                $this->assertTrue($component->preActionsCalled);
+                $this->assertTrue($component->preAssertionsCalled);
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function with_can_accept_multiple_browsers_and_components(): void
+    {
+        $this->browser()
+            ->with(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2) {
+                $this->assertInstanceOf(Browser::class, $browser1);
+                $this->assertInstanceOf(Browser::class, $browser2);
+                $this->assertInstanceOf(TestComponent1::class, $component1);
+                $this->assertInstanceOf(TestComponent2::class, $component2);
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function invalid_with_callback_parameter_throws_type_error(): void
+    {
+        $this->expectException(\TypeError::class);
+
+        $this->browser()->with(function(string $invalidType) {});
     }
 
     /**

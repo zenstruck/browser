@@ -242,8 +242,12 @@ $browser
     // (NOTE: not available for PantherBrowser)
     ->interceptRedirects()
 
-    ->with(function(\Zenstruck\Browser $browser) {
+    ->with(function() {
         // do something without breaking
+    })
+
+    ->with(function(\Zenstruck\Browser $browser) {
+        // access the current Browser instance
     })
 
     ->dump() // dump() the html on the page (then continue)
@@ -273,6 +277,95 @@ $browser
 ```
 
 ## Extending
+
+### Components
+
+You may have pages or page parts that have specific actions/assertions you use
+quite regularly in your tests. You can wrap these up into a "Component". Let's create
+a `CommentComponent` as an example to demonstrate this feature:
+
+```php
+namespace App\Tests;
+
+use Zenstruck\Browser\Component;
+use Zenstruck\Browser\KernelBrowser;
+
+/**
+ * If only using this component with a specific browser, this type hint can help your IDE.
+ *
+ * @method KernelBrowser browser()
+ */
+class CommentComponent extends Component
+{
+    public function assertHasNoComments(): self
+    {
+        $this->browser()->assertElementCount('#comments li', 0);
+
+        return $this; // optionally make methods fluent
+    }
+
+    public function assertHasComment(string $body, string $author): self
+    {
+        $this->browser()
+            ->assertSeeIn('#comments li span.body', $body)
+            ->assertSeeIn('#comments li span.author', $author)
+        ;
+
+        return $this; 
+    }
+
+    public function addComment(string $body, string $author): self
+    {
+        $this->browser()
+            ->fillField('Name', $author)
+            ->fillField('Comment', $body)
+            ->press('Add Comment')
+        ;
+
+        return $this;
+    }
+
+    protected function preAssertions(): void
+    {
+        // this is called as soon as the component is loaded
+        $this->browser()->assertSeeElement('#comments');
+    }
+
+    protected function preActions(): void
+    {
+        // this is called when the component is loaded but before
+        // preAssertions(). Useful for page components where you
+        // need to navigate to the page:
+        // $this->browser()->visit('/contact');
+    }
+}
+```
+
+Access and use this new component in your tests:
+
+```php
+/** @var \Zenstruck\Browser $browser **/
+
+$browser
+    ->visit('/post/1')
+    ->with(function(CommentComponent $component) {
+        // the function typehint triggers the component to be loaded,
+        // preActions() run and preAssertions() run
+
+        $component
+            ->assertHasNoComments()
+            ->addComment('comment body', 'Kevin')
+            ->assertHasComment('comment body')
+        ;
+    })
+;
+
+// you can optionally inject multiple components into the ->with() callback
+$browser->with(function(Component1 $component1, Component2 $component2) {
+    $component1->doSomething();
+    $component2->doSomethingElse();
+});
+```
 
 ### Custom Browser
 

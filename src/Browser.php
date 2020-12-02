@@ -9,10 +9,11 @@ use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Panther\Client;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
-use Zenstruck\Browser\ContainerAware;
+use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Mink\PantherBrowserKitDriver;
 
 /**
@@ -20,12 +21,13 @@ use Zenstruck\Browser\Mink\PantherBrowserKitDriver;
  */
 class Browser implements ContainerAwareInterface
 {
-    use Actions, Assertions, ContainerAware;
+    use Actions, Assertions;
 
     private const SESSION = 'app';
 
     private AbstractBrowser $inner;
     private Mink $mink;
+    private ?ContainerInterface $container = null;
 
     public function __construct(AbstractBrowser $inner)
     {
@@ -33,6 +35,20 @@ class Browser implements ContainerAwareInterface
 
         $this->inner = $inner;
         $this->mink = new Mink([self::SESSION => new Session($driver)]);
+    }
+
+    final public function setContainer(?ContainerInterface $container = null): void
+    {
+        $this->container = $container;
+    }
+
+    final public function container(): ContainerInterface
+    {
+        if (!$this->container) {
+            throw new \RuntimeException('Container has not been set.');
+        }
+
+        return $this->container;
     }
 
     final public function inner(): AbstractBrowser
@@ -64,7 +80,26 @@ class Browser implements ContainerAwareInterface
 
     final public function with(callable $callback): self
     {
-        $callback($this);
+        $parameters = \array_map(
+            function(\ReflectionParameter $parameter) {
+                $type = $parameter->getType();
+
+                if (!$type || ($type instanceof \ReflectionNamedType && \is_a($type->getName(), self::class, true))) {
+                    return $this;
+                }
+
+                if (!$type instanceof \ReflectionNamedType || !\is_a($type->getName(), Component::class, true)) {
+                    throw new \TypeError('Browser::with() callback can only take instances of Browser and/or Component as parameters.');
+                }
+
+                $class = $type->getName();
+
+                return new $class($this);
+            },
+            (new \ReflectionFunction(\Closure::fromCallable($callback)))->getParameters()
+        );
+
+        $callback(...$parameters);
 
         return $this;
     }
