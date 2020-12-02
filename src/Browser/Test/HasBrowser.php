@@ -7,8 +7,6 @@ use Zenstruck\Browser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @mixin KernelTestCase
  */
 trait HasBrowser
 {

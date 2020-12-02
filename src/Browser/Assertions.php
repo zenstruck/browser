@@ -3,13 +3,13 @@
 namespace Zenstruck\Browser;
 
 use Behat\Mink\Exception\ExpectationException;
-use Behat\Mink\WebAssert;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Zenstruck\Browser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @method WebAssert webAssert()
+ * @mixin Browser
  */
 trait Assertions
 {

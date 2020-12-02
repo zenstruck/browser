@@ -2,16 +2,12 @@
 
 namespace Zenstruck\Browser;
 
-use Behat\Mink\Element\DocumentElement;
-use Behat\Mink\Session;
-use Symfony\Component\BrowserKit\AbstractBrowser;
+use Zenstruck\Browser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @method AbstractBrowser inner()
- * @method Session         minkSession()
- * @method DocumentElement documentElement()
+ * @mixin Browser
  */
 trait Actions
 {
