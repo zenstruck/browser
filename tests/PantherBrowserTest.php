@@ -61,12 +61,4 @@ final class PantherBrowserTest extends PantherTestCase
     {
         $this->markTestSkipped('Panther can only make "GET" requests.');
     }
-
-    /**
-     * @test
-     */
-    public function form_multiselect(): void
-    {
-        $this->markTestIncomplete('Do not yet have multi-select working with Panther.');
-    }
 }
