@@ -192,11 +192,46 @@ $browser
 ;
 
 // http request actions (NOTE: these are not available for PantherBrowser)
+use Zenstruck\Browser\HttpOptions;
+
 $browser
     ->get('/api/endpoint')
     ->put('/api/endpoint')
     ->post('/api/endpoint')
     ->delete('/api/endpoint')
+
+    // second parameter can be an array of request options
+    ->post('/api/endpoint', [
+        // request headers
+        'headers' => ['X-Token' => 'my-token'],
+
+        // request body
+        'body' => 'request body',
+    ])
+    ->post('/api/endpoint', [
+        // json_encode request body and set Content-Type/Accept headers to application/json
+        'json' => ['request' => 'body'],
+
+        // simulates an AJAX request (sets the X-Requested-With to XMLHttpRequest)
+        'ajax' => true,
+    ])
+
+    // optionally use the provided Zenstruck\Browser\HttpOptions object
+    ->post('/api/endpoint',
+        HttpOptions::create()->withHeader('X-Token', 'my-token')->withBody('request body')
+    )
+
+    // sets the Content-Type/Accept headers to application/json
+    ->post('/api/endpoint', HttpOptions::json())
+
+    // json encodes value and sets as body
+    ->post('/api/endpoint', HttpOptions::json(['request' => 'body']))
+
+    // simulates an AJAX request (sets the X-Requested-With to XMLHttpRequest)
+    ->post('/api/endpoint', HttpOptions::ajax())
+
+    // simulates a JSON AJAX request
+    ->post('/api/endpoint', HttpOptions::jsonAjax())
 ;
 
 // convenience methods

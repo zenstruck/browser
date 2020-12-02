@@ -45,7 +45,17 @@ final class Kernel extends BaseKernel
 
     public function httpMethod(Request $request): Response
     {
-        return new Response("method: {$request->getMethod()}");
+        return new JsonResponse([
+            'method' => $request->getMethod(),
+            'headers' => $request->headers->all(),
+            'query' => $request->query->all(),
+            'attributes' => $request->attributes->all(),
+            'files' => $request->files->all(),
+            'server' => $request->server->all(),
+            'request' => $request->query->all(),
+            'content' => $request->getContent(),
+            'ajax' => $request->isXmlHttpRequest(),
+        ]);
     }
 
     public function exception(): void

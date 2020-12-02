@@ -14,32 +14,48 @@ trait Actions
         return $this;
     }
 
-    final public function get(string $url, array $parameters = [], array $files = [], array $server = []): self
+    /**
+     * @param HttpOptions|array $options @see HttpOptions::DEFAULT_OPTIONS
+     */
+    final public function request(string $method, string $url, $options = []): self
     {
-        $this->inner()->request('GET', $url, $parameters, $files, $server);
+        $options = HttpOptions::create($options);
+
+        $this->inner()->request($method, $url, $options->parameters(), $options->files(), $options->server(), $options->body());
 
         return $this;
     }
 
-    final public function post(string $url, array $parameters = [], array $files = [], array $server = []): self
+    /**
+     * @see request()
+     */
+    final public function get(string $url, $options = []): self
     {
-        $this->inner()->request('POST', $url, $parameters, $files, $server);
-
-        return $this;
+        return $this->request('GET', $url, $options);
     }
 
-    final public function put(string $url, array $parameters = [], array $files = [], array $server = []): self
+    /**
+     * @see request()
+     */
+    final public function post(string $url, $options = []): self
     {
-        $this->inner()->request('PUT', $url, $parameters, $files, $server);
-
-        return $this;
+        return $this->request('POST', $url, $options);
     }
 
-    final public function delete(string $url, array $parameters = []): self
+    /**
+     * @see request()
+     */
+    final public function put(string $url, $options = []): self
     {
-        $this->inner()->request('DELETE', $url, $parameters);
+        return $this->request('PUT', $url, $options);
+    }
 
-        return $this;
+    /**
+     * @see request()
+     */
+    final public function delete(string $url, $options = []): self
+    {
+        return $this->request('DELETE', $url, $options);
     }
 
     final public function follow(string $link): self

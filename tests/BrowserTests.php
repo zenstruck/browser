@@ -3,9 +3,12 @@
 namespace Zenstruck\Browser\Tests;
 
 use Zenstruck\Browser;
+use Zenstruck\Browser\HttpOptions;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @method Browser browser()
  */
 trait BrowserTests
 {
@@ -171,16 +174,31 @@ trait BrowserTests
         $this->browser()
             ->get('/http-method')
             ->assertSuccessful()
-            ->assertResponseContains('method: GET')
+            ->assertResponseContains('"method":"GET"')
             ->post('/http-method')
             ->assertSuccessful()
-            ->assertResponseContains('method: POST')
+            ->assertResponseContains('"method":"POST"')
             ->delete('/http-method')
             ->assertSuccessful()
-            ->assertResponseContains('method: DELETE')
+            ->assertResponseContains('"method":"DELETE"')
             ->put('/http-method')
             ->assertSuccessful()
-            ->assertResponseContains('method: PUT')
+            ->assertResponseContains('"method":"PUT"')
+            ->assertResponseContains('"ajax":false')
+            ->post('/http-method', [
+                'json' => ['foo' => 'bar'],
+                'headers' => ['X-Foo' => 'Bar'],
+                'ajax' => true,
+            ])
+            ->assertResponseContains('"content-type":["application\/json"]')
+            ->assertResponseContains('"x-foo":["Bar"]')
+            ->assertResponseContains('"content":"{\u0022foo\u0022:\u0022bar\u0022}"')
+            ->assertResponseContains('"ajax":true')
+            ->post('/http-method', HttpOptions::jsonAjax(['foo' => 'bar'])->withHeader('X-Foo', 'Bar'))
+            ->assertResponseContains('"content-type":["application\/json"]')
+            ->assertResponseContains('"x-foo":["Bar"]')
+            ->assertResponseContains('"content":"{\u0022foo\u0022:\u0022bar\u0022}"')
+            ->assertResponseContains('"ajax":true')
         ;
     }
 
