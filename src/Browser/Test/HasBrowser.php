@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Test;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Zenstruck\Browser;
 
 /**
@@ -12,18 +13,22 @@ trait HasBrowser
 {
     final protected function browser(): Browser
     {
+        $browser = $this->createBrowser();
+
         if (!$this instanceof KernelTestCase) {
-            throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
+            return $browser;
         }
 
-        // reboot kernel before starting browser
-        static::bootKernel();
+        if ($browser instanceof ContainerAwareInterface) {
+            if (!static::$booted) {
+                static::bootKernel();
+            }
 
-        return $this->createBrowser();
+            $browser->setContainer(static::$container);
+        }
+
+        return $browser;
     }
 
-    protected function createBrowser(): Browser
-    {
-        return new Browser(static::$container->get('test.client'));
-    }
+    abstract protected function createBrowser(): Browser;
 }

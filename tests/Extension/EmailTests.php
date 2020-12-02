@@ -2,28 +2,20 @@
 
 namespace Zenstruck\Browser\Tests\Extension;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Extension\Email\TestEmail;
-use Zenstruck\Browser\Test\HasBrowser;
-use Zenstruck\Browser\Tests\Fixture\EmailBrowser;
 
 /**
- * @method EmailBrowser browser()
- *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class EmailTest extends KernelTestCase
+trait EmailTests
 {
-    use HasBrowser;
-
     /**
      * @test
      */
     public function assert_no_email_sent(): void
     {
-        $this->browser()
-            ->withProfiling()
+        $this->createEmailBrowser()
             ->visit('/page1')
             ->assertSuccessful()
             ->assertNoEmailSent()
@@ -35,9 +27,7 @@ final class EmailTest extends KernelTestCase
      */
     public function assert_email_sent(): void
     {
-        $this->browser()
-            ->throwExceptions()
-            ->withProfiling()
+        $this->createEmailBrowser()
             ->visit('/send-email')
             ->assertSuccessful()
             ->assertEmailSentTo('kevin@example.com', 'email subject')
@@ -57,8 +47,5 @@ final class EmailTest extends KernelTestCase
         ;
     }
 
-    protected function createBrowser(): Browser
-    {
-        return new EmailBrowser(static::$container->get('test.client'));
-    }
+    abstract protected function createEmailBrowser(): Browser;
 }

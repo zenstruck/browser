@@ -2,34 +2,36 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Panther\PantherTestCase;
-use Zenstruck\Browser;
+use Zenstruck\Browser\Extension\Email;
+use Zenstruck\Browser\HttpBrowser;
+use Zenstruck\Browser\Test\HasHttpBrowser;
+use Zenstruck\Browser\Tests\Extension\EmailTests;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class HttpBrowserTest extends PantherTestCase
 {
-    use BrowserTests;
+    use HasHttpBrowser, BrowserTests, ProfileAwareTests, EmailTests;
 
     /**
      * @test
      */
-    public function can_enable_exception_throwing(): void
+    public function the_container_is_injected(): void
     {
-        $this->markTestSkipped('HttpBrowser cannot enable exception throwing.');
+        $this->assertInstanceOf(ContainerInterface::class, $this->browser()->container());
     }
 
-    /**
-     * @test
-     */
-    public function can_access_the_profiler(): void
+    protected function createEmailBrowser(): HttpBrowser
     {
-        $this->markTestSkipped('HttpBrowser cannot access the profiler... yet...');
-    }
+        $browser = new class(static::createHttpBrowserClient()) extends HttpBrowser {
+            use Email;
+        };
 
-    protected function createBrowser(): Browser
-    {
-        return new Browser(static::createHttpBrowserClient());
+        $browser->setContainer(static::$container);
+
+        return $browser;
     }
 }

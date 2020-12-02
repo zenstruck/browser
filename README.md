@@ -50,20 +50,25 @@ public function testViewPostAndAddComment()
 $ composer require zenstruck/browser --dev
 ```
 
-## Usage
+This library provides `Zenstruck\Browser`, which is a fluent wrapper around
+`Symfony\Component\BrowserKit\AbstractBrowser` (previously `Symfony\Component\BrowserKit\Client`
+before Symfony 5). While this class is usable for any `AbstractBrowser` there are three
+implementations provided by this library:
 
-Have your functional test case use the `HasBrowser` trait and call `->browser()` in
-your tests:
+### 1. KernelBrowser
+
+This browser is a wrapper for `Symfony\Bundle\FrameworkBundle\KernelBrowser`. To use in your functional
+tests, have your standard Symfony `WebTestCase` or `KernelTestCase` use the `HasKernelBrowser` trait:
 
 ```php
 namespace App\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Browser\Test\HasBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Zenstruck\Browser\Test\HasKernelBrowser;
 
-class MyTest extends KernelTestCase
+class MyTest extends WebTestCase
 {
-    use HasBrowser;
+    use HasKernelBrowser;
 
     public function testDemo(): void
     {
@@ -75,7 +80,61 @@ class MyTest extends KernelTestCase
 }
 ```
 
-`->browser()` returns an instance of `Zenstruck\Browser` with has the following
+### 2. HttpBrowser
+
+This browser is a wrapper for `Symfony\Component\BrowserKit\HttpBrowser` (requires `symfony/http-client`).
+To use in your functional tests, have a `PantherTestCase` test use the `HasHttpBrowser` trait.
+`symfony/panther` is required as it needs a real webserver that Panther can create:
+
+```php
+namespace App\Tests;
+
+use Symfony\Component\Panther\PantherTestCase;
+use Zenstruck\Browser\Test\HasHttpBrowser;
+
+class MyTest extends PantherTestCase
+{
+    use HasHttpBrowser;
+
+    public function testDemo(): void
+    {
+        $this->browser()
+            ->visit('/my/page')
+            ->assertSuccessful()
+        ;
+    }
+}
+```
+
+### 3. PantherBrowser
+
+This browser is a wrapper for `Symfony\Component\Panther\Client` (requires `symfony/panther`).
+To use in your functional tests, have a `PantherTestCase` test use the `HasPantherBrowser` trait:
+
+```php
+namespace App\Tests;
+
+use Symfony\Component\Panther\PantherTestCase;
+use Zenstruck\Browser\Test\HasPantherBrowser;
+
+class MyTest extends PantherTestCase
+{
+    use HasPantherBrowser;
+
+    public function testDemo(): void
+    {
+        $this->browser()
+            ->visit('/my/page')
+            ->assertSee('My Title')
+        ;
+    }
+}
+```
+
+## Usage
+
+`HasKernelBrowser`, `HasHttpBrowser` and `HasPantherBrowser` all provide a `->browser()`
+method that returns an instance of `Zenstruck\Browser` which has the following
 actions/assertions:
 
 ```php
@@ -92,19 +151,15 @@ $browser
     ->selectFieldOptions('Notification', ['Email', 'SMS']) // multi-option select
     ->attachFile('Photo', '/path/to/photo.jpg')
     ->press('Submit')
+
+    // Follows a redirect if ->interceptRedirects() has been turned on
+    // (NOTE: Not available for PantherBrowser)
     ->followRedirect()
 ;
 
 // assertions
 $browser
-    ->assertStatus(200)
-    ->assertSuccessful() // 2xx status code
-    ->assertRedirected() // 3xx status code
     ->assertOn('/my/page')
-    ->assertHeaderContains('Content-Type', 'text/html; charset=UTF-8')
-
-    // combination of assertRedirected(), followRedirect(), assertOn()
-    ->assertRedirectedTo('/some/page')
 
     // these look in the entire response body (useful for non-html pages)
     ->assertResponseContains('some text')
@@ -125,40 +180,58 @@ $browser
     ->assertFieldEquals('Username', 'kevin')
     ->assertChecked('Accept Terms')
     ->assertNotChecked('Accept Terms')
+
+    // response assertions (NOTE: these are not available for PantherBrowser)
+    ->assertStatus(200)
+    ->assertSuccessful() // 2xx status code
+    ->assertRedirected() // 3xx status code
+    ->assertHeaderContains('Content-Type', 'text/html; charset=UTF-8')
+
+    // combination of assertRedirected(), followRedirect(), assertOn()
+    ->assertRedirectedTo('/some/page')
 ;
 
-// http request actions
+// http request actions (NOTE: these are not available for PantherBrowser)
 $browser
-    ->get('/api/endpoint', $parameters, $files, $server)
-    ->post('/api/endpoint', $parameters, $files, $server)
-    ->delete('/api/endpoint', $parameters)
+    ->get('/api/endpoint')
+    ->put('/api/endpoint')
+    ->post('/api/endpoint')
+    ->delete('/api/endpoint')
 ;
 
 // convenience methods
 $browser
     // by default, redirects are followed, this disables that behaviour
-    ->interceptRedirects() 
+    // (NOTE: not available for PantherBrowser)
+    ->interceptRedirects()
 
-    // by default, exceptions are caught and converted to a response
-    // this disables that behaviour allowing you to use TestCase::expectException()
-    ->throwExceptions()
- 
     ->with(function(\Zenstruck\Browser $browser) {
         // do something without breaking
     })
 
-    // enable the profiler for the next request
-    ->withProfiling()
+    ->dump() // dump() the html on the page (then continue)
+    ->dump('h1') // dump() the h1 tag (then continue)
+    ->dd() // dd() the html on the page
+    ->dd('h1') // dd() the h1 tag
+;
 
+// KernelBrowser/HttpBrowser specific methods
+$browser
     // access the profile for the last request
+    // HttpBrowser requires profiling have collect globally enabled
     ->with(function(\Zenstruck\Browser $browser) {
         $queryCount = $browser->profile()->getCollector('db')->getQueryCount();
     })
+;
 
-    ->dump() // dump() the html on the page (then continues)
-    ->dump('h1') // dump() the h1 tag (then continues)
-    ->dd() // dd() the html on the page
-    ->dd('h1') // dd() the h1 tag
+// KernelBrowser specific methods
+$browser
+    // by default, exceptions are caught and converted to a response
+    // this disables that behaviour allowing you to use TestCase::expectException()
+    ->throwExceptions()
+
+    // enable the profiler for the next request (if not globally enabled)
+    ->withProfiling()
 ;
 ```
 
@@ -167,15 +240,15 @@ $browser
 ### Custom Browser
 
 It is likely you will want to add your own actions and assertions. You can do this
-by creating your own "Browser" that extends `Zenstruck\Browser`. You can then add
-your own actions/assertions by using the base browser methods.
+by creating your own "Browser" that extends `Zenstruck\Browser` (or one of the implementations).
+You can then add your own actions/assertions by using the base browser methods.
 
 ```php
 namespace App\Tests;
 
-use Zenstruck\Browser;
+use Zenstruck\Browser\KernelBrowser;
 
-class AppBrowser extends Browser
+class AppBrowser extends KernelBrowser
 {
     public function assertHasToolbar(): self
     {
@@ -193,24 +266,28 @@ class AppBrowser extends Browser
 }
 ```
 
-Then in your test case, overwrite the `->createBrowser()` method:
+Then in your test case, (depending on the base browser), override the `xBrowserClass()`
+method and return your custom class:
 
 ```php
 namespace App\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Browser\Test\HasBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Zenstruck\Browser\Test\HasKernelBrowser;
 
 /**
  * @method AppBrowser browser() This will help your IDE with typehints
  */
-class MyTest extends KernelTestCase
+class MyTest extends WebTestCase
 {
-    use HasBrowser;
+    use HasKernelBrowser;
 
-    protected function createBrowser() : AppBrowser
+    /**
+     * Alternatively, set the appropriate env variable: KERNEL_BROWSER_CLASS=App\Tests\AppBrowser
+     */
+    protected static function kernelBrowserClass() : string
     {
-        return new AppBrowser(static::$container->get('test.client'));
+        return AppBrowser::class;
     }
 
     public function testDemo(): void
@@ -227,55 +304,17 @@ class MyTest extends KernelTestCase
 **TIP**: Create a base functional test case so all your tests can use your
 custom browser.
 
+Each Browser type, and their corresponding test trait have their own class method and
+env variable:
+
+1. `KernelBrowser`/`HasKernelBrowser`: `kernelBrowserClass()`/`KERNEL_BROWSER_CLASS`
+2. `HttpBrowser`/`HasHttpBrowser`: `httpBrowserClass()`/`HTTP_BROWSER_CLASS`
+3. `PantherBrowser`/`HasPantherBrowser`: `pantherBrowserClass()`/`PANTHER_BROWSER_CLASS`
+
 ### Extensions
 
 There are several packaged extensions. These are traits that can be added to a
 [Custom Browser](#custom-browser).
-
-#### Authentication
-
-This extension is more of an example. Each Symfony application handles authentication
-differently but this is a good starting point. You can either override the methods
-provided by the extension or write your own.
-
-Add to your [Custom Browser](#custom-browser):
-
-```php
-namespace App\Tests;
-
-use Zenstruck\Browser;
-use Zenstruck\Browser\Extension\Authentication;
-
-class AppBrowser extends Browser
-{
-    use Authentication;
-}
-```
-
-Use in your tests:
-
-```php
-public function testDemo(): void
-{
-    $this->browser()
-        // goes to the /login page, fills email/password fields,
-        // and presses the Login button
-        ->loginAs('kevin@example.com', 'password')
-
-        // asserts text "Logout" exists (assumes you have a logout link when users are logged in)
-        ->assertLoggedIn()
-
-        // asserts email exists as text (assumes you display the user's email when they are logged in)
-        ->assertLoggedInAs('kevin@example.com')
-
-        // goes to the /logout page
-        ->logout()
-
-        // asserts text "Login" exists (assumes you have a login link when users not logged in)
-        ->assertNotLoggedIn()
-    ;
-}
-```
 
 #### Email
 
@@ -286,10 +325,10 @@ Add to your [Custom Browser](#custom-browser):
 ```php
 namespace App\Tests;
 
-use Zenstruck\Browser;
+use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Extension\Email;
 
-class AppBrowser extends Browser
+class AppBrowser extends KernelBrowser
 {
     use Email;
 }
@@ -325,6 +364,51 @@ public function testDemo(): void
                 ->assertHasFile('file.txt', 'text/plain', 'Hello there!')
             ;
         })
+    ;
+}
+```
+
+#### Authentication
+
+This extension is more of an example. Each Symfony application handles authentication
+differently but this is a good starting point. You can either override the methods
+provided by the extension or write your own.
+
+Add to your [Custom Browser](#custom-browser):
+
+```php
+namespace App\Tests;
+
+use Zenstruck\Browser\KernelBrowser;
+use Zenstruck\Browser\Extension\Authentication;
+
+class AppBrowser extends KernelBrowser
+{
+    use Authentication;
+}
+```
+
+Use in your tests:
+
+```php
+public function testDemo(): void
+{
+    $this->browser()
+        // goes to the /login page, fills email/password fields,
+        // and presses the Login button
+        ->loginAs('kevin@example.com', 'password')
+
+        // asserts text "Logout" exists (assumes you have a logout link when users are logged in)
+        ->assertLoggedIn()
+
+        // asserts email exists as text (assumes you display the user's email when they are logged in)
+        ->assertLoggedInAs('kevin@example.com')
+
+        // goes to the /logout page
+        ->logout()
+
+        // asserts text "Login" exists (assumes you have a login link when users not logged in)
+        ->assertNotLoggedIn()
     ;
 }
 ```

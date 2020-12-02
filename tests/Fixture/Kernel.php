@@ -106,7 +106,7 @@ final class Kernel extends BaseKernel
             'secret' => 'S3CRET',
             'router' => ['utf8' => true],
             'test' => true,
-            'profiler' => ['enabled' => true, 'collect' => false],
+            'profiler' => ['enabled' => true, 'collect' => true],
             'mailer' => ['dsn' => 'null://null'],
         ]);
         $c->register('logger', NullLogger::class); // disable logging

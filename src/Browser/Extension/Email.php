@@ -7,6 +7,7 @@ use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
 use Zenstruck\Browser\Extension\Email\TestEmail;
+use Zenstruck\Browser\ProfileAware;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -71,8 +72,8 @@ trait Email
      */
     final protected function mailerEvents(): array
     {
-        if (!\method_exists($this, 'profile')) {
-            throw new \RuntimeException('The "Email" extension requires the "Profiler" extension.');
+        if (!$this instanceof ProfileAware) {
+            throw new \RuntimeException(\sprintf('The "Email" extension requires the browser implement %s.', ProfileAware::class));
         }
 
         if (!$this->profile()->hasCollector('mailer')) {

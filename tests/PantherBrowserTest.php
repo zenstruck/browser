@@ -3,7 +3,7 @@
 namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\Panther\PantherTestCase;
-use Zenstruck\Browser;
+use Zenstruck\Browser\Test\HasPantherBrowser;
 
 /**
  * @group panther
@@ -12,7 +12,7 @@ use Zenstruck\Browser;
  */
 final class PantherBrowserTest extends PantherTestCase
 {
-    use BrowserTests;
+    use HasPantherBrowser, BrowserTests;
 
     /**
      * @test
@@ -36,22 +36,6 @@ final class PantherBrowserTest extends PantherTestCase
     public function exceptions_are_caught_by_default(): void
     {
         $this->markTestSkipped('Panther does not support response status codes.');
-    }
-
-    /**
-     * @test
-     */
-    public function can_access_the_profiler(): void
-    {
-        $this->markTestSkipped('Panther cannot access the profiler.');
-    }
-
-    /**
-     * @test
-     */
-    public function can_enable_exception_throwing(): void
-    {
-        $this->markTestSkipped('Panther cannot enable exception throwing.');
     }
 
     /**
@@ -84,12 +68,5 @@ final class PantherBrowserTest extends PantherTestCase
     public function form_multiselect(): void
     {
         $this->markTestIncomplete('Do not yet have multi-select working with Panther.');
-    }
-
-    protected function createBrowser(): Browser
-    {
-        return new Browser(static::createPantherClient([
-            'browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME,
-        ]));
     }
 }

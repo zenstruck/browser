@@ -7,10 +7,7 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\AbstractBrowser;
-use Symfony\Component\HttpKernel\HttpKernelBrowser;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Panther\Client;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
@@ -28,7 +25,7 @@ class Browser
     private AbstractBrowser $inner;
     private Mink $mink;
 
-    final public function __construct(AbstractBrowser $inner)
+    public function __construct(AbstractBrowser $inner)
     {
         $driver = $inner instanceof Client ? new PantherBrowserKitDriver($inner) : new BrowserKitDriver($inner);
 
@@ -61,41 +58,6 @@ class Browser
         $this->inner->followRedirects(false);
 
         return $this;
-    }
-
-    final public function throwExceptions(): self
-    {
-        if (!$this->inner instanceof HttpKernelBrowser) {
-            throw new \RuntimeException('Can only disable exception catching when using HttpKernelBrowser.');
-        }
-
-        $this->inner->catchExceptions(false);
-
-        return $this;
-    }
-
-    final public function withProfiling(): self
-    {
-        if (!$this->inner instanceof KernelBrowser) {
-            throw new \RuntimeException('KernelBrowser not being used.');
-        }
-
-        $this->inner->enableProfiler();
-
-        return $this;
-    }
-
-    final public function profile(): Profile
-    {
-        if (!$this->inner instanceof KernelBrowser) {
-            throw new \RuntimeException('KernelBrowser not being used.');
-        }
-
-        if (!$profile = $this->inner->getProfile()) {
-            throw new \RuntimeException('Profiler not enabled.');
-        }
-
-        return $profile;
     }
 
     final public function with(callable $callback): self
