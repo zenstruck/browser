@@ -6,13 +6,10 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
-use Zenstruck\Browser;
 use Zenstruck\Browser\Extension\Email\TestEmail;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @mixin Browser
  */
 trait Email
 {

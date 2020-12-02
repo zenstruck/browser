@@ -2,18 +2,12 @@
 
 namespace Zenstruck\Browser\Extension;
 
-use Zenstruck\Browser\Actions;
-use Zenstruck\Browser\Assertions;
-
 /**
  * This is a basic authentication extension more for an example. You will
  * likely need to create your own authentication extension or override
  * these methods.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @mixin Actions
- * @mixin Assertions
  */
 trait Authentication
 {

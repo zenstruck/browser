@@ -2,12 +2,8 @@
 
 namespace Zenstruck\Browser;
 
-use Zenstruck\Browser;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @mixin Browser
  */
 trait Actions
 {

@@ -4,12 +4,9 @@ namespace Zenstruck\Browser;
 
 use Behat\Mink\Exception\ExpectationException;
 use PHPUnit\Framework\Assert as PHPUnit;
-use Zenstruck\Browser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @mixin Browser
  */
 trait Assertions
 {
