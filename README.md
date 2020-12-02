@@ -235,6 +235,8 @@ $browser
 ;
 
 // convenience methods
+$browser->container(); // the test service container (all services are public)
+
 $browser
     // by default, redirects are followed, this disables that behaviour
     // (NOTE: not available for PantherBrowser)
