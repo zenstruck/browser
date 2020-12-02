@@ -44,8 +44,15 @@ jobs:
       - name: Test
         run: vendor/bin/simple-phpunit --teamcity --exclude-group panther
 
-      - name: Test Panther Browser
+      - name: Test Panther Browser (Chrome)
         run: vendor/bin/simple-phpunit --teamcity --group panther
+        env:
+          PANTHER_BROWSER: chrome
+
+#      - name: Test Panther Browser (Firefox)
+#        run: vendor/bin/simple-phpunit --teamcity --group panther
+#        env:
+#          PANTHER_BROWSER: firefox
 
   code-coverage:
     name: Code Coverage
