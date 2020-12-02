@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Zenstruck\Browser;
 use Zenstruck\Browser\HttpOptions;
 
@@ -12,6 +13,14 @@ use Zenstruck\Browser\HttpOptions;
  */
 trait BrowserTests
 {
+    /**
+     * @test
+     */
+    public function the_container_is_injected(): void
+    {
+        $this->assertInstanceOf(ContainerInterface::class, $this->browser()->container());
+    }
+
     /**
      * @test
      */

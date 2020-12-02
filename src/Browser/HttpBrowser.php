@@ -3,20 +3,16 @@
 namespace Zenstruck\Browser;
 
 use Symfony\Component\BrowserKit\HttpBrowser as SymfonyHttpBrowser;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Extension\ContainerAware;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @method SymfonyHttpBrowser inner()
  */
-class HttpBrowser extends Browser implements ProfileAware, ContainerAwareInterface
+class HttpBrowser extends Browser implements ProfileAware
 {
-    use ContainerAware;
-
     final public function __construct(SymfonyHttpBrowser $inner)
     {
         parent::__construct($inner);

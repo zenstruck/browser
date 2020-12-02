@@ -8,17 +8,19 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Panther\Client;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
+use Zenstruck\Browser\ContainerAware;
 use Zenstruck\Browser\Mink\PantherBrowserKitDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class Browser
+class Browser implements ContainerAwareInterface
 {
-    use Actions, Assertions;
+    use Actions, Assertions, ContainerAware;
 
     private const SESSION = 'app';
 

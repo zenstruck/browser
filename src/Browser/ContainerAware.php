@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Browser\Extension;
+namespace Zenstruck\Browser;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
