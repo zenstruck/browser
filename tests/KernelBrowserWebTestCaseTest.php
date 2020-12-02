@@ -28,6 +28,19 @@ final class KernelBrowserWebTestCaseTest extends WebTestCase
         ;
     }
 
+    /**
+     * @test
+     */
+    public function can_use_native_web_test_case_assertions(): void
+    {
+        $this->browser()
+            ->visit('/invalid-page')
+            ->assertStatus(404)
+        ;
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
     protected function createEmailBrowser(): KernelBrowser
     {
         return new class(static::createClient()) extends KernelBrowser {
