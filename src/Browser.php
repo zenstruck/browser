@@ -14,6 +14,7 @@ use Symfony\Component\Panther\Client;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
 use Zenstruck\Browser\Component;
+use Zenstruck\Browser\FunctionExecutor;
 use Zenstruck\Browser\Mink\PantherBrowserKitDriver;
 
 /**
@@ -80,26 +81,12 @@ class Browser implements ContainerAwareInterface
 
     final public function with(callable $callback): self
     {
-        $parameters = \array_map(
-            function(\ReflectionParameter $parameter) {
-                $type = $parameter->getType();
-
-                if (!$type || ($type instanceof \ReflectionNamedType && \is_a($type->getName(), self::class, true))) {
-                    return $this;
-                }
-
-                if (!$type instanceof \ReflectionNamedType || !\is_a($type->getName(), Component::class, true)) {
-                    throw new \TypeError('Browser::with() callback can only take instances of Browser and/or Component as parameters.');
-                }
-
-                $class = $type->getName();
-
-                return new $class($this);
-            },
-            (new \ReflectionFunction(\Closure::fromCallable($callback)))->getParameters()
-        );
-
-        $callback(...$parameters);
+        FunctionExecutor::createFor($callback)
+            ->replaceUntypedArgument($this)
+            ->replaceTypedArgument(self::class, $this)
+            ->replaceTypedArgument(Component::class, fn(string $class) => new $class($this))
+            ->execute()
+        ;
 
         return $this;
     }

@@ -80,7 +80,7 @@ final class Kernel extends BaseKernel
 
     public function sendEmail(): Response
     {
-        $this->container->get('mailer')->send((new Email())
+        $email = (new Email())
             ->from('webmaster@example.com')
             ->to(new Address('kevin@example.com', 'Kevin'))
             ->cc('cc@example.com')
@@ -90,7 +90,11 @@ final class Kernel extends BaseKernel
             ->subject('email subject')
             ->html('html body')
             ->text('text body')
-        );
+        ;
+
+        $email->getHeaders()->addTextHeader('X-PM-Tag', 'reset-password');
+
+        $this->container->get('mailer')->send($email);
 
         return new Response('success');
     }

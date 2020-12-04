@@ -33,6 +33,9 @@ trait BrowserTests
                 $browser->visit('/redirect1');
             })
             ->assertOn('/page1')
+            ->with(function() {
+                $this->assertTrue(true);
+            })
         ;
     }
 
@@ -71,6 +74,8 @@ trait BrowserTests
             ->with(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2) {
                 $this->assertInstanceOf(Browser::class, $browser1);
                 $this->assertInstanceOf(Browser::class, $browser2);
+                $this->assertInstanceOf($this->browserClass(), $browser1);
+                $this->assertInstanceOf($this->browserClass(), $browser2);
                 $this->assertInstanceOf(TestComponent1::class, $component1);
                 $this->assertInstanceOf(TestComponent2::class, $component2);
             })
@@ -299,4 +304,6 @@ trait BrowserTests
             ->assertResponseContains('"input_6":["option 1","option 3"]')
         ;
     }
+
+    abstract protected static function browserClass(): string;
 }

@@ -4,6 +4,7 @@ namespace Zenstruck\Browser\Tests\Extension;
 
 use Zenstruck\Browser;
 use Zenstruck\Browser\Extension\Email\TestEmail;
+use Zenstruck\Browser\Tests\Fixture\CustomTestEmail;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -43,6 +44,22 @@ trait EmailTests
                     ->assertContains('body')
                     ->assertHasFile('attachment.txt', 'text/plain', "attachment contents\n")
                 ;
+
+                // TestEmail can call underlying Symfony\Component\Mime\Email methods
+                $this->assertSame('Kevin', $email->getTo()[0]->getName());
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_custom_test_email_class(): void
+    {
+        $this->createEmailBrowser()
+            ->visit('/send-email')
+            ->assertEmailSentTo('kevin@example.com', function(CustomTestEmail $email) {
+                $email->assertHasPostmarkTag('reset-password');
             })
         ;
     }

@@ -25,4 +25,9 @@ final class HttpBrowserTest extends PantherTestCase
 
         return $browser;
     }
+
+    protected static function browserClass(): string
+    {
+        return HttpBrowser::class;
+    }
 }

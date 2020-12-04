@@ -7,6 +7,7 @@ use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
 use Zenstruck\Browser\Extension\Email\TestEmail;
+use Zenstruck\Browser\FunctionExecutor;
 use Zenstruck\Browser\ProfileAware;
 
 /**
@@ -47,24 +48,22 @@ trait Email
                 continue;
             }
 
-            $toAddresses = \array_map(fn(Address $address) => $address->getAddress(), $message->getTo());
+            $toAddresses = \array_map(static fn(Address $address) => $address->getAddress(), $message->getTo());
             $foundToAddresses[] = $toAddresses;
 
             if (\in_array($expectedTo, $toAddresses, true)) {
                 // address matches
-                $class = $this->testEmailClass();
-                $callback(new $class($message));
+                FunctionExecutor::createFor($callback)
+                    ->minArguments(1)
+                    ->replaceTypedArgument(TestEmail::class, fn(string $class) => new $class($message))
+                    ->execute()
+                ;
 
                 return $this;
             }
         }
 
         PHPUnit::fail(\sprintf('Email sent, but "%s" is not among to-addresses: %s', $expectedTo, \implode(', ', \array_merge(...$foundToAddresses))));
-    }
-
-    protected function testEmailClass(): string
-    {
-        return TestEmail::class;
     }
 
     /**

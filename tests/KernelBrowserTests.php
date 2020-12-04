@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use Zenstruck\Browser\KernelBrowser;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -33,5 +35,10 @@ trait KernelBrowserTests
         ;
 
         $this->assertTrue($profile->hasCollector('request'));
+    }
+
+    protected static function browserClass(): string
+    {
+        return KernelBrowser::class;
     }
 }

@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\Panther\PantherTestCase;
+use Zenstruck\Browser\PantherBrowser;
 use Zenstruck\Browser\Test\HasPantherBrowser;
 
 /**
@@ -68,5 +69,10 @@ final class PantherBrowserTest extends PantherTestCase
     public function form_multiselect(): void
     {
         $this->markTestIncomplete('Do not yet have multi-select working with Panther.');
+    }
+
+    protected static function browserClass(): string
+    {
+        return PantherBrowser::class;
     }
 }
