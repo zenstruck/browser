@@ -137,10 +137,11 @@ class MyTest extends PantherTestCase
 method that returns an instance of `Zenstruck\Browser` which has the following
 actions/assertions:
 
+### Actions
+
 ```php
 /** @var \Zenstruck\Browser $browser **/
 
-// actions
 $browser
     ->visit('/my/page')
     ->follow('A link')
@@ -156,8 +157,13 @@ $browser
     // (NOTE: Not available for PantherBrowser)
     ->followRedirect()
 ;
+```
 
-// assertions
+### Assertions
+
+```php
+/** @var \Zenstruck\Browser $browser **/
+
 $browser
     ->assertOn('/my/page')
 
@@ -190,6 +196,54 @@ $browser
     // combination of assertRedirected(), followRedirect(), assertOn()
     ->assertRedirectedTo('/some/page')
 ;
+```
+
+### Convenience Methods
+
+```php
+/** @var \Zenstruck\Browser $browser **/
+
+// convenience methods
+$browser->container(); // the test service container (all services are public)
+
+$browser
+    // by default, redirects are followed, this disables that behaviour
+    // (NOTE: not available for PantherBrowser)
+    ->interceptRedirects()
+
+    ->with(function() {
+        // do something without breaking
+    })
+
+    ->with(function(\Zenstruck\Browser $browser) {
+        // access the current Browser instance
+    })
+
+    ->dump() // dump() the html on the page (then continue)
+    ->dump('h1') // dump() the h1 tag (then continue)
+    ->dd() // dd() the html on the page
+    ->dd('h1') // dd() the h1 tag
+;
+
+// KernelBrowser/HttpBrowser has access to the profiler
+// HttpBrowser requires profiling have collect globally enabled
+$queryCount = $browser->profile()->getCollector('db')->getQueryCount();
+
+// KernelBrowser specific methods
+$browser
+    // by default, exceptions are caught and converted to a response
+    // this disables that behaviour allowing you to use TestCase::expectException()
+    ->throwExceptions()
+
+    // enable the profiler for the next request (if not globally enabled)
+    ->withProfiling()
+;
+```
+
+### Http Actions
+
+```php
+/** @var \Zenstruck\Browser $browser **/
 
 // http request actions (NOTE: these are not available for PantherBrowser)
 use Zenstruck\Browser\HttpOptions;
@@ -232,47 +286,6 @@ $browser
 
     // simulates a JSON AJAX request
     ->post('/api/endpoint', HttpOptions::jsonAjax())
-;
-
-// convenience methods
-$browser->container(); // the test service container (all services are public)
-
-$browser
-    // by default, redirects are followed, this disables that behaviour
-    // (NOTE: not available for PantherBrowser)
-    ->interceptRedirects()
-
-    ->with(function() {
-        // do something without breaking
-    })
-
-    ->with(function(\Zenstruck\Browser $browser) {
-        // access the current Browser instance
-    })
-
-    ->dump() // dump() the html on the page (then continue)
-    ->dump('h1') // dump() the h1 tag (then continue)
-    ->dd() // dd() the html on the page
-    ->dd('h1') // dd() the h1 tag
-;
-
-// KernelBrowser/HttpBrowser specific methods
-$browser
-    // access the profile for the last request
-    // HttpBrowser requires profiling have collect globally enabled
-    ->with(function(\Zenstruck\Browser $browser) {
-        $queryCount = $browser->profile()->getCollector('db')->getQueryCount();
-    })
-;
-
-// KernelBrowser specific methods
-$browser
-    // by default, exceptions are caught and converted to a response
-    // this disables that behaviour allowing you to use TestCase::expectException()
-    ->throwExceptions()
-
-    // enable the profiler for the next request (if not globally enabled)
-    ->withProfiling()
 ;
 ```
 
@@ -369,9 +382,10 @@ $browser->with(function(Component1 $component1, Component2 $component2) {
 
 ### Custom HttpOptions
 
-If you find yourself creating a lot of http requests with the same options (ie an `X-Token` header)
-there are a couple ways to reduce this duplication. You can either create a [custom browser](#custom-browser)
-with a custom method (ie `->apiRequest()`) or create and use a custom `HttpOptions` object:
+If you find yourself creating a lot of [http requests](#http-actions) with the same options
+(ie an `X-Token` header) there are a couple ways to reduce this duplication. You can either
+create a [custom browser](#custom-browser) with a custom method (ie `->apiRequest()`) or
+create and use a custom `HttpOptions` object:
 
 ```php
 namespace App\Tests;
