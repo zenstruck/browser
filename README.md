@@ -289,6 +289,51 @@ $browser
 ;
 ```
 
+### Email Component
+
+You can make assertions about emails sent in the last request:
+
+```php
+use Zenstruck\Browser\Component\EmailComponent;
+use Zenstruck\Browser\Component\Email\TestEmail;
+
+/** @var \Zenstruck\Browser $browser **/
+$browser
+    ->visit('/page/that/does/not/send/email')
+    ->with(function(EmailComponent $component) {
+        $component->assertNoEmailSent();
+    })
+
+    ->visit('/page/that/sends/email')
+    
+    // just check that an email was sent to an address with a subject
+    ->with(function(EmailComponent $component) {
+        $component->assertEmailSentTo('kevin@example.com', 'Email Subject');
+    })
+    
+    // advanced assertions
+    ->with(function(EmailComponent $component) {
+        $component->assertEmailSentTo('kevin@example.com', function(TestEmail $email) {
+            $email
+                ->assertSubject('Email Subject')
+                ->assertFrom('from@example.com')
+                ->assertReplyTo('reply@example.com')
+                ->assertCc('cc1@example.com')
+                ->assertCc('cc2@example.com')
+                ->assertBcc('bcc@example.com')
+                ->assertTextContains('some text')
+                ->assertHtmlContains('some text')
+                ->assertContains('some text') // asserts text and html both contain a value
+                ->assertHasFile('file.txt', 'text/plain', 'Hello there!')
+            ;
+        });
+    })
+;
+```
+
+**NOTE**: There is an [Email Extension](#email-extension) that adds the `assertNoEmailSent()`
+and `assertEmailSentTo()` methods right onto your custom browser.
+
 ## Extending
 
 ### Custom Components
@@ -488,9 +533,9 @@ env variable:
 There are several packaged extensions. These are traits that can be added to a
 [Custom Browser](#custom-browser).
 
-#### Email
+#### Email Extension
 
-Provides useful email assertions for a request.
+Wraps the [Email Component](#email-component) into methods directly on your browser.
 
 Add to your [Custom Browser](#custom-browser):
 
@@ -512,7 +557,6 @@ Use in your tests:
 public function testDemo(): void
 {
     $this->browser()
-        ->withProfiling() // enable profiling for the next request
         ->visit('/page/that/does/not/send/email')
         ->assertNoEmailSent()
 
@@ -520,27 +564,11 @@ public function testDemo(): void
 
         // just check that an email was sent to an address with a subject
         ->assertEmailSentTo('kevin@example.com', 'Email Subject')
-
-        // advanced assertions
-        ->assertEmailSentTo('kevin@example.com', function(\Zenstruck\Browser\Extension\Email\TestEmail $email) {
-            $email
-                ->assertSubject('Email Subject')
-                ->assertFrom('from@example.com')
-                ->assertReplyTo('reply@example.com')
-                ->assertCc('cc1@example.com')
-                ->assertCc('cc2@example.com')
-                ->assertBcc('bcc@example.com')
-                ->assertTextContains('some text')
-                ->assertHtmlContains('some text')
-                ->assertContains('some text') // asserts text and html both contain a value
-                ->assertHasFile('file.txt', 'text/plain', 'Hello there!')
-            ;
-        })
     ;
 }
 ```
 
-#### Authentication
+#### Authentication Extension
 
 This extension is more of an example. Each Symfony application handles authentication
 differently but this is a good starting point. You can either override the methods

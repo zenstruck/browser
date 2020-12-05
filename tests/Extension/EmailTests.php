@@ -3,7 +3,7 @@
 namespace Zenstruck\Browser\Tests\Extension;
 
 use Zenstruck\Browser;
-use Zenstruck\Browser\Extension\Email\TestEmail;
+use Zenstruck\Browser\Component\Email\TestEmail;
 use Zenstruck\Browser\Tests\Fixture\CustomTestEmail;
 
 /**

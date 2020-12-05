@@ -3,7 +3,7 @@
 namespace Zenstruck\Browser\Tests\Fixture;
 
 use PHPUnit\Framework\Assert as PHPUnit;
-use Zenstruck\Browser\Extension\Email\TestEmail;
+use Zenstruck\Browser\Component\Email\TestEmail;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

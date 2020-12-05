@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Browser\Extension\Email;
+namespace Zenstruck\Browser\Component\Email;
 
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Mime\Email;
