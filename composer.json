@@ -19,7 +19,6 @@
         "symfony/framework-bundle": "^4.4|^5.0"
     },
     "require-dev": {
-        "dbrekelmans/bdi": "^0.2.1",
         "symfony/mailer": "^4.4|^5.0",
         "symfony/panther": "dev-main",
         "symfony/phpunit-bridge": "^5.1"

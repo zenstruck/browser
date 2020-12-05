@@ -37,7 +37,6 @@ jobs:
         run: |
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-suggest
           vendor/bin/simple-phpunit install
-          vendor/bin/bdi driver:chromedriver vendor/chromedriver-bin --os=linux
 
       - name: Test
         run: vendor/bin/simple-phpunit -v --exclude-group panther
@@ -46,7 +45,6 @@ jobs:
         run: vendor/bin/simple-phpunit -v --group panther
         env:
           PANTHER_BROWSER: chrome
-          PANTHER_CHROME_DRIVER_BINARY: ./vendor/chromedriver-bin/chromedriver
 
 #      - name: Test Panther Browser (Firefox)
 #        run: vendor/bin/simple-phpunit --teamcity --group panther
@@ -76,13 +74,9 @@ jobs:
         run: |
           composer update --prefer-dist --no-interaction --no-suggest
           vendor/bin/simple-phpunit install
-          vendor/bin/bdi driver:chromedriver vendor/chromedriver-bin --os=linux
 
       - name: Test with coverage
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover coverage.xml
-        env:
-          PANTHER_BROWSER: chrome
-          PANTHER_CHROME_DRIVER_BINARY: ./vendor/chromedriver-bin/chromedriver
 
 #      - name: Publish coverage report to Codecov
 #        uses: codecov/codecov-action@v1
