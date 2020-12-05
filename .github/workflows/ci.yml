@@ -38,14 +38,11 @@ jobs:
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-suggest
           vendor/bin/simple-phpunit install
 
-      - name: Configure PHPUnit annotations
-        uses: mheap/phpunit-matcher-action@v1
-
       - name: Test
-        run: vendor/bin/simple-phpunit --teamcity --exclude-group panther
+        run: vendor/bin/simple-phpunit -v --exclude-group panther
 
       - name: Test Panther Browser (Chrome)
-        run: vendor/bin/simple-phpunit --teamcity --group panther
+        run: vendor/bin/simple-phpunit -v --group panther
         env:
           PANTHER_BROWSER: chrome
 
