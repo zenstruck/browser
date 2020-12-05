@@ -27,6 +27,9 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
 
+      - name: Setup chromedriver
+        uses: nanasess/setup-chromedriver@v1.0.1
+
       - name: Cache dependencies
         uses: actions/cache@v2.1.2
         with:
@@ -45,6 +48,7 @@ jobs:
         run: vendor/bin/simple-phpunit -v --group panther
         env:
           PANTHER_BROWSER: chrome
+          PANTHER_CHROME_DRIVER_BINARY: chromedriver
 
 #      - name: Test Panther Browser (Firefox)
 #        run: vendor/bin/simple-phpunit --teamcity --group panther
@@ -64,6 +68,9 @@ jobs:
           php-version: 7.4
           coverage: xdebug
 
+      - name: Setup chromedriver
+        uses: nanasess/setup-chromedriver@v1.0.1
+
       - name: Cache dependencies
         uses: actions/cache@v2.1.2
         with:
@@ -77,6 +84,9 @@ jobs:
 
       - name: Test with coverage
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover coverage.xml
+        env:
+          PANTHER_BROWSER: chrome
+          PANTHER_CHROME_DRIVER_BINARY: chromedriver
 
 #      - name: Publish coverage report to Codecov
 #        uses: codecov/codecov-action@v1
