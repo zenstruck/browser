@@ -278,7 +278,7 @@ $browser
 
 ## Extending
 
-### Components
+### Custom Components
 
 You may have pages or page parts that have specific actions/assertions you use
 quite regularly in your tests. You can wrap these up into a "Component". Let's create
@@ -367,6 +367,44 @@ $browser->with(function(Component1 $component1, Component2 $component2) {
 });
 ```
 
+### Custom HttpOptions
+
+If you find yourself creating a lot of http requests with the same options (ie an `X-Token` header)
+there are a couple ways to reduce this duplication. You can either create a [custom browser](#custom-browser)
+with a custom method (ie `->apiRequest()`) or create and use a custom `HttpOptions` object:
+
+```php
+namespace App\Tests;
+
+use Zenstruck\Browser\HttpOptions;
+
+class AppHttpOptions extends HttpOptions
+{
+    public static function api(string $token, $json = null): self
+    {
+        return self::json($json)
+            ->withHeader('X-Token', $token)
+        ;
+    }
+}
+```
+
+Then, in your tests:
+
+```php
+use Zenstruck\Browser\HttpOptions;
+
+/** @var \Zenstruck\Browser $browser **/
+
+$browser
+    // instead of
+    ->post('/api/endpoint', HttpOptions::json()->withHeader('X-Token', 'my-token'))
+
+    // use your ApiHttpOptions object
+    ->post('/api/endpoint', AppHttpOptions::api('my-token'))
+;
+```
+
 ### Custom Browser
 
 It is likely you will want to add your own actions and assertions. You can do this
@@ -383,15 +421,6 @@ class AppBrowser extends KernelBrowser
     public function assertHasToolbar(): self
     {
         return $this->assertSeeElement('#toolbar');
-    }
-
-    public function addComment(string $name, string $content): self
-    {
-        return $this
-            ->fillField('Name', $name)
-            ->fillField('Comment', $content)
-            ->press('Add Comment')
-        ;
     }
 }
 ```
@@ -425,7 +454,6 @@ class MyTest extends WebTestCase
         $this->browser()
             ->visit('/my/page')
             ->assertHasToolbar()
-            ->addComment('Kevin', 'My Comment')
         ;
     }
 }

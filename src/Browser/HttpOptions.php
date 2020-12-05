@@ -37,26 +37,26 @@ class HttpOptions
      */
     final public static function create($value = []): self
     {
-        if ($value instanceof self) {
+        if ($value instanceof static) {
             return $value;
         }
 
-        return new self($value);
+        return new static($value);
     }
 
     final public static function json($body = null): self
     {
-        return self::create()->asJson($body);
+        return static::create()->asJson($body);
     }
 
     final public static function ajax(): self
     {
-        return self::create()->asAjax();
+        return static::create()->asAjax();
     }
 
     final public static function jsonAjax($body = null): self
     {
-        return self::json($body)->asAjax();
+        return static::json($body)->asAjax();
     }
 
     final public function withHeader(string $header, string $value): self

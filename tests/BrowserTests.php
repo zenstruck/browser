@@ -5,6 +5,7 @@ namespace Zenstruck\Browser\Tests;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Zenstruck\Browser;
 use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
 
@@ -266,6 +267,9 @@ trait BrowserTests
             ->assertResponseContains('"x-foo":["Bar"]')
             ->assertResponseContains('"content":"{\u0022foo\u0022:\u0022bar\u0022}"')
             ->assertResponseContains('"ajax":true')
+            ->post('/http-method', CustomHttpOptions::api('my-token'))
+            ->assertResponseContains('"content-type":["application\/json"]')
+            ->assertResponseContains('"x-token":["my-token"]')
         ;
     }
 
