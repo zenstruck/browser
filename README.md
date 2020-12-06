@@ -289,6 +289,19 @@ $browser
 ;
 ```
 
+### PantherBrowser Actions
+
+```php
+/** @var \Zenstruck\Browser\PantherBrowser $browser **/
+
+$browser
+    // pauses the tests and enters "interactive mode" which
+    // allows you to investigate the current state in the browser
+    // (requires the env variable PANTHER_NO_HEADLESS=1)
+    ->inspect()
+;
+```
+
 ### Email Component
 
 You can make assertions about emails sent in the last request:
