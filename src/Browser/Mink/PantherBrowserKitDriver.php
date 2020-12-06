@@ -40,7 +40,6 @@ final class PantherBrowserKitDriver extends CoreDriver
 
     public function stop(): void
     {
-        $this->client->quit();
         $this->started = false;
     }
 
