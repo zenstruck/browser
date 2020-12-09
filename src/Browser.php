@@ -3,6 +3,7 @@
 namespace Zenstruck;
 
 use Behat\Mink\Driver\BrowserKitDriver;
+use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
@@ -10,12 +11,10 @@ use Behat\Mink\WebAssert;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Panther\Client;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\FunctionExecutor;
-use Zenstruck\Browser\Mink\PantherBrowserKitDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -32,10 +31,8 @@ class Browser implements ContainerAwareInterface
 
     public function __construct(AbstractBrowser $inner)
     {
-        $driver = $inner instanceof Client ? new PantherBrowserKitDriver($inner) : new BrowserKitDriver($inner);
-
         $this->inner = $inner;
-        $this->mink = new Mink([self::SESSION => new Session($driver)]);
+        $this->mink = new Mink([self::SESSION => new Session($this->createMinkDriver())]);
     }
 
     final public function setContainer(?ContainerInterface $container = null): void
@@ -106,5 +103,10 @@ class Browser implements ContainerAwareInterface
     {
         $this->dump($selector);
         exit(1);
+    }
+
+    protected function createMinkDriver(): DriverInterface
+    {
+        return new BrowserKitDriver($this->inner());
     }
 }
