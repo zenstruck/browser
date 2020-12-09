@@ -400,5 +400,35 @@ trait BrowserTests
         $this->assertSame('bar', $dumpedValues[1]);
     }
 
+    /**
+     * @test
+     */
+    public function can_dump_json_path_expression(): void
+    {
+        $dumpedValues[] = null;
+
+        VarDumper::setHandler(function($var) use (&$dumpedValues) {
+            $dumpedValues[] = $var;
+        });
+
+        $this->browser()
+            ->post('/json', ['json' => [
+                'foo' => [
+                    'bar' => ['baz' => 1],
+                    'bam' => ['baz' => 2],
+                    'boo' => ['baz' => 3],
+                ],
+            ]])
+            ->dump('foo.*.baz')
+        ;
+
+        VarDumper::setHandler();
+
+        // a null value is added to the beginning
+        $dumpedValues = \array_values(\array_filter($dumpedValues));
+
+        $this->assertSame([1, 2, 3], $dumpedValues[1]);
+    }
+
     abstract protected static function browserClass(): string;
 }

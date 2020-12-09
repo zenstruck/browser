@@ -15,6 +15,7 @@ use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\FunctionExecutor;
+use function JmesPath\search;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -117,6 +118,10 @@ class Browser implements ContainerAwareInterface
         }
 
         $array = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if ($selector && \function_exists('JmesPath\search')) {
+            return search($selector, $array);
+        }
 
         return $selector ? $array[$selector] : $array;
     }

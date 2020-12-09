@@ -219,10 +219,17 @@ $browser
         // access the current Browser instance
     })
 
-    ->dump() // dump() the html on the page (then continue)
-    ->dump('h1') // dump() the h1 tag (then continue)
-    ->dd() // dd() the html on the page
-    ->dd('h1') // dd() the h1 tag
+    // the following use symfony/var-dumper's dump() function and continue
+    ->dump() // raw response body or array if json
+    ->dump('h1') // html element
+    ->dump('foo') // if json response, array key
+    ->dump('foo.*.baz') // if json response and mtdowling/jmespath.php installed, can use jmes path notation
+
+    // the following use symfony/var-dumper's dd() function ("dump & die")
+    ->dd() // raw response body or array if json
+    ->dd('h1') // html element
+    ->dd('foo') // if json response, array key
+    ->dd('foo.*.baz') // if json response and mtdowling/jmespath.php installed, can use jmes path notation
 ;
 
 // KernelBrowser/HttpBrowser has access to the profiler

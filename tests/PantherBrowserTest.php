@@ -81,6 +81,14 @@ final class PantherBrowserTest extends PantherTestCase
         $this->markTestSkipped('Panther does not support json responses.');
     }
 
+    /**
+     * @test
+     */
+    public function can_dump_json_path_expression(): void
+    {
+        $this->markTestSkipped('Panther does not support json responses.');
+    }
+
     protected static function browserClass(): string
     {
         return PantherBrowser::class;
