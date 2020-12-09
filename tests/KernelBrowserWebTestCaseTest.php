@@ -4,16 +4,18 @@ namespace Zenstruck\Browser\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Browser\Extension\Email;
+use Zenstruck\Browser\Extension\Json;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Test\HasKernelBrowser;
 use Zenstruck\Browser\Tests\Extension\EmailTests;
+use Zenstruck\Browser\Tests\Extension\JsonTests;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class KernelBrowserWebTestCaseTest extends WebTestCase
 {
-    use BrowserTests, EmailTests, HasKernelBrowser, KernelBrowserTests, ProfileAwareTests;
+    use BrowserTests, EmailTests, HasKernelBrowser, JsonTests, KernelBrowserTests, ProfileAwareTests;
 
     /**
      * @test
@@ -45,6 +47,13 @@ final class KernelBrowserWebTestCaseTest extends WebTestCase
     {
         return new class(static::createClient()) extends KernelBrowser {
             use Email;
+        };
+    }
+
+    protected function createJsonBrowser(): KernelBrowser
+    {
+        return new class(static::createClient()) extends KernelBrowser {
+            use Json;
         };
     }
 }
