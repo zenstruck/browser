@@ -58,6 +58,11 @@ final class Kernel extends BaseKernel
         ]);
     }
 
+    public function json(Request $request): JsonResponse
+    {
+        return new JsonResponse($request->getContent(), 200, [], true);
+    }
+
     public function exception(): void
     {
         throw new \Exception('exception thrown');
@@ -138,5 +143,6 @@ final class Kernel extends BaseKernel
         $routes->add('/redirect2', 'kernel::redirect2');
         $routes->add('/redirect3', 'kernel::redirect3');
         $routes->add('/send-email', 'kernel::sendEmail');
+        $routes->add('/json', 'kernel::json');
     }
 }

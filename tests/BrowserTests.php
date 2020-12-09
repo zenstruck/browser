@@ -352,5 +352,53 @@ trait BrowserTests
         $this->assertStringContainsString('/page1', $dumpedValues[2]);
     }
 
+    /**
+     * @test
+     */
+    public function can_dump_json_response_as_array(): void
+    {
+        $dumpedValues[] = null;
+
+        VarDumper::setHandler(function($var) use (&$dumpedValues) {
+            $dumpedValues[] = $var;
+        });
+
+        $this->browser()
+            ->post('/json', ['json' => $expected = ['foo' => 'bar']])
+            ->dump()
+        ;
+
+        VarDumper::setHandler();
+
+        // a null value is added to the beginning
+        $dumpedValues = \array_values(\array_filter($dumpedValues));
+
+        $this->assertSame($expected, $dumpedValues[1]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_dump_json_array_key(): void
+    {
+        $dumpedValues[] = null;
+
+        VarDumper::setHandler(function($var) use (&$dumpedValues) {
+            $dumpedValues[] = $var;
+        });
+
+        $this->browser()
+            ->post('/json', ['json' => ['foo' => 'bar']])
+            ->dump('foo')
+        ;
+
+        VarDumper::setHandler();
+
+        // a null value is added to the beginning
+        $dumpedValues = \array_values(\array_filter($dumpedValues));
+
+        $this->assertSame('bar', $dumpedValues[1]);
+    }
+
     abstract protected static function browserClass(): string;
 }

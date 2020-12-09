@@ -92,9 +92,7 @@ class Browser implements ContainerAwareInterface
     {
         $context = 'URL: '.$this->minkSession()->getCurrentUrl().', STATUS: '.$this->inner()->getInternalResponse()->getStatusCode();
 
-        dump($context);
-        dump($selector ? $this->documentElement()->find('css', $selector)->getHtml() : $this->documentElement()->getContent());
-        dump($context);
+        dump($context, $this->normalizeDumpValue($selector), $context);
 
         return $this;
     }
@@ -108,5 +106,18 @@ class Browser implements ContainerAwareInterface
     protected function createMinkDriver(): DriverInterface
     {
         return new BrowserKitDriver($this->inner());
+    }
+
+    private function normalizeDumpValue(?string $selector = null)
+    {
+        $response = $this->inner()->getInternalResponse();
+
+        if (!str_contains((string) $response->getHeader('content-type'), 'application/json')) {
+            return $selector ? $this->documentElement()->find('css', $selector)->getHtml() : $this->documentElement()->getContent();
+        }
+
+        $array = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        return $selector ? $array[$selector] : $array;
     }
 }

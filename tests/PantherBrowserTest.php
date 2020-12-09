@@ -65,6 +65,22 @@ final class PantherBrowserTest extends PantherTestCase
         $this->markTestSkipped('Panther can only make "GET" requests.');
     }
 
+    /**
+     * @test
+     */
+    public function can_dump_json_response_as_array(): void
+    {
+        $this->markTestSkipped('Panther does not support json responses.');
+    }
+
+    /**
+     * @test
+     */
+    public function can_dump_json_array_key(): void
+    {
+        $this->markTestSkipped('Panther does not support json responses.');
+    }
+
     protected static function browserClass(): string
     {
         return PantherBrowser::class;
