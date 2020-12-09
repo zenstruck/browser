@@ -48,11 +48,13 @@ final class PantherBrowserTest extends PantherTestCase
     }
 
     /**
+     * TODO - this should be possible as Panther has access to the page source.
+     *
      * @test
      */
     public function html_head_assertions(): void
     {
-        $this->markTestSkipped('Panther cannot access <head>.');
+        $this->markTestIncomplete('Panther cannot access <head>.');
     }
 
     /**
