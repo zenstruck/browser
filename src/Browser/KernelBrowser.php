@@ -21,6 +21,8 @@ class KernelBrowser extends BrowserKitBrowser
      * By default, exceptions made during a request are caught and converted
      * to responses by Symfony. This disables this behaviour and actually
      * throws the exception.
+     *
+     * @return static
      */
     final public function throwExceptions(): self
     {
@@ -32,6 +34,8 @@ class KernelBrowser extends BrowserKitBrowser
     /**
      * Enable profiling for the next request. Not required if profiling is
      * globally enabled.
+     *
+     * @return static
      */
     final public function withProfiling(): self
     {

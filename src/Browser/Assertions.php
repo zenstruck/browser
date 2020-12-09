@@ -10,6 +10,9 @@ use PHPUnit\Framework\Assert as PHPUnit;
  */
 trait Assertions
 {
+    /**
+     * @return static
+     */
     final public function assertOn(string $expected): self
     {
         $expected = \parse_url($expected);
@@ -29,6 +32,9 @@ trait Assertions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function assertStatus(int $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -36,6 +42,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertSuccessful(): self
     {
         $status = $this->minkSession()->getStatusCode();
@@ -45,6 +54,9 @@ trait Assertions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function assertRedirected(): self
     {
         $status = $this->minkSession()->getStatusCode();
@@ -54,6 +66,9 @@ trait Assertions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function assertResponseContains(string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -61,6 +76,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertResponseNotContains(string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -68,6 +86,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertHeaderEquals(string $header, string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -75,6 +96,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertHeaderContains(string $header, string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -82,6 +106,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertSee(string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -89,6 +116,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertNotSee(string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -96,6 +126,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertSeeIn(string $selector, string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -103,6 +136,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertNotSeeIn(string $selector, string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -110,6 +146,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertSeeElement(string $selector): self
     {
         return $this->wrapMinkExpectation(
@@ -117,6 +156,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertNotSeeElement(string $selector): self
     {
         return $this->wrapMinkExpectation(
@@ -124,6 +166,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertElementCount(string $selector, int $count): self
     {
         return $this->wrapMinkExpectation(
@@ -131,6 +176,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertFieldEquals(string $selector, string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -138,6 +186,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertChecked(string $selector): self
     {
         return $this->wrapMinkExpectation(
@@ -145,6 +196,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertNotChecked(string $selector): self
     {
         return $this->wrapMinkExpectation(
@@ -152,6 +206,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertElementAttributeContains(string $selector, string $attribute, string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -159,6 +216,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final public function assertElementAttributeNotContains(string $selector, string $attribute, string $expected): self
     {
         return $this->wrapMinkExpectation(
@@ -166,6 +226,9 @@ trait Assertions
         );
     }
 
+    /**
+     * @return static
+     */
     final protected function wrapMinkExpectation(callable $callback): self
     {
         try {

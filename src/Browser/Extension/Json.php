@@ -11,6 +11,8 @@ trait Json
 {
     /**
      * @see JsonComponent::assertMatches()
+     *
+     * @return static
      */
     final public function assertJsonMatches(string $expression, $expected): self
     {

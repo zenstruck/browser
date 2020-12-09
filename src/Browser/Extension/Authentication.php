@@ -11,6 +11,9 @@ namespace Zenstruck\Browser\Extension;
  */
 trait Authentication
 {
+    /**
+     * @return static
+     */
     public function loginAs(string $username, string $password): self
     {
         return $this
@@ -21,11 +24,17 @@ trait Authentication
         ;
     }
 
+    /**
+     * @return static
+     */
     public function logout(): self
     {
         return $this->visit('/logout');
     }
 
+    /**
+     * @return static
+     */
     public function assertLoggedIn(): self
     {
         $this->assertSee('Logout');
@@ -33,6 +42,9 @@ trait Authentication
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function assertLoggedInAs(string $user): self
     {
         $this->assertSee($user);
@@ -40,6 +52,9 @@ trait Authentication
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function assertNotLoggedIn(): self
     {
         $this->assertSee('Login');

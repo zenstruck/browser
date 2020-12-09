@@ -11,6 +11,8 @@ trait Email
 {
     /**
      * @see EmailComponent::assertNoEmailSent()
+     *
+     * @return static
      */
     final public function assertNoEmailSent(): self
     {
@@ -21,6 +23,8 @@ trait Email
 
     /**
      * @see EmailComponent::assertEmailSentTo()
+     *
+     * @return static
      */
     final public function assertEmailSentTo(string $expectedTo, $callback): self
     {

@@ -16,6 +16,9 @@ class PantherBrowser extends Browser
         parent::__construct(new PantherBrowserKitDriver($client));
     }
 
+    /**
+     * @return static
+     */
     final public function inspect(): self
     {
         if (!($_SERVER['PANTHER_NO_HEADLESS'] ?? false)) {

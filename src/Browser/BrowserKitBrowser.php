@@ -25,6 +25,9 @@ abstract class BrowserKitBrowser extends Browser implements ProfileAware
         return $this->inner;
     }
 
+    /**
+     * @return static
+     */
     final public function interceptRedirects(): self
     {
         $this->inner->followRedirects(false);
@@ -32,6 +35,9 @@ abstract class BrowserKitBrowser extends Browser implements ProfileAware
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function followRedirect(): self
     {
         $this->inner->followRedirect();
@@ -39,6 +45,9 @@ abstract class BrowserKitBrowser extends Browser implements ProfileAware
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function assertRedirectedTo(string $expected): self
     {
         $this->assertRedirected();
@@ -50,6 +59,8 @@ abstract class BrowserKitBrowser extends Browser implements ProfileAware
 
     /**
      * @param HttpOptions|array $options @see HttpOptions::DEFAULT_OPTIONS
+     *
+     * @return static
      */
     final public function request(string $method, string $url, $options = []): self
     {
@@ -62,6 +73,8 @@ abstract class BrowserKitBrowser extends Browser implements ProfileAware
 
     /**
      * @see request()
+     *
+     * @return static
      */
     final public function get(string $url, $options = []): self
     {
@@ -70,6 +83,8 @@ abstract class BrowserKitBrowser extends Browser implements ProfileAware
 
     /**
      * @see request()
+     *
+     * @return static
      */
     final public function post(string $url, $options = []): self
     {
@@ -78,6 +93,8 @@ abstract class BrowserKitBrowser extends Browser implements ProfileAware
 
     /**
      * @see request()
+     *
+     * @return static
      */
     final public function put(string $url, $options = []): self
     {
@@ -86,6 +103,8 @@ abstract class BrowserKitBrowser extends Browser implements ProfileAware
 
     /**
      * @see request()
+     *
+     * @return static
      */
     final public function delete(string $url, $options = []): self
     {
