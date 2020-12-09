@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
@@ -295,6 +296,60 @@ trait BrowserTests
             ->assertResponseContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
             ->assertResponseContains('"input_6":["option 1","option 3"]')
         ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_dump_response(): void
+    {
+        $dumpedValues[] = null;
+
+        VarDumper::setHandler(function($var) use (&$dumpedValues) {
+            $dumpedValues[] = $var;
+        });
+
+        $this->browser()
+            ->visit('/page1')
+            ->dump()
+        ;
+
+        VarDumper::setHandler();
+
+        // a null value is added to the beginning
+        $dumpedValues = \array_values(\array_filter($dumpedValues));
+
+        $this->assertCount(3, $dumpedValues);
+        $this->assertStringContainsString('/page1', $dumpedValues[0]);
+        $this->assertStringContainsString('<h1>h1 title</h1>', $dumpedValues[1]);
+        $this->assertStringContainsString('/page1', $dumpedValues[2]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_dump_html_element(): void
+    {
+        $dumpedValues[] = null;
+
+        VarDumper::setHandler(function($var) use (&$dumpedValues) {
+            $dumpedValues[] = $var;
+        });
+
+        $this->browser()
+            ->visit('/page1')
+            ->dump('p#link')
+        ;
+
+        VarDumper::setHandler();
+
+        // a null value is added to the beginning
+        $dumpedValues = \array_values(\array_filter($dumpedValues));
+
+        $this->assertCount(3, $dumpedValues);
+        $this->assertStringContainsString('/page1', $dumpedValues[0]);
+        $this->assertSame('<a href="/page2">a link</a> not a link', $dumpedValues[1]);
+        $this->assertStringContainsString('/page1', $dumpedValues[2]);
     }
 
     abstract protected static function browserClass(): string;

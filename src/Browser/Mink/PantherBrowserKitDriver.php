@@ -188,6 +188,19 @@ final class PantherBrowserKitDriver extends CoreDriver
         return $this->client->executeScript($script);
     }
 
+    public function getHtml($xpath): string
+    {
+        // cut the tag itself (making innerHTML out of outerHTML)
+        return \preg_replace('/^<[^>]+>|<[^>]+>$/', '', $this->getOuterHtml($xpath));
+    }
+
+    public function getOuterHtml($xpath): string
+    {
+        $crawler = $this->filteredCrawler($xpath);
+
+        return $crawler->html();
+    }
+
     protected function findElementXpaths($xpath): array
     {
         $nodes = $this->crawler()->filterXPath($xpath);

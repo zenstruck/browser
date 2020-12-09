@@ -93,7 +93,7 @@ class Browser implements ContainerAwareInterface
         $context = 'URL: '.$this->minkSession()->getCurrentUrl().', STATUS: '.$this->inner()->getInternalResponse()->getStatusCode();
 
         dump($context);
-        dump($selector ? $this->documentElement()->find('css', $selector)->getText() : $this->documentElement()->getContent());
+        dump($selector ? $this->documentElement()->find('css', $selector)->getHtml() : $this->documentElement()->getContent());
         dump($context);
 
         return $this;
