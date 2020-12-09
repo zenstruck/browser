@@ -103,7 +103,7 @@ class HttpOptions
 
     final public function asJson($body = null): self
     {
-        return $this->withBody(null !== $body ? \json_encode($body, \JSON_THROW_ON_ERROR) : null)
+        return $this->withBody(null !== $body ? \json_encode($body, JSON_THROW_ON_ERROR) : null)
             ->withHeader('Content-Type', 'application/json')
             ->withHeader('Accept', 'application/json')
         ;

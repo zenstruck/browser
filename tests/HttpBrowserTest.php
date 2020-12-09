@@ -13,7 +13,7 @@ use Zenstruck\Browser\Tests\Extension\EmailTests;
  */
 final class HttpBrowserTest extends PantherTestCase
 {
-    use HasHttpBrowser, BrowserTests, ProfileAwareTests, EmailTests;
+    use BrowserTests, EmailTests, HasHttpBrowser, ProfileAwareTests;
 
     protected function createEmailBrowser(): HttpBrowser
     {

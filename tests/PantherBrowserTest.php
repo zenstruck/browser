@@ -13,7 +13,7 @@ use Zenstruck\Browser\Test\HasPantherBrowser;
  */
 final class PantherBrowserTest extends PantherTestCase
 {
-    use HasPantherBrowser, BrowserTests;
+    use BrowserTests, HasPantherBrowser;
 
     /**
      * @test

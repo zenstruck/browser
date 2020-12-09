@@ -13,7 +13,7 @@ use Zenstruck\Browser\Tests\Extension\EmailTests;
  */
 final class KernelBrowserKernelTestCaseTest extends KernelTestCase
 {
-    use HasKernelBrowser, BrowserTests, ProfileAwareTests, KernelBrowserTests, EmailTests;
+    use BrowserTests, EmailTests, HasKernelBrowser, KernelBrowserTests, ProfileAwareTests;
 
     protected function createEmailBrowser(): KernelBrowser
     {
