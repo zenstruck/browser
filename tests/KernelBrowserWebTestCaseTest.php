@@ -6,16 +6,13 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Browser\Extension\Email;
 use Zenstruck\Browser\Extension\Json;
 use Zenstruck\Browser\KernelBrowser;
-use Zenstruck\Browser\Test\HasKernelBrowser;
-use Zenstruck\Browser\Tests\Extension\EmailTests;
-use Zenstruck\Browser\Tests\Extension\JsonTests;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class KernelBrowserWebTestCaseTest extends WebTestCase
 {
-    use BrowserTests, EmailTests, HasKernelBrowser, JsonTests, KernelBrowserTests, ProfileAwareTests;
+    use KernelBrowserTests;
 
     /**
      * @test

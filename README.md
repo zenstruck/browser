@@ -152,10 +152,6 @@ $browser
     ->selectFieldOptions('Notification', ['Email', 'SMS']) // multi-option select
     ->attachFile('Photo', '/path/to/photo.jpg')
     ->press('Submit')
-
-    // Follows a redirect if ->interceptRedirects() has been turned on
-    // (NOTE: Not available for PantherBrowser)
-    ->followRedirect()
 ;
 ```
 
@@ -192,9 +188,6 @@ $browser
     ->assertSuccessful() // 2xx status code
     ->assertRedirected() // 3xx status code
     ->assertHeaderContains('Content-Type', 'text/html; charset=UTF-8')
-
-    // combination of assertRedirected(), followRedirect(), assertOn()
-    ->assertRedirectedTo('/some/page')
 ;
 ```
 
@@ -203,14 +196,7 @@ $browser
 ```php
 /** @var \Zenstruck\Browser $browser **/
 
-// convenience methods
-$browser->container(); // the test service container (all services are public)
-
 $browser
-    // by default, redirects are followed, this disables that behaviour
-    // (NOTE: not available for PantherBrowser)
-    ->interceptRedirects()
-
     ->with(function() {
         // do something without breaking
     })
@@ -231,26 +217,68 @@ $browser
     ->dd('foo') // if json response, array key
     ->dd('foo.*.baz') // if json response and mtdowling/jmespath.php installed, can use jmes path notation
 ;
+```
 
-// KernelBrowser/HttpBrowser has access to the profiler
-// HttpBrowser requires profiling have collect globally enabled
-$queryCount = $browser->profile()->getCollector('db')->getQueryCount();
+### Profiler Access
 
-// KernelBrowser specific methods
+*Only available on `KernelBrowser`/`HttpBrowser`.*
+
+```php
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
+
+$queryCount = $browser
+    // enable the profiler for the next request (if not globally enabled)
+    // (NOTE: Not available for HttpBrowser)
+    ->withProfiling()
+    ->visit('/page')
+    
+    // HttpBrowser requires profiling have collect globally enabled.
+    // If not globally enabled and using KernelBrowser, ->withProfiling()
+    // must be called before the request.
+    ->profile()->getCollector('db')->getQueryCount()
+;
+````
+
+### Redirect Handling
+
+*Only available on `KernelBrowser`/`HttpBrowser`.*
+
+```php
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
+
+$browser
+    // by default, redirects are followed, this disables that behaviour
+    ->interceptRedirects()
+
+    // Follows a redirect if ->interceptRedirects() has been turned on
+    ->followRedirect()
+
+    // combination of assertRedirected(), followRedirect(), assertOn()
+    ->assertRedirectedTo('/some/page')
+;
+````
+
+### Exception Handling
+
+*Only available on `KernelBrowser`.*
+
+```php
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
+
 $browser
     // by default, exceptions are caught and converted to a response
     // this disables that behaviour allowing you to use TestCase::expectException()
     ->throwExceptions()
-
-    // enable the profiler for the next request (if not globally enabled)
-    ->withProfiling()
+    ->visit('/page')
 ;
-```
+````
 
 ### Http Actions
 
+*Only available on `KernelBrowser`/`HttpBrowser`.*
+
 ```php
-/** @var \Zenstruck\Browser $browser **/
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
 // http request actions (NOTE: these are not available for PantherBrowser)
 use Zenstruck\Browser\HttpOptions;

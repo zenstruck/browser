@@ -21,7 +21,7 @@ final class JsonComponent extends Component
             throw new \RuntimeException('mtdowling/jmespath.php requires (composer require --dev mtdowling/jmespath.php).');
         }
 
-        $data = \json_decode($this->browser()->inner()->getInternalResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $data = \json_decode($this->browser()->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         PHPUnit::assertSame($expected, search($expression, $data));
 

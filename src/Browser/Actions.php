@@ -14,50 +14,6 @@ trait Actions
         return $this;
     }
 
-    /**
-     * @param HttpOptions|array $options @see HttpOptions::DEFAULT_OPTIONS
-     */
-    final public function request(string $method, string $url, $options = []): self
-    {
-        $options = HttpOptions::create($options);
-
-        $this->inner()->request($method, $url, $options->parameters(), $options->files(), $options->server(), $options->body());
-
-        return $this;
-    }
-
-    /**
-     * @see request()
-     */
-    final public function get(string $url, $options = []): self
-    {
-        return $this->request('GET', $url, $options);
-    }
-
-    /**
-     * @see request()
-     */
-    final public function post(string $url, $options = []): self
-    {
-        return $this->request('POST', $url, $options);
-    }
-
-    /**
-     * @see request()
-     */
-    final public function put(string $url, $options = []): self
-    {
-        return $this->request('PUT', $url, $options);
-    }
-
-    /**
-     * @see request()
-     */
-    final public function delete(string $url, $options = []): self
-    {
-        return $this->request('DELETE', $url, $options);
-    }
-
     final public function follow(string $link): self
     {
         $this->documentElement()->clickLink($link);
@@ -112,13 +68,6 @@ trait Actions
     final public function press(string $selector): self
     {
         $this->documentElement()->pressButton($selector);
-
-        return $this;
-    }
-
-    final public function followRedirect(): self
-    {
-        $this->inner()->followRedirect();
 
         return $this;
     }

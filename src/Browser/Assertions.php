@@ -54,15 +54,6 @@ trait Assertions
         return $this;
     }
 
-    final public function assertRedirectedTo(string $expected): self
-    {
-        $this->assertRedirected();
-        $this->followRedirect();
-        $this->assertOn($expected);
-
-        return $this;
-    }
-
     final public function assertResponseContains(string $expected): self
     {
         return $this->wrapMinkExpectation(

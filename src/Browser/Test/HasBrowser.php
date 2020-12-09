@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Test;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Zenstruck\Browser;
 
 /**
@@ -22,7 +23,9 @@ trait HasBrowser
             static::bootKernel();
         }
 
-        $browser->setContainer(static::$container);
+        if ($browser instanceof ContainerAwareInterface) {
+            $browser->setContainer(static::$container);
+        }
 
         return $browser;
     }

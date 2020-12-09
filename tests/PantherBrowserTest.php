@@ -18,22 +18,6 @@ final class PantherBrowserTest extends PantherTestCase
     /**
      * @test
      */
-    public function can_intercept_redirects(): void
-    {
-        $this->markTestSkipped('Redirects cannot be intercepted with panther.');
-    }
-
-    /**
-     * @test
-     */
-    public function can_assert_redirected_to(): void
-    {
-        $this->markTestSkipped('Redirects cannot be intercepted with panther.');
-    }
-
-    /**
-     * @test
-     */
     public function exceptions_are_caught_by_default(): void
     {
         $this->markTestSkipped('Panther does not support response status codes.');
@@ -55,14 +39,6 @@ final class PantherBrowserTest extends PantherTestCase
     public function html_head_assertions(): void
     {
         $this->markTestIncomplete('Panther cannot access <head>.');
-    }
-
-    /**
-     * @test
-     */
-    public function http_method_actions(): void
-    {
-        $this->markTestSkipped('Panther can only make "GET" requests.');
     }
 
     /**

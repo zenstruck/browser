@@ -2,15 +2,12 @@
 
 namespace Zenstruck;
 
-use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Element\DocumentElement;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
-use Symfony\Component\BrowserKit\AbstractBrowser;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
 use Zenstruck\Browser\Component;
@@ -20,39 +17,17 @@ use function JmesPath\search;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class Browser implements ContainerAwareInterface
+class Browser
 {
     use Actions, Assertions;
 
     private const SESSION = 'app';
 
-    private AbstractBrowser $inner;
     private Mink $mink;
-    private ?ContainerInterface $container = null;
 
-    public function __construct(AbstractBrowser $inner)
+    public function __construct(DriverInterface $driver)
     {
-        $this->inner = $inner;
-        $this->mink = new Mink([self::SESSION => new Session($this->createMinkDriver())]);
-    }
-
-    final public function setContainer(?ContainerInterface $container = null): void
-    {
-        $this->container = $container;
-    }
-
-    final public function container(): ContainerInterface
-    {
-        if (!$this->container) {
-            throw new \RuntimeException('Container has not been set.');
-        }
-
-        return $this->container;
-    }
-
-    final public function inner(): AbstractBrowser
-    {
-        return $this->inner;
+        $this->mink = new Mink([self::SESSION => new Session($driver)]);
     }
 
     final public function minkSession(): Session
@@ -70,13 +45,6 @@ class Browser implements ContainerAwareInterface
         return $this->minkSession()->getPage();
     }
 
-    final public function interceptRedirects(): self
-    {
-        $this->inner->followRedirects(false);
-
-        return $this;
-    }
-
     final public function with(callable $callback): self
     {
         FunctionExecutor::createFor($callback)
@@ -91,7 +59,12 @@ class Browser implements ContainerAwareInterface
 
     final public function dump(?string $selector = null): self
     {
-        $context = 'URL: '.$this->minkSession()->getCurrentUrl().', STATUS: '.$this->inner()->getInternalResponse()->getStatusCode();
+        $context = 'URL: '.$this->minkSession()->getCurrentUrl();
+
+        try {
+            $context .= ', STATUS: '.$this->minkSession()->getStatusCode();
+        } catch (UnsupportedDriverActionException $e) {
+        }
 
         dump($context, $this->normalizeDumpValue($selector), $context);
 
@@ -104,20 +77,19 @@ class Browser implements ContainerAwareInterface
         exit(1);
     }
 
-    protected function createMinkDriver(): DriverInterface
-    {
-        return new BrowserKitDriver($this->inner());
-    }
-
     private function normalizeDumpValue(?string $selector = null)
     {
-        $response = $this->inner()->getInternalResponse();
+        try {
+            $contentType = $this->minkSession()->getResponseHeader('content-type');
+        } catch (UnsupportedDriverActionException $e) {
+            $contentType = null;
+        }
 
-        if (!str_contains((string) $response->getHeader('content-type'), 'application/json')) {
+        if (!str_contains((string) $contentType, 'application/json')) {
             return $selector ? $this->documentElement()->find('css', $selector)->getHtml() : $this->documentElement()->getContent();
         }
 
-        $array = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $array = \json_decode($this->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         if ($selector && \function_exists('JmesPath\search')) {
             return search($selector, $array);

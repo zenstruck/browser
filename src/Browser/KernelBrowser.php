@@ -4,14 +4,13 @@ namespace Zenstruck\Browser;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
-use Zenstruck\Browser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @method SymfonyKernelBrowser inner()
  */
-class KernelBrowser extends Browser implements ProfileAware
+class KernelBrowser extends BrowserKitBrowser
 {
     final public function __construct(SymfonyKernelBrowser $inner)
     {

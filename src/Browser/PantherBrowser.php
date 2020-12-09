@@ -2,21 +2,18 @@
 
 namespace Zenstruck\Browser;
 
-use Behat\Mink\Driver\DriverInterface;
 use Symfony\Component\Panther\Client;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\PantherBrowserKitDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @method Client inner()
  */
 class PantherBrowser extends Browser
 {
-    final public function __construct(Client $inner)
+    final public function __construct(Client $client)
     {
-        parent::__construct($inner);
+        parent::__construct(new PantherBrowserKitDriver($client));
     }
 
     final public function inspect(): self
@@ -29,10 +26,5 @@ class PantherBrowser extends Browser
         \fgets(STDIN);
 
         return $this;
-    }
-
-    protected function createMinkDriver(): DriverInterface
-    {
-        return new PantherBrowserKitDriver($this->inner());
     }
 }

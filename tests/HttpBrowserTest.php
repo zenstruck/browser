@@ -15,7 +15,7 @@ use Zenstruck\Browser\Tests\Extension\JsonTests;
  */
 final class HttpBrowserTest extends PantherTestCase
 {
-    use BrowserTests, EmailTests, HasHttpBrowser, JsonTests, ProfileAwareTests;
+    use BrowserKitBrowserTests, BrowserTests, EmailTests, HasHttpBrowser, JsonTests, ProfileAwareTests;
 
     protected function createEmailBrowser(): HttpBrowser
     {
