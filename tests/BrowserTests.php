@@ -17,6 +17,21 @@ trait BrowserTests
     /**
      * @test
      */
+    public function assert_on(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->assertOn('/page1')
+            ->assertNotOn('/page2')
+            ->visit('/page1?foo=bar')
+            ->assertOn('/page1?foo=bar')
+            ->assertNotOn('/page1?foo=baz')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_use_with(): void
     {
         $this->browser()

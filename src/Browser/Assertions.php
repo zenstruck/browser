@@ -15,19 +15,17 @@ trait Assertions
      */
     final public function assertOn(string $expected): self
     {
-        $expected = \parse_url($expected);
-        $actual = \parse_url(\urldecode($this->minkSession()->getCurrentUrl()));
+        PHPUnit::assertSame(self::cleanUrl($expected), self::cleanUrl($this->minkSession()->getCurrentUrl()));
 
-        unset(
-            $expected['host'],
-            $expected['scheme'],
-            $expected['port'],
-            $actual['host'],
-            $actual['scheme'],
-            $actual['port']
-        );
+        return $this;
+    }
 
-        PHPUnit::assertSame($expected, $actual);
+    /**
+     * @return static
+     */
+    final public function assertNotOn(string $expected): self
+    {
+        PHPUnit::assertNotSame(self::cleanUrl($expected), self::cleanUrl($this->minkSession()->getCurrentUrl()));
 
         return $this;
     }
@@ -283,5 +281,14 @@ trait Assertions
         }
 
         return $this;
+    }
+
+    private static function cleanUrl(string $url): array
+    {
+        $parts = \parse_url(\urldecode($url));
+
+        unset($parts['host'], $parts['scheme'], $parts['port']);
+
+        return $parts;
     }
 }
