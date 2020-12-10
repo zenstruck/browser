@@ -175,6 +175,9 @@ trait BrowserTests
             ->assertNotChecked('Input 2')
             ->assertNotChecked('input2')
             ->assertNotChecked('input_2')
+            ->assertFieldEquals('Input 4', 'option 1')
+            ->assertFieldEquals('input4', 'option 1')
+            ->assertFieldEquals('input_4', 'option 1')
         ;
     }
 
@@ -193,7 +196,31 @@ trait BrowserTests
     /**
      * @test
      */
-    public function form_actions(): void
+    public function form_actions_by_field_label(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->fillField('Input 1', 'Kevin')
+            ->checkField('Input 2')
+            ->uncheckField('Input 3')
+            ->selectFieldOption('Input 4', 'option 2')
+            ->attachFile('Input 5', __FILE__)
+            ->selectFieldOptions('Input 6', ['option 1', 'option 3'])
+            ->press('Submit')
+            ->assertOn('/submit-form')
+            ->assertResponseContains('"input_1":"Kevin"')
+            ->assertResponseContains('"input_2":"on"')
+            ->assertResponseNotContains('"input_3')
+            ->assertResponseContains('"input_4":"option 2"')
+            ->assertResponseContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+            ->assertResponseContains('"input_6":["option 1","option 3"]')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function form_actions_by_field_id(): void
     {
         $this->browser()
             ->visit('/page1')
@@ -203,6 +230,30 @@ trait BrowserTests
             ->selectFieldOption('input4', 'option 2')
             ->attachFile('input5', __FILE__)
             ->selectFieldOptions('input6', ['option 1', 'option 3'])
+            ->press('Submit')
+            ->assertOn('/submit-form')
+            ->assertResponseContains('"input_1":"Kevin"')
+            ->assertResponseContains('"input_2":"on"')
+            ->assertResponseNotContains('"input_3')
+            ->assertResponseContains('"input_4":"option 2"')
+            ->assertResponseContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+            ->assertResponseContains('"input_6":["option 1","option 3"]')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function form_actions_by_field_name(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->fillField('input_1', 'Kevin')
+            ->checkField('input_2')
+            ->uncheckField('input_3')
+            ->selectFieldOption('input_4', 'option 2')
+            ->attachFile('input_5', __FILE__)
+            ->selectFieldOptions('input_6[]', ['option 1', 'option 3'])
             ->press('Submit')
             ->assertOn('/submit-form')
             ->assertResponseContains('"input_1":"Kevin"')
