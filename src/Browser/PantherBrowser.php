@@ -4,7 +4,7 @@ namespace Zenstruck\Browser;
 
 use Symfony\Component\Panther\Client;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Mink\PantherBrowserKitDriver;
+use Zenstruck\Browser\Mink\PantherDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -13,7 +13,7 @@ class PantherBrowser extends Browser
 {
     final public function __construct(Client $client)
     {
-        parent::__construct(new PantherBrowserKitDriver($client));
+        parent::__construct(new PantherDriver($client));
     }
 
     /**

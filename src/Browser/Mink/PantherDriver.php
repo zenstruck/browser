@@ -23,7 +23,7 @@ use Symfony\Component\Panther\DomCrawler\Field\TextareaFormField;
  * @author Robert Freigang <robertfreigang@gmx.de>
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PantherBrowserKitDriver extends CoreDriver
+final class PantherDriver extends CoreDriver
 {
     private Client $client;
     private bool $started = false;
