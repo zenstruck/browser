@@ -178,10 +178,22 @@ $browser
     ->assertElementAttributeContains('head meta[name=description]', 'content', 'my description')
     ->assertElementAttributeNotContains('head meta[name=description]', 'content', 'my description')
 
-    // form assertions
+    // form field assertions
     ->assertFieldEquals('Username', 'kevin')
+    ->assertFieldNotEquals('Username', 'john')
+    
+    // form checkbox assertions
     ->assertChecked('Accept Terms')
     ->assertNotChecked('Accept Terms')
+    
+    // form select assertions
+    ->assertSelected('Type', 'Employee')
+    ->assertNotSelected('Type', 'Admin')
+    
+    // form multi-select assertions
+    ->assertSelected('Roles', 'Content Editor')
+    ->assertSelected('Roles', 'Human Resources')
+    ->assertNotSelected('Roles', 'Owner')
 
     // response assertions (NOTE: these are not available for PantherBrowser)
     ->assertStatus(200)

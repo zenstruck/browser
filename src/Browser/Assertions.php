@@ -189,6 +189,50 @@ trait Assertions
     /**
      * @return static
      */
+    final public function assertFieldNotEquals(string $selector, string $expected): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->fieldValueNotEquals($selector, $expected)
+        );
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertSelected(string $selector, string $expected): self
+    {
+        try {
+            $field = $this->webAssert()->fieldExists($selector);
+            PHPUnit::assertTrue(true);
+        } catch (ExpectationException $e) {
+            PHPUnit::fail($e->getMessage());
+        }
+
+        PHPUnit::assertContains($expected, (array) $field->getValue());
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertNotSelected(string $selector, string $expected): self
+    {
+        try {
+            $field = $this->webAssert()->fieldExists($selector);
+            PHPUnit::assertTrue(true);
+        } catch (ExpectationException $e) {
+            PHPUnit::fail($e->getMessage());
+        }
+
+        PHPUnit::assertNotContains($expected, (array) $field->getValue());
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
     final public function assertChecked(string $selector): self
     {
         return $this->wrapMinkExpectation(
