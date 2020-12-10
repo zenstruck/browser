@@ -2,9 +2,9 @@
 
 namespace Zenstruck\Browser;
 
-use Behat\Mink\Driver\BrowserKitDriver;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Zenstruck\Browser;
+use Zenstruck\Browser\Mink\BrowserKitDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
