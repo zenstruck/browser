@@ -27,7 +27,16 @@ trait HasBrowser
             $browser->setContainer(static::$container);
         }
 
+        $this->configureBrowser($browser);
+
         return $browser;
+    }
+
+    /**
+     * Override to configure the Browser's initial state/options.
+     */
+    protected function configureBrowser(Browser $browser): void
+    {
     }
 
     abstract protected function createBrowser(): Browser;

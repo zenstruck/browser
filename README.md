@@ -422,6 +422,44 @@ and `assertEmailSentTo()` methods right onto your custom browser.
 
 ## Extending
 
+### Test Browser Configuration
+
+You can configure default options or a starting state for your browser in your tests by
+overriding the `configureBrowser`:
+
+```php
+namespace App\Tests;
+
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Zenstruck\Browser;
+use Zenstruck\Browser\KernelBrowser;
+use Zenstruck\Browser\Test\HasKernelBrowser;
+
+class MyTest extends WebTestCase
+{
+    use HasKernelBrowser;
+
+    public function testDemo(): void
+    {
+        $this->browser()
+            ->assertOn('/') // browser always starts on the homepage (as defined below)
+        ;
+    }
+
+    /**
+     * @param Browser|KernelBrowser $browser
+     */
+    protected function configureBrowser(Browser $browser): void
+    {
+        $browser
+            ->interceptRedirects() // always intercept redirects
+            ->throwExceptions() // always throw exceptions
+            ->visit('/') // always start on the homepage
+        ;
+    }
+}
+```
+
 ### Custom Components
 
 You may have pages or page parts that have specific actions/assertions you use
@@ -589,7 +627,7 @@ class MyTest extends WebTestCase
     /**
      * Alternatively, set the appropriate env variable: KERNEL_BROWSER_CLASS=App\Tests\AppBrowser
      */
-    protected static function kernelBrowserClass() : string
+    protected static function kernelBrowserClass(): string
     {
         return AppBrowser::class;
     }
