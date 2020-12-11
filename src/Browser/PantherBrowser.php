@@ -9,6 +9,8 @@ use Zenstruck\Browser\Mink\PantherDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @experimental in 1.0
  */
 class PantherBrowser extends Browser
 {

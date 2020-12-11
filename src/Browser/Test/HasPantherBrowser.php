@@ -8,6 +8,8 @@ use Zenstruck\Browser\PantherBrowser;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
+ * @experimental in 1.0
+ *
  * @method PantherBrowser browser()
  */
 trait HasPantherBrowser

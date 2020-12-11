@@ -34,6 +34,8 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
  * @ref https://github.com/minkphp/MinkBrowserKitDriver/pull/151
  *
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
+ *
+ * @internal
  */
 final class BrowserKitDriver extends CoreDriver
 {

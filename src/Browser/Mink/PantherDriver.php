@@ -18,10 +18,12 @@ use Symfony\Component\Panther\DomCrawler\Field\InputFormField;
 use Symfony\Component\Panther\DomCrawler\Field\TextareaFormField;
 
 /**
- * @credit https://github.com/robertfausk/mink-panther-driver
+ * @ref https://github.com/robertfausk/mink-panther-driver
  *
  * @author Robert Freigang <robertfreigang@gmx.de>
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class PantherDriver extends CoreDriver
 {

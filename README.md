@@ -342,6 +342,8 @@ $browser
 
 ### PantherBrowser Actions
 
+*The `PantherBrowser` is experimental in 1.0 and may be subject to BC Breaks.*
+
 ```php
 /** @var \Zenstruck\Browser\PantherBrowser $browser **/
 
