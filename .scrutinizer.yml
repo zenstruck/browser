@@ -3,6 +3,9 @@ filter:
 checks:
   php: true
 build:
+  environment:
+    php:
+      pecl_extensions: [zip]
   nodes:
     analysis:
       tests:
