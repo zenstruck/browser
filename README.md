@@ -1,5 +1,9 @@
 # zenstruck/browser
 
+[![CI Status](https://github.com/zenstruck/browser/workflows/CI/badge.svg)](https://github.com/zenstruck/browser/actions?query=workflow%3ACI)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/zenstruck/browser/badges/quality-score.png?b=1.x)](https://scrutinizer-ci.com/g/zenstruck/browser/?branch=1.x)
+[![Code Coverage](https://codecov.io/gh/zenstruck/browser/branch/1.x/graph/badge.svg?token=R7OHYYGPKM)](https://codecov.io/gh/zenstruck/browser)
+
 Functional testing with Symfony can be verbose. This library provides an expressive,
 auto-completable, fluent wrapper around Symfony's native functional testing features:
 
