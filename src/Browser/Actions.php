@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Browser;
 
+use Behat\Mink\Exception\ElementNotFoundException;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -94,7 +96,12 @@ trait Actions
      */
     final public function press(string $selector): self
     {
-        $this->documentElement()->pressButton($selector);
+        try {
+            $this->documentElement()->pressButton($selector);
+        } catch (ElementNotFoundException $e) {
+            // try link
+            $this->documentElement()->clickLink($selector);
+        }
 
         return $this;
     }

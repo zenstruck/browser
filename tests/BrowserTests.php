@@ -218,6 +218,9 @@ trait BrowserTests
             ->visit('/page1')
             ->follow('a link')
             ->assertOn('/page2')
+            ->visit('/page1')
+            ->press('a link')
+            ->assertOn('/page2')
         ;
     }
 
