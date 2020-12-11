@@ -35,6 +35,11 @@ final class Kernel extends BaseKernel
         return new Response('success');
     }
 
+    public function javascript(): Response
+    {
+        return new Response(\file_get_contents(__DIR__.'/files/javascript.html'));
+    }
+
     public function submitForm(Request $request): JsonResponse
     {
         return new JsonResponse(\array_merge(
@@ -144,5 +149,6 @@ final class Kernel extends BaseKernel
         $routes->add('/redirect3', 'kernel::redirect3');
         $routes->add('/send-email', 'kernel::sendEmail');
         $routes->add('/json', 'kernel::json');
+        $routes->add('/javascript', 'kernel::javascript');
     }
 }

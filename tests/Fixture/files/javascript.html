@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>meta title</title>
+    <meta name="description" content="meta description">
+</head>
+<body>
+<h1>Input Test</h1>
+<input id="input" type="text"><button id="submit">submit</button><button id="clear">clear</button>
+<div id="output"></div>
+<hr>
+
+<h1>Show Test</h1>
+<button id="show">show</button>
+<div style="display: none;" id="show-box">Contents of show box</div>
+<hr>
+
+<h1>Hide Test</h1>
+<button id="hide">hide</button>
+<div id="hide-box">Contents of hide box</div>
+<hr>
+
+<h1>Toggle Test</h1>
+<button id="toggle">toggle</button>
+<div id="toggle-box">Contents of toggle box</div>
+<hr>
+
+<h1>Timeout Test</h1>
+<div style="display: none" id="timeout-box">Contents of timeout box</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(function(){
+        $('#submit').click(function() {
+            $('#output').text($('#input').val());
+        });
+
+        $('#clear').click(function() {
+            $('#input').val('');
+            $('#output').text('');
+        });
+
+        window.setTimeout(function() {
+            $('#timeout-box').show();
+        }, 500);
+
+        $('#show').click(function() {
+            $('#show-box').show();
+        });
+        $('#hide').click(function() {
+            $('#hide-box').hide();
+        });
+        $('#toggle').click(function() {
+            $('#toggle-box').toggle();
+        });
+    });
+</script>
+</body>
+</html>

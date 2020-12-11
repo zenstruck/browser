@@ -39,6 +39,76 @@ final class PantherBrowserTest extends PantherTestCase
     /**
      * @test
      */
+    public function can_wait(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->assertNotSee('Contents of timeout box')
+            ->wait(600)
+            ->assertSee('Contents of timeout box')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_wait_until_visible_and_hidden(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->assertNotSee('Contents of timeout box')
+            ->waitUntilVisible('#timeout-box')
+            ->assertSee('Contents of timeout box')
+            ->assertNotSee('Contents of show box')
+            ->press('show')
+            ->waitUntilVisible('#show-box')
+            ->assertSee('Contents of show box')
+            ->assertSee('Contents of hide box')
+            ->press('hide')
+            ->waitUntilHidden('#hide-box')
+            ->assertNotSee('Contents of hide box')
+            ->assertSee('Contents of toggle box')
+            ->press('toggle')
+            ->waitUntilHidden('#toggle-box')
+            ->assertNotSee('Contents of toggle box')
+            ->press('toggle')
+            ->waitUntilVisible('#toggle-box')
+            ->assertSee('Contents of toggle box')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_wait_until_see_in_and_not_see_in(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->assertNotSee('Contents of timeout box')
+            ->waitUntilSeeIn('#timeout-box', 'timeout')
+            ->assertSee('Contents of timeout box')
+            ->assertNotSee('Contents of show box')
+            ->press('show')
+            ->waitUntilSeeIn('#show-box', 'show')
+            ->assertSee('Contents of show box')
+            ->assertSee('Contents of hide box')
+            ->press('hide')
+            ->waitUntilNotSeeIn('#hide-box', 'hide')
+            ->assertNotSee('Contents of hide box')
+            ->assertNotSee('some text')
+            ->fillField('input', 'some text')
+            ->press('submit')
+            ->waitUntilSeeIn('#output', 'some text')
+            ->assertSee('some text')
+            ->press('clear')
+            ->waitUntilNotSeeIn('#output', 'some text')
+            ->assertNotSee('some text')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function exceptions_are_caught_by_default(): void
     {
         $this->markTestSkipped('Panther does not support response status codes.');

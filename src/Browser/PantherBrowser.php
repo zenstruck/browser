@@ -26,6 +26,44 @@ class PantherBrowser extends Browser
     /**
      * @return static
      */
+    public function wait(int $milliseconds): self
+    {
+        \usleep($milliseconds * 1000);
+
+        return $this;
+    }
+
+    public function waitUntilVisible(string $selector): self
+    {
+        $this->client->waitForVisibility($selector);
+
+        return $this;
+    }
+
+    public function waitUntilHidden(string $selector): self
+    {
+        $this->client->waitForInvisibility($selector);
+
+        return $this;
+    }
+
+    public function waitUntilSeeIn(string $selector, string $expected): self
+    {
+        $this->client->waitForElementToContain($selector, $expected);
+
+        return $this;
+    }
+
+    public function waitUntilNotSeeIn(string $selector, string $expected): self
+    {
+        $this->client->waitForElementToNotContain($selector, $expected);
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
     final public function inspect(): self
     {
         if (!($_SERVER['PANTHER_NO_HEADLESS'] ?? false)) {
@@ -38,6 +76,9 @@ class PantherBrowser extends Browser
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function takeScreenshot(string $filename): self
     {
         $this->client->takeScreenshot($filename);
