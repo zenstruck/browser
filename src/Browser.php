@@ -45,7 +45,7 @@ class Browser
         return $this->minkSession()->getPage();
     }
 
-    final public function with(callable $callback): self
+    final public function use(callable $callback): self
     {
         FunctionExecutor::createFor($callback)
             ->replaceUntypedArgument($this)

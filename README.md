@@ -213,11 +213,11 @@ $browser
 /** @var \Zenstruck\Browser $browser **/
 
 $browser
-    ->with(function() {
+    ->use(function() {
         // do something without breaking
     })
 
-    ->with(function(\Zenstruck\Browser $browser) {
+    ->use(function(\Zenstruck\Browser $browser) {
         // access the current Browser instance
     })
 
@@ -382,7 +382,7 @@ use Zenstruck\Browser\Component\JsonComponent;
 /** @var \Zenstruck\Browser $browser **/
 $browser
     ->get('/api/endpoing')
-    ->with(function(JsonComponent $component) {
+    ->use(function(JsonComponent $component) {
         // automatically asserts the response's content-type is application/json
         $component
             ->assertMatches('foo.bar.baz', 1)
@@ -407,19 +407,19 @@ use Zenstruck\Browser\Component\Email\TestEmail;
 /** @var \Zenstruck\Browser $browser **/
 $browser
     ->visit('/page/that/does/not/send/email')
-    ->with(function(EmailComponent $component) {
+    ->use(function(EmailComponent $component) {
         $component->assertNoEmailSent();
     })
 
     ->visit('/page/that/sends/email')
     
     // just check that an email was sent to an address with a subject
-    ->with(function(EmailComponent $component) {
+    ->use(function(EmailComponent $component) {
         $component->assertEmailSentTo('kevin@example.com', 'Email Subject');
     })
     
     // advanced assertions
-    ->with(function(EmailComponent $component) {
+    ->use(function(EmailComponent $component) {
         $component->assertEmailSentTo('kevin@example.com', function(TestEmail $email) {
             $email
                 ->assertSubject('Email Subject')
@@ -551,7 +551,7 @@ Access and use this new component in your tests:
 
 $browser
     ->visit('/post/1')
-    ->with(function(CommentComponent $component) {
+    ->use(function(CommentComponent $component) {
         // the function typehint triggers the component to be loaded,
         // preActions() run and preAssertions() run
 
@@ -563,8 +563,8 @@ $browser
     })
 ;
 
-// you can optionally inject multiple components into the ->with() callback
-$browser->with(function(Component1 $component1, Component2 $component2) {
+// you can optionally inject multiple components into the ->use() callback
+$browser->use(function(Component1 $component1, Component2 $component2) {
     $component1->doSomething();
     $component2->doSomethingElse();
 });

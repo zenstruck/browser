@@ -30,14 +30,18 @@ trait BrowserTests
     /**
      * @test
      */
-    public function can_use_with(): void
+    public function can_use_current_browser(): void
     {
-        $this->browser()
-            ->with(function(Browser $browser) {
+        $browser = $this->browser();
+
+        $browser
+            ->use(function(Browser $b) use ($browser) {
+                $this->assertSame($b, $browser);
+
                 $browser->visit('/redirect1');
             })
             ->assertOn('/page1')
-            ->with(function() {
+            ->use(function() {
                 $this->assertTrue(true);
             })
         ;
@@ -49,7 +53,7 @@ trait BrowserTests
     public function can_use_components(): void
     {
         $this->browser()
-            ->with(function(TestComponent1 $component) {
+            ->use(function(TestComponent1 $component) {
                 $component->assertTitle('h1 title');
             })
             ->assertOn('/page1')
@@ -62,7 +66,7 @@ trait BrowserTests
     public function component_pre_assertions_and_actions_are_called(): void
     {
         $this->browser()
-            ->with(function(TestComponent2 $component) {
+            ->use(function(TestComponent2 $component) {
                 $this->assertTrue($component->preActionsCalled);
                 $this->assertTrue($component->preAssertionsCalled);
             })
@@ -75,7 +79,7 @@ trait BrowserTests
     public function with_can_accept_multiple_browsers_and_components(): void
     {
         $this->browser()
-            ->with(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2) {
+            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2) {
                 $this->assertInstanceOf(Browser::class, $browser1);
                 $this->assertInstanceOf(Browser::class, $browser2);
                 $this->assertInstanceOf($this->browserClass(), $browser1);
@@ -93,7 +97,7 @@ trait BrowserTests
     {
         $this->expectException(\TypeError::class);
 
-        $this->browser()->with(function(string $invalidType) {});
+        $this->browser()->use(function(string $invalidType) {});
     }
 
     /**

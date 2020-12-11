@@ -16,7 +16,7 @@ trait Email
      */
     final public function assertNoEmailSent(): self
     {
-        return $this->with(function(EmailComponent $component) {
+        return $this->use(function(EmailComponent $component) {
             $component->assertNoEmailSent();
         });
     }
@@ -28,7 +28,7 @@ trait Email
      */
     final public function assertEmailSentTo(string $expectedTo, $callback): self
     {
-        return $this->with(function(EmailComponent $component) use ($expectedTo, $callback) {
+        return $this->use(function(EmailComponent $component) use ($expectedTo, $callback) {
             $component->assertEmailSentTo($expectedTo, $callback);
         });
     }

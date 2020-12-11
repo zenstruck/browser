@@ -16,7 +16,7 @@ trait Json
      */
     final public function assertJsonMatches(string $expression, $expected): self
     {
-        return $this->with(function(JsonComponent $component) use ($expression, $expected) {
+        return $this->use(function(JsonComponent $component) use ($expression, $expected) {
             $component->assertMatches($expression, $expected);
         });
     }
