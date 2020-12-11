@@ -19,7 +19,7 @@ public function testViewPostAndAddComment()
         ->assertSeeIn('h1', 'My First Post')
         ->assertNotSeeElement('#comments')
         ->fillField('Comment', 'My First Comment')
-        ->press('Submit')
+        ->click('Submit')
         ->assertOn('/posts/3')
         ->assertSeeIn('#comments', 'My First Comment')
     ;
@@ -41,7 +41,7 @@ public function testViewPostAndAddComment()
         ->assertSeeIn('h1', 'My First Post')
         ->assertNotSeeElement('#comments')
         ->fillField('Comment', 'My First Comment')
-        ->press('Submit')
+        ->click('Submit')
         ->assertOn("/posts/{$post->getId()}")
         ->assertSeeIn('#comments', 'My First Comment')
     ;
@@ -155,7 +155,7 @@ $browser
     ->selectFieldOption('Type', 'Employee') // single option select
     ->selectFieldOptions('Notification', ['Email', 'SMS']) // multi-option select
     ->attachFile('Photo', '/path/to/photo.jpg')
-    ->press('Submit')
+    ->click('Submit')
 ;
 ```
 
@@ -516,7 +516,7 @@ class CommentComponent extends Component
         $this->browser()
             ->fillField('Name', $author)
             ->fillField('Comment', $body)
-            ->press('Add Comment')
+            ->click('Add Comment')
         ;
 
         return $this;

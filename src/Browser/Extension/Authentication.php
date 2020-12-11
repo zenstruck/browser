@@ -20,7 +20,7 @@ trait Authentication
             ->visit('/login')
             ->fillField('email', $username)
             ->fillField('password', $password)
-            ->press('Login')
+            ->click('Login')
         ;
     }
 

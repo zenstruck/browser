@@ -94,7 +94,7 @@ trait Actions
     /**
      * @return static
      */
-    final public function press(string $selector): self
+    final public function click(string $selector): self
     {
         try {
             $this->documentElement()->pressButton($selector);
