@@ -52,7 +52,7 @@ final class PantherBrowserTest extends PantherTestCase
     /**
      * @test
      */
-    public function can_wait_until_visible_and_hidden(): void
+    public function can_wait_until_visible_and_not_visible(): void
     {
         $this->browser()
             ->visit('/javascript')
@@ -65,11 +65,11 @@ final class PantherBrowserTest extends PantherTestCase
             ->assertSeeIn('#show-box', 'Contents of show box')
             ->assertSeeIn('#hide-box', 'Contents of hide box')
             ->click('hide')
-            ->waitUntilHidden('#hide-box')
+            ->waitUntilNotVisible('#hide-box')
             ->assertNotSeeIn('#hide-box', 'Contents of hide box')
             ->assertSeeIn('#toggle-box', 'Contents of toggle box')
             ->click('toggle')
-            ->waitUntilHidden('#toggle-box')
+            ->waitUntilNotVisible('#toggle-box')
             ->assertNotSeeIn('#toggle-box', 'Contents of toggle box')
             ->click('toggle')
             ->waitUntilVisible('#toggle-box')
@@ -103,6 +103,19 @@ final class PantherBrowserTest extends PantherTestCase
             ->click('clear')
             ->waitUntilNotSeeIn('#output', 'some text')
             ->assertNotSeeIn('#output', 'some text')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_check_if_element_is_visible_and_not_visible(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->assertVisible('#hide-box')
+            ->assertNotVisible('#show-box')
+            ->assertNotVisible('#invalid-element')
         ;
     }
 

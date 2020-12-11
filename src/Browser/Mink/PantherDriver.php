@@ -194,6 +194,11 @@ final class PantherDriver extends CoreDriver
         return \preg_replace('/^<[^>]+>|<[^>]+>$/', '', $this->getOuterHtml($xpath));
     }
 
+    public function isVisible($xpath): bool
+    {
+        return $this->crawlerElement($this->filteredCrawler($xpath))->isDisplayed();
+    }
+
     public function getOuterHtml($xpath): string
     {
         $crawler = $this->filteredCrawler($xpath);

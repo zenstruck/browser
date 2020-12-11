@@ -354,11 +354,15 @@ $browser
     // take a screenshot of the current browser state
     ->takeScreenshot('/path/to/image.png')
 
+    // check if element is visible in the browser
+    ->assertVisible('.selector')
+    ->assertNotVisible('.selector')
+
     // wait x milliseconds
     ->wait(1000) // 1 second
 
     ->waitUntilVisible('.selector')
-    ->waitUntilHidden('.selector')
+    ->waitUntilNotVisible('.selector')
     ->waitUntilSeeIn('.selector', 'some text')
     ->waitUntilNotSeeIn('.selector', 'some text')
 ;
