@@ -11,9 +11,16 @@ use Zenstruck\Browser\Mink\PantherDriver;
  */
 class PantherBrowser extends Browser
 {
+    private Client $client;
+
     final public function __construct(Client $client)
     {
-        parent::__construct(new PantherDriver($client));
+        parent::__construct(new PantherDriver($this->client = $client));
+    }
+
+    public function client(): Client
+    {
+        return $this->client;
     }
 
     /**
@@ -27,6 +34,13 @@ class PantherBrowser extends Browser
 
         \fwrite(STDIN, "\n\nInspecting the browser.\n\nPress enter to continue...");
         \fgets(STDIN);
+
+        return $this;
+    }
+
+    final public function takeScreenshot(string $filename): self
+    {
+        $this->client->takeScreenshot($filename);
 
         return $this;
     }

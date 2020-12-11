@@ -7,13 +7,34 @@ use Zenstruck\Browser\PantherBrowser;
 use Zenstruck\Browser\Test\HasPantherBrowser;
 
 /**
- * @group panther
- *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @group panther
  */
 final class PantherBrowserTest extends PantherTestCase
 {
     use BrowserTests, HasPantherBrowser;
+
+    /**
+     * @test
+     */
+    public function can_take_screenshot(): void
+    {
+        $file = \sys_get_temp_dir().'/zenstruck-browser/screen.png';
+
+        if (\file_exists($file)) {
+            \unlink($file);
+        }
+
+        $this->browser()
+            ->visit('/page1')
+            ->takeScreenshot($file)
+        ;
+
+        $this->assertFileExists($file);
+
+        \unlink($file);
+    }
 
     /**
      * @test

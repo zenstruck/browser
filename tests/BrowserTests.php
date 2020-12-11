@@ -9,8 +9,6 @@ use Zenstruck\Browser\Tests\Fixture\TestComponent2;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @method Browser browser()
  */
 trait BrowserTests
 {

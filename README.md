@@ -350,6 +350,9 @@ $browser
     // allows you to investigate the current state in the browser
     // (requires the env variable PANTHER_NO_HEADLESS=1)
     ->inspect()
+
+    // take a screenshot of the current browser state
+    ->takeScreenshot('/path/to/image.png')
 ;
 ```
 
