@@ -221,6 +221,9 @@ $browser
         // access the current Browser instance
     })
 
+    // save the raw source of the current page
+    ->saveSource('/path/to/source.txt')
+
     // the following use symfony/var-dumper's dump() function and continue
     ->dump() // raw response body or array if json
     ->dump('h1') // html element
@@ -356,6 +359,9 @@ $browser
     // take a screenshot of the current browser state
     ->takeScreenshot('/path/to/image.png')
 
+    // save the browser's console error log
+    ->saveConsoleLog('/path/to/console.log')
+
     // check if element is visible in the browser
     ->assertVisible('.selector')
     ->assertNotVisible('.selector')
@@ -367,6 +373,12 @@ $browser
     ->waitUntilNotVisible('.selector')
     ->waitUntilSeeIn('.selector', 'some text')
     ->waitUntilNotSeeIn('.selector', 'some text')
+
+    // dump() the browser's console error log
+    ->dumpConsoleLog()
+    
+    // dd() the browser's console error log
+    ->ddConsoleLog()
 ;
 ```
 
