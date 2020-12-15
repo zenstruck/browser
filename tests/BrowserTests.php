@@ -319,12 +319,11 @@ trait BrowserTests
         VarDumper::setHandler();
 
         // a null value is added to the beginning
-        $dumpedValues = \array_values(\array_filter($dumpedValues));
+        $dumped = \array_values(\array_filter($dumpedValues))[0];
 
-        $this->assertCount(3, $dumpedValues);
-        $this->assertStringContainsString('/page1', $dumpedValues[0]);
-        $this->assertStringContainsString('<h1>h1 title</h1>', $dumpedValues[1]);
-        $this->assertStringContainsString('/page1', $dumpedValues[2]);
+        $this->assertStringContainsString('/page1', $dumped);
+        $this->assertStringContainsString('<h1>h1 title</h1>', $dumped);
+        $this->assertStringContainsString('/page1', $dumped);
     }
 
     /**
@@ -346,12 +345,9 @@ trait BrowserTests
         VarDumper::setHandler();
 
         // a null value is added to the beginning
-        $dumpedValues = \array_values(\array_filter($dumpedValues));
+        $dumped = \array_values(\array_filter($dumpedValues))[0];
 
-        $this->assertCount(3, $dumpedValues);
-        $this->assertStringContainsString('/page1', $dumpedValues[0]);
-        $this->assertSame('<a href="/page2">a link</a> not a link', $dumpedValues[1]);
-        $this->assertStringContainsString('/page1', $dumpedValues[2]);
+        $this->assertSame('<a href="/page2">a link</a> not a link', $dumped);
     }
 
     /**
@@ -366,16 +362,16 @@ trait BrowserTests
         });
 
         $this->browser()
-            ->post('/json', ['json' => $expected = ['foo' => 'bar']])
+            ->post('/json', ['json' => ['foo' => 'bar']])
             ->dump()
         ;
 
         VarDumper::setHandler();
 
         // a null value is added to the beginning
-        $dumpedValues = \array_values(\array_filter($dumpedValues));
+        $dumped = \array_values(\array_filter($dumpedValues))[0];
 
-        $this->assertSame($expected, $dumpedValues[1]);
+        $this->assertStringContainsString('    "foo": "bar"', $dumped);
     }
 
     /**
@@ -397,9 +393,9 @@ trait BrowserTests
         VarDumper::setHandler();
 
         // a null value is added to the beginning
-        $dumpedValues = \array_values(\array_filter($dumpedValues));
+        $dumped = \array_values(\array_filter($dumpedValues))[0];
 
-        $this->assertSame('bar', $dumpedValues[1]);
+        $this->assertSame('bar', $dumped);
     }
 
     /**
@@ -427,9 +423,9 @@ trait BrowserTests
         VarDumper::setHandler();
 
         // a null value is added to the beginning
-        $dumpedValues = \array_values(\array_filter($dumpedValues));
+        $dumped = \array_values(\array_filter($dumpedValues))[0];
 
-        $this->assertSame([1, 2, 3], $dumpedValues[1]);
+        $this->assertSame([1, 2, 3], $dumped);
     }
 
     /**

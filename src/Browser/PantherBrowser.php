@@ -159,4 +159,9 @@ class PantherBrowser extends Browser
     {
         return "URL: {$this->minkSession()->getCurrentUrl()}\n\n{$this->documentElement()->getContent()}";
     }
+
+    protected function normalizeDumpVariable(string $selector)
+    {
+        return $this->documentElement()->find('css', $selector)->getHtml();
+    }
 }

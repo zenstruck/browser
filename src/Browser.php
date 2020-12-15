@@ -4,10 +4,10 @@ namespace Zenstruck;
 
 use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Element\DocumentElement;
-use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
+use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
 use Zenstruck\Browser\Component;
@@ -66,14 +66,7 @@ class Browser
 
     final public function dump(?string $selector = null): self
     {
-        $context = 'URL: '.$this->minkSession()->getCurrentUrl();
-
-        try {
-            $context .= ', STATUS: '.$this->minkSession()->getStatusCode();
-        } catch (UnsupportedDriverActionException $e) {
-        }
-
-        dump($context, $this->normalizeDumpValue($selector), $context);
+        VarDumper::dump($selector ? $this->normalizeDumpVariable($selector) : $this->rawResponse());
 
         return $this;
     }
@@ -82,6 +75,23 @@ class Browser
     {
         $this->dump($selector);
         exit(1);
+    }
+
+    protected function normalizeDumpVariable(string $selector)
+    {
+        $contentType = $this->minkSession()->getResponseHeader('content-type');
+
+        if (!str_contains((string) $contentType, 'application/json')) {
+            return $this->documentElement()->find('css', $selector)->getHtml();
+        }
+
+        $array = \json_decode($this->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (\function_exists('JmesPath\search')) {
+            return search($selector, $array);
+        }
+
+        return $array[$selector];
     }
 
     protected function rawResponse(): string
@@ -103,26 +113,5 @@ class Browser
         }
 
         return "{$response}\n{$body}";
-    }
-
-    private function normalizeDumpValue(?string $selector = null)
-    {
-        try {
-            $contentType = $this->minkSession()->getResponseHeader('content-type');
-        } catch (UnsupportedDriverActionException $e) {
-            $contentType = null;
-        }
-
-        if (!str_contains((string) $contentType, 'application/json')) {
-            return $selector ? $this->documentElement()->find('css', $selector)->getHtml() : $this->documentElement()->getContent();
-        }
-
-        $array = \json_decode($this->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        if ($selector && \function_exists('JmesPath\search')) {
-            return search($selector, $array);
-        }
-
-        return $selector ? $array[$selector] : $array;
     }
 }
