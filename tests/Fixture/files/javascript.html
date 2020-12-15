@@ -28,6 +28,11 @@
 
 <h1>Timeout Test</h1>
 <div style="display: none" id="timeout-box">Contents of timeout box</div>
+<hr>
+
+<h1>Console Log Test</h1>
+<button id="log">log</button>
+<hr>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
@@ -53,6 +58,9 @@
         });
         $('#toggle').click(function() {
             $('#toggle-box').toggle();
+        });
+        $('#log').click(function() {
+            console.error('error!');
         });
     });
 </script>

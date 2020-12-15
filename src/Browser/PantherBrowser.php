@@ -4,6 +4,7 @@ namespace Zenstruck\Browser;
 
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Panther\Client;
+use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\PantherDriver;
 
@@ -129,6 +130,29 @@ class PantherBrowser extends Browser
         $this->client->takeScreenshot($filename);
 
         return $this;
+    }
+
+    final public function saveConsoleLog(string $filename): self
+    {
+        $log = $this->client->manage()->getLog('browser');
+        $log = \json_encode($log, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+
+        \file_put_contents($filename, $log);
+
+        return $this;
+    }
+
+    final public function dumpConsoleLog(): self
+    {
+        VarDumper::dump($this->client->manage()->getLog('browser'));
+
+        return $this;
+    }
+
+    final public function ddConsoleLog(): void
+    {
+        $this->dumpConsoleLog();
+        exit(1);
     }
 
     protected function rawResponse(): string

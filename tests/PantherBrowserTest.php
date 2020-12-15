@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\Panther\PantherTestCase;
+use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\PantherBrowser;
 use Zenstruck\Browser\Test\HasPantherBrowser;
 
@@ -117,6 +118,59 @@ final class PantherBrowserTest extends PantherTestCase
             ->assertNotVisible('#show-box')
             ->assertNotVisible('#invalid-element')
         ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_save_console_log(): void
+    {
+        $file = \sys_get_temp_dir().'/zenstruck-browser/console.log';
+
+        if (\file_exists($file)) {
+            \unlink($file);
+        }
+
+        $this->browser()
+            ->visit('/javascript')
+            ->click('log')
+            ->saveConsoleLog($file)
+        ;
+
+        $this->assertFileExists($file);
+
+        $contents = \file_get_contents($file);
+
+        $this->assertStringContainsString('        "level": "SEVERE",', $contents);
+        $this->assertStringContainsString('error!', $contents);
+
+        \unlink($file);
+    }
+
+    /**
+     * @test
+     */
+    public function can_dump_console_log(): void
+    {
+        $dumpedValues[] = null;
+
+        VarDumper::setHandler(function($var) use (&$dumpedValues) {
+            $dumpedValues[] = $var;
+        });
+
+        $this->browser()
+            ->visit('/javascript')
+            ->click('log')
+            ->dumpConsoleLog()
+        ;
+
+        VarDumper::setHandler();
+
+        // a null value is added to the beginning
+        $dumpedValues = \array_values(\array_filter($dumpedValues));
+
+        $this->assertSame('SEVERE', $dumpedValues[0][0]['level']);
+        $this->assertStringContainsString('error!', $dumpedValues[0][0]['message']);
     }
 
     /**
