@@ -16,6 +16,8 @@ trait HasBrowser
         $browser = $this->createBrowser();
 
         if (!$this instanceof KernelTestCase) {
+            $this->configureBrowser($browser);
+
             return $browser;
         }
 
