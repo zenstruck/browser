@@ -130,4 +130,9 @@ class PantherBrowser extends Browser
 
         return $this;
     }
+
+    protected function rawResponse(): string
+    {
+        return "URL: {$this->minkSession()->getCurrentUrl()}\n\n{$this->documentElement()->getContent()}";
+    }
 }

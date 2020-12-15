@@ -432,5 +432,57 @@ trait BrowserTests
         $this->assertSame([1, 2, 3], $dumpedValues[1]);
     }
 
+    /**
+     * @test
+     */
+    public function can_save_source(): void
+    {
+        $file = \sys_get_temp_dir().'/zenstruck-browser/source.txt';
+
+        if (\file_exists($file)) {
+            \unlink($file);
+        }
+
+        $this->browser()
+            ->visit('/page1')
+            ->saveSource($file)
+        ;
+
+        $this->assertFileExists($file);
+
+        $contents = \file_get_contents($file);
+
+        $this->assertStringContainsString('/page1', $contents);
+        $this->assertStringContainsString('<h1>h1 title</h1>', $contents);
+
+        \unlink($file);
+    }
+
+    /**
+     * @test
+     */
+    public function can_save_formatted_json_source(): void
+    {
+        $file = \sys_get_temp_dir().'/zenstruck-browser/source.txt';
+
+        if (\file_exists($file)) {
+            \unlink($file);
+        }
+
+        $this->browser()
+            ->visit('/http-method')
+            ->saveSource($file)
+        ;
+
+        $this->assertFileExists($file);
+
+        $contents = \file_get_contents($file);
+
+        $this->assertStringContainsString('/http-method', $contents);
+        $this->assertStringContainsString('    "content": "",', $contents);
+
+        \unlink($file);
+    }
+
     abstract protected static function browserClass(): string;
 }

@@ -57,6 +57,13 @@ class Browser
         return $this;
     }
 
+    final public function saveSource(string $filename): self
+    {
+        \file_put_contents($filename, $this->rawResponse());
+
+        return $this;
+    }
+
     final public function dump(?string $selector = null): self
     {
         $context = 'URL: '.$this->minkSession()->getCurrentUrl();
@@ -75,6 +82,27 @@ class Browser
     {
         $this->dump($selector);
         exit(1);
+    }
+
+    protected function rawResponse(): string
+    {
+        $response = "URL: {$this->minkSession()->getCurrentUrl()} ({$this->minkSession()->getStatusCode()})\n\n";
+
+        foreach ($this->minkSession()->getResponseHeaders() as $header => $values) {
+            foreach ($values as $value) {
+                $response .= "{$header}: {$value}\n";
+            }
+        }
+
+        $body = $this->documentElement()->getContent();
+        $contentType = $this->minkSession()->getResponseHeader('content-type');
+
+        if (str_contains((string) $contentType, 'application/json')) {
+            $body = \json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+            $body = \json_encode($body, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        }
+
+        return "{$response}\n{$body}";
     }
 
     private function normalizeDumpValue(?string $selector = null)
