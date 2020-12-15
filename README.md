@@ -382,6 +382,37 @@ $browser
 ;
 ```
 
+### Multiple Browser Instances
+
+Within your test, you can call `->browser()` multiple times to get different
+browser instances. This could be useful for testing an app with real-time
+capabilities (ie websockets):
+
+```php
+namespace App\Tests;
+
+use Symfony\Component\Panther\PantherTestCase;
+use Zenstruck\Browser\Test\HasPantherBrowser;
+
+class MyTest extends PantherTestCase
+{
+    use HasPantherBrowser;
+
+    public function testDemo(): void
+    {
+        $browser1 = $this->browser()
+            ->visit('/my/page')
+            // ...
+        ;
+        
+        $browser2 = $this->browser()
+            ->visit('/my/page')
+            // ...
+        ;
+    }
+}
+```
+
 ### Json Component
 
 Make assertions about json responses using [JMESPath expressions](https://jmespath.org/)

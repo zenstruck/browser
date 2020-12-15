@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Test;
 
+use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Browser\PantherBrowser;
 
@@ -16,6 +17,17 @@ trait HasPantherBrowser
 {
     use HasBrowser;
 
+    private static ?Client $primaryPantherClient = null;
+
+    /**
+     * @internal
+     * @after
+     */
+    public static function _resetPrimaryPantherClient(): void
+    {
+        self::$primaryPantherClient = null;
+    }
+
     protected function createBrowser(): PantherBrowser
     {
         if (!$this instanceof PantherTestCase) {
@@ -28,7 +40,11 @@ trait HasPantherBrowser
             throw new \RuntimeException(\sprintf('"PANTHER_BROWSER_CLASS" env variable must reference a class that extends %s.', PantherBrowser::class));
         }
 
-        return new $class(static::createPantherClient(['browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME]));
+        if (self::$primaryPantherClient) {
+            return new $class(static::createAdditionalPantherClient());
+        }
+
+        return new $class(self::$primaryPantherClient = static::createPantherClient(['browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME]));
     }
 
     protected static function pantherBrowserClass(): string

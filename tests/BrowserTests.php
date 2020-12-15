@@ -15,6 +15,25 @@ trait BrowserTests
     /**
      * @test
      */
+    public function multiple_browsers(): void
+    {
+        $browser1 = $this->browser()
+            ->visit('/page1')
+            ->assertOn('/page1')
+        ;
+
+        $browser2 = $this->browser()
+            ->visit('/page2')
+            ->assertOn('/page2')
+        ;
+
+        // this ensures a different browser is actually used
+        $browser1->assertOn('/page1');
+    }
+
+    /**
+     * @test
+     */
     public function assert_on(): void
     {
         $this->browser()

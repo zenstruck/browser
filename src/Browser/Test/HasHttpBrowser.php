@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Test;
 
+use Symfony\Component\BrowserKit\HttpBrowser as HttpBrowserClient;
 use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Browser\HttpBrowser;
 
@@ -13,6 +14,18 @@ use Zenstruck\Browser\HttpBrowser;
 trait HasHttpBrowser
 {
     use HasBrowser;
+
+    /** @var HttpBrowserClient[] */
+    private static array $httpBrowserClients = [];
+
+    /**
+     * @internal
+     * @after
+     */
+    public static function _resetHttpBrowserClients(): void
+    {
+        self::$httpBrowserClients = [];
+    }
 
     protected function createBrowser(): HttpBrowser
     {
@@ -26,7 +39,22 @@ trait HasHttpBrowser
             throw new \RuntimeException(\sprintf('"HTTP_BROWSER_CLASS" env variable must reference a class that extends %s.', HttpBrowser::class));
         }
 
-        return new $class(static::createHttpBrowserClient());
+        if (empty(self::$httpBrowserClients)) {
+            return new $class(self::$httpBrowserClients[] = static::createHttpBrowserClient());
+        }
+
+        $additionalClient = new HttpBrowserClient();
+
+        // copied from PantherTestCaseTrait::createHttpBrowserClient()
+        $urlComponents = \parse_url(self::$baseUri);
+
+        $additionalClient->setServerParameter('HTTP_HOST', \sprintf('%s:%s', $urlComponents['host'], $urlComponents['port']));
+
+        if ('https' === $urlComponents['scheme']) {
+            self::$httpBrowserClient->setServerParameter('HTTPS', 'true');
+        }
+
+        return new $class(self::$httpBrowserClients[] = $additionalClient);
     }
 
     protected static function httpBrowserClass(): string
