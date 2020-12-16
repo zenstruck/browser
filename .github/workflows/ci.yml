@@ -79,6 +79,7 @@ jobs:
         with:
           php-version: 7.4
           coverage: xdebug
+          ini-values: xdebug.mode=coverage
 
       - name: Setup chromedriver
         uses: nanasess/setup-chromedriver@v1.0.1
