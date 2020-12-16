@@ -3,8 +3,6 @@
 namespace Zenstruck\Browser\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Zenstruck\Browser\Extension\Email;
-use Zenstruck\Browser\KernelBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -37,12 +35,5 @@ final class KernelBrowserWebTestCaseTest extends WebTestCase
         ;
 
         self::assertResponseStatusCodeSame(404);
-    }
-
-    protected function createEmailBrowser(): KernelBrowser
-    {
-        return new class(static::createClient()) extends KernelBrowser {
-            use Email;
-        };
     }
 }

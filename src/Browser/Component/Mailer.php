@@ -7,14 +7,14 @@ use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
 use Zenstruck\Browser\Component;
-use Zenstruck\Browser\Component\Email\TestEmail;
+use Zenstruck\Browser\Component\Mailer\TestEmail;
 use Zenstruck\Browser\FunctionExecutor;
 use Zenstruck\Browser\ProfileAware;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class EmailComponent extends Component
+final class Mailer extends Component
 {
     public function assertNoEmailSent(): self
     {

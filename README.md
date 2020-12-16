@@ -459,30 +459,30 @@ class MyTest extends PantherTestCase
 }
 ```
 
-### Email Component
+### Mailer Component
 
 You can make assertions about emails sent in the last request:
 
 ```php
-use Zenstruck\Browser\Component\EmailComponent;
-use Zenstruck\Browser\Component\Email\TestEmail;
+use Zenstruck\Browser\Component\Mailer;
+use Zenstruck\Browser\Component\Mailer\TestEmail;
 
 /** @var \Zenstruck\Browser $browser **/
 $browser
     ->visit('/page/that/does/not/send/email')
-    ->use(function(EmailComponent $component) {
+    ->use(function(Mailer $component) {
         $component->assertNoEmailSent();
     })
 
     ->visit('/page/that/sends/email')
     
     // just check that an email was sent to an address with a subject
-    ->use(function(EmailComponent $component) {
+    ->use(function(Mailer $component) {
         $component->assertEmailSentTo('kevin@example.com', 'Email Subject');
     })
     
     // advanced assertions
-    ->use(function(EmailComponent $component) {
+    ->use(function(Mailer $component) {
         $component->assertEmailSentTo('kevin@example.com', function(TestEmail $email) {
             $email
                 ->assertSubject('Email Subject')
@@ -501,7 +501,7 @@ $browser
 ;
 ```
 
-**NOTE**: There is an [Email Extension](#email-extension) that adds the `assertNoEmailSent()`
+**NOTE**: There is an [Mailer Extension](#mailer-extension) that adds the `assertNoEmailSent()`
 and `assertEmailSentTo()` methods right onto your custom browser.
 
 ## Extending
@@ -741,9 +741,9 @@ env variable:
 There are several packaged extensions. These are traits that can be added to a
 [Custom Browser](#custom-browser).
 
-#### Email Extension
+#### Mailer Extension
 
-Wraps the [Email Component](#email-component) into methods directly on your browser.
+Wraps the [Mailer Component](#mailer-component) into methods directly on your browser.
 
 Add to your [Custom Browser](#custom-browser):
 
@@ -751,11 +751,11 @@ Add to your [Custom Browser](#custom-browser):
 namespace App\Tests;
 
 use Zenstruck\Browser\KernelBrowser;
-use Zenstruck\Browser\Extension\Email;
+use Zenstruck\Browser\Extension\Mailer;
 
 class AppBrowser extends KernelBrowser
 {
-    use Email;
+    use Mailer;
 }
 ```
 

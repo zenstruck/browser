@@ -4,7 +4,7 @@ namespace Zenstruck\Browser\Tests;
 
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Test\HasKernelBrowser;
-use Zenstruck\Browser\Tests\Extension\EmailTests;
+use Zenstruck\Browser\Tests\Component\EmailTests;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
