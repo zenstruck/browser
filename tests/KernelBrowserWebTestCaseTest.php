@@ -4,7 +4,6 @@ namespace Zenstruck\Browser\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Browser\Extension\Email;
-use Zenstruck\Browser\Extension\Json;
 use Zenstruck\Browser\KernelBrowser;
 
 /**
@@ -44,13 +43,6 @@ final class KernelBrowserWebTestCaseTest extends WebTestCase
     {
         return new class(static::createClient()) extends KernelBrowser {
             use Email;
-        };
-    }
-
-    protected function createJsonBrowser(): KernelBrowser
-    {
-        return new class(static::createClient()) extends KernelBrowser {
-            use Json;
         };
     }
 }

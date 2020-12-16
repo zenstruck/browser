@@ -4,6 +4,7 @@ namespace Zenstruck\Browser;
 
 use Behat\Mink\Exception\ExpectationException;
 use PHPUnit\Framework\Assert as PHPUnit;
+use function JmesPath\search;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -266,6 +267,27 @@ trait Assertions
         return $this->wrapMinkExpectation(
             fn() => $this->webAssert()->elementAttributeNotContains('css', $selector, $attribute, $expected)
         );
+    }
+
+    /**
+     * @param string $expression JMESPath expression
+     * @param mixed  $expected
+     *
+     * @return static
+     */
+    final public function assertJsonMatches(string $expression, $expected): self
+    {
+        $this->assertHeaderContains('Content-Type', 'application/json');
+
+        if (!\function_exists('JmesPath\search')) {
+            throw new \RuntimeException('mtdowling/jmespath.php requires (composer require --dev mtdowling/jmespath.php).');
+        }
+
+        $data = \json_decode($this->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        PHPUnit::assertSame($expected, search($expression, $data));
+
+        return $this;
     }
 
     /**

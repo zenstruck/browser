@@ -277,6 +277,24 @@ $browser
 ;
 ````
 
+### Json Assertions
+
+*Only available on `KernelBrowser`/`HttpBrowser`.*
+
+Make assertions about json responses using [JMESPath expressions](https://jmespath.org/)
+Requires [mtdowling/jmespath.php](https://github.com/jmespath/jmespath.php) (`composer require
+--dev mtdowling/jmespath.php`).
+
+```php
+/** @var \Zenstruck\Browser $browser **/
+$browser
+    ->get('/api/endpoint')
+    ->assertJsonMatches('foo.bar.baz', 1) // automatically asserts the content-type is application/json
+    ->assertJsonMatches('foo.*.baz', [1, 2, 3])
+    ->assertJsonMatches('length(foo)', 3)
+;
+```
+
 ### Exception Handling
 
 *Only available on `KernelBrowser`.*
@@ -412,32 +430,6 @@ class MyTest extends PantherTestCase
     }
 }
 ```
-
-### Json Component
-
-Make assertions about json responses using [JMESPath expressions](https://jmespath.org/)
-Requires [mtdowling/jmespath.php](https://github.com/jmespath/jmespath.php) (`composer require
---dev mtdowling/jmespath.php`).
-
-```php
-use Zenstruck\Browser\Component\JsonComponent;
-
-/** @var \Zenstruck\Browser $browser **/
-$browser
-    ->get('/api/endpoing')
-    ->use(function(JsonComponent $component) {
-        // automatically asserts the response's content-type is application/json
-        $component
-            ->assertMatches('foo.bar.baz', 1)
-            ->assertMatches('foo.*.baz', [1, 2, 3])
-            ->assertMatches('length(foo)', 3)
-        ;
-    })
-;
-```
-
-**NOTE**: There is an [Json Extension](#json-extension) that adds the `assertJsonMatches()`
-method right onto your custom browser.
 
 ### Email Component
 
@@ -720,37 +712,6 @@ env variable:
 
 There are several packaged extensions. These are traits that can be added to a
 [Custom Browser](#custom-browser).
-
-#### Json Extension
-
-Wraps the [Json Component](#json-component) into methods directly on your browser.
-
-Add to your [Custom Browser](#custom-browser):
-
-```php
-namespace App\Tests;
-
-use Zenstruck\Browser\KernelBrowser;
-use Zenstruck\Browser\Extension\Json;
-
-class AppBrowser extends KernelBrowser
-{
-    use Json;
-}
-```
-
-Use in your tests:
-
-```php
-public function testDemo(): void
-{
-    $this->browser()
-        ->assertJsonMatches('foo.bar.baz', 1)
-        ->assertJsonMatches('foo.*.baz', [1, 2, 3])
-        ->assertJsonMatches('length(foo)', 3)
-    ;
-}
-```
 
 #### Email Extension
 

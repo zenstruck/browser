@@ -4,18 +4,16 @@ namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Browser\Extension\Email;
-use Zenstruck\Browser\Extension\Json;
 use Zenstruck\Browser\HttpBrowser;
 use Zenstruck\Browser\Test\HasHttpBrowser;
 use Zenstruck\Browser\Tests\Extension\EmailTests;
-use Zenstruck\Browser\Tests\Extension\JsonTests;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class HttpBrowserTest extends PantherTestCase
 {
-    use BrowserKitBrowserTests, BrowserTests, EmailTests, HasHttpBrowser, JsonTests, ProfileAwareTests;
+    use BrowserKitBrowserTests, BrowserTests, EmailTests, HasHttpBrowser, ProfileAwareTests;
 
     protected function createEmailBrowser(): HttpBrowser
     {
@@ -26,13 +24,6 @@ final class HttpBrowserTest extends PantherTestCase
         $browser->setContainer(static::$container);
 
         return $browser;
-    }
-
-    protected function createJsonBrowser(): HttpBrowser
-    {
-        return new class(static::createHttpBrowserClient()) extends HttpBrowser {
-            use Json;
-        };
     }
 
     protected static function browserClass(): string

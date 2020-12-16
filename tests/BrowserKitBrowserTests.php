@@ -82,4 +82,23 @@ trait BrowserKitBrowserTests
             ->assertResponseContains('"x-token":["my-token"]')
         ;
     }
+
+    /**
+     * @test
+     */
+    public function can_assert_json_matches(): void
+    {
+        $this->browser()
+            ->post('/json', ['json' => [
+                'foo' => [
+                    'bar' => ['baz' => 1],
+                    'bam' => ['baz' => 2],
+                    'boo' => ['baz' => 3],
+                ],
+            ]])
+            ->assertJsonMatches('foo.bar.baz', 1)
+            ->assertJsonMatches('foo.*.baz', [1, 2, 3])
+            ->assertJsonMatches('length(foo)', 3)
+        ;
+    }
 }
