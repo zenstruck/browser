@@ -64,7 +64,12 @@ final class BrowserExtension implements BeforeFirstTestHook, BeforeTestHook, Aft
         $filename = \sprintf('%s_%s', $type, self::normalizeTestName($test));
 
         foreach (self::$registeredBrowsers as $i => $browser) {
-            $browser->dumpCurrentState("{$filename}__{$i}");
+            try {
+                $browser->dumpCurrentState("{$filename}__{$i}");
+            } catch (\Throwable $e) {
+                // noop - swallow exceptions related to dumping the current state so as to not
+                // lose the actual error/failure.
+            }
         }
     }
 
