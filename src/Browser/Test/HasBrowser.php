@@ -13,7 +13,11 @@ trait HasBrowser
 {
     final protected function browser(): Browser
     {
-        $browser = $this->createBrowser();
+        $browser = $this->createBrowser()
+            ->setSourceDir($_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source')
+        ;
+
+        BrowserExtension::registerBrowser($browser);
 
         if (!$this instanceof KernelTestCase) {
             $this->configureBrowser($browser);

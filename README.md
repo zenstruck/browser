@@ -54,10 +54,38 @@ public function testViewPostAndAddComment()
 $ composer require zenstruck/browser --dev
 ```
 
-This library provides `Zenstruck\Browser`, which is a fluent wrapper around
-`Symfony\Component\BrowserKit\AbstractBrowser` (previously `Symfony\Component\BrowserKit\Client`
-before Symfony 5). While this class is usable for any `AbstractBrowser` there are three
-implementations provided by this library:
+Optionally, enable the provided extension in your `phpunit.xml`. This extension intercepts test
+errors/failures and saves the current browser's source to the filesystem. If using the `PantherBrowser`,
+a screenshot and the javascript console is also saved.
+
+```xml
+<!-- phpunit.xml -->
+
+<extensions>
+    <extension class="Zenstruck\Browser\Test\BrowserExtension" />
+</extensions>
+```
+
+## Configuration
+
+There are several environment variables available to configure:
+
+* `BROWSER_SOURCE_DIR`: The directory to save source files to
+  (*default:* `<project-root>/var/browser/source`)
+* `BROWSER_SCREENSHOT_DIR`: The directory to save screenshot files to
+  (*default:* `<project-root>/var/browser/screenshots`)
+* `BROWSER_CONSOLE_LOG_DIR`: The directory to save screenshot files to
+  (*default:* `<project-root>/var/browser/console-logs`)
+* `KERNEL_BROWSER_CLASS`: The default `KernelBrowser` class to use
+  (*default:* `Zenstruck\Browser\KernelBrowser`)
+* `HTTP_BROWSER_CLASS`: The default `HttpBrowser` class to use
+  (*default:* `Zenstruck\Browser\HttpBrowser`)
+* `PANTHER_BROWSER_CLASS`: The default `PantherBrowser` class to use
+  (*default:* `Zenstruck\Browser\PantherBrowser`)
+* `PANTHER_NO_HEADLESS`: Set to `1` to disable headless mode and enable the ability to
+  use `PantherBrowser::inspect()` (*default:* `0`)
+
+## Usage
 
 ### 1. KernelBrowser
 
@@ -134,12 +162,6 @@ class MyTest extends PantherTestCase
     }
 }
 ```
-
-## Usage
-
-`HasKernelBrowser`, `HasHttpBrowser` and `HasPantherBrowser` all provide a `->browser()`
-method that returns an instance of `Zenstruck\Browser` which has the following
-actions/assertions:
 
 ### Actions
 
@@ -222,7 +244,9 @@ $browser
     })
 
     // save the raw source of the current page
-    ->saveSource('/path/to/source.txt')
+    // by default, saves to "<project-root>/var/browser/source"
+    // configure with "BROWSER_SOURCE_DIR" env variable
+    ->saveSource('source.txt')
 
     // the following use symfony/var-dumper's dump() function and continue
     ->dump() // raw response body or array if json
@@ -375,10 +399,14 @@ $browser
     ->inspect()
 
     // take a screenshot of the current browser state
-    ->takeScreenshot('/path/to/image.png')
+    // by default, saves to "<project-root>/var/browser/screenshots"
+    // configure with "BROWSER_SCREENSHOT_DIR" env variable
+    ->takeScreenshot('screenshot.png')
 
-    // save the browser's console error log
-    ->saveConsoleLog('/path/to/console.log')
+    // save the browser's javascript console error log
+    // by default, saves to "<project-root>/var/browser/console-log"
+    // configure with "BROWSER_CONSOLE_LOG_DIR" env variable
+    ->saveConsoleLog('console.log')
 
     // check if element is visible in the browser
     ->assertVisible('.selector')

@@ -30,6 +30,19 @@ trait HasPantherBrowser
 
     protected function createBrowser(): PantherBrowser
     {
+        return $this->createPantherBrowser()
+            ->setScreenshotDir($_SERVER['BROWSER_SCREENSHOT_DIR'] ?? './var/browser/screenshots')
+            ->setConsoleLogDir($_SERVER['BROWSER_CONSOLE_LOG_DIR'] ?? './var/browser/console-logs')
+        ;
+    }
+
+    protected static function pantherBrowserClass(): string
+    {
+        return $_SERVER['PANTHER_BROWSER_CLASS'] ?? PantherBrowser::class;
+    }
+
+    private function createPantherBrowser(): PantherBrowser
+    {
         if (!$this instanceof PantherTestCase) {
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, PantherTestCase::class));
         }
@@ -45,10 +58,5 @@ trait HasPantherBrowser
         }
 
         return new $class(self::$primaryPantherClient = static::createPantherClient(['browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME]));
-    }
-
-    protected static function pantherBrowserClass(): string
-    {
-        return $_SERVER['PANTHER_BROWSER_CLASS'] ?? PantherBrowser::class;
     }
 }

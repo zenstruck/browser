@@ -7,6 +7,7 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Actions;
 use Zenstruck\Browser\Assertions;
@@ -24,10 +25,18 @@ class Browser
     private const SESSION = 'app';
 
     private Mink $mink;
+    private ?string $sourceDir = null;
 
     public function __construct(DriverInterface $driver)
     {
         $this->mink = new Mink([self::SESSION => new Session($driver)]);
+    }
+
+    final public function setSourceDir(string $dir): self
+    {
+        $this->sourceDir = $dir;
+
+        return $this;
     }
 
     final public function minkSession(): Session
@@ -59,7 +68,11 @@ class Browser
 
     final public function saveSource(string $filename): self
     {
-        \file_put_contents($filename, $this->rawResponse());
+        if ($this->sourceDir) {
+            $filename = \sprintf('%s/%s', \rtrim($this->sourceDir, '/'), \ltrim($filename, '/'));
+        }
+
+        (new Filesystem())->dumpFile($filename, $this->rawResponse());
 
         return $this;
     }
@@ -75,6 +88,11 @@ class Browser
     {
         $this->dump($selector);
         exit(1);
+    }
+
+    public function dumpCurrentState(string $filename): void
+    {
+        $this->saveSource("{$filename}.txt");
     }
 
     protected function normalizeDumpVariable(string $selector)

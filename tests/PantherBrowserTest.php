@@ -21,7 +21,7 @@ final class PantherBrowserTest extends PantherTestCase
      */
     public function can_take_screenshot(): void
     {
-        $file = \sys_get_temp_dir().'/zenstruck-browser/screen.png';
+        $file = __DIR__.'/../var/browser/screenshots/screen.png';
 
         if (\file_exists($file)) {
             \unlink($file);
@@ -29,7 +29,7 @@ final class PantherBrowserTest extends PantherTestCase
 
         $this->browser()
             ->visit('/page1')
-            ->takeScreenshot($file)
+            ->takeScreenshot('screen.png')
         ;
 
         $this->assertFileExists($file);
@@ -125,7 +125,7 @@ final class PantherBrowserTest extends PantherTestCase
      */
     public function can_save_console_log(): void
     {
-        $file = \sys_get_temp_dir().'/zenstruck-browser/console.log';
+        $file = __DIR__.'/../var/browser/console-logs/console.log';
 
         if (\file_exists($file)) {
             \unlink($file);
@@ -134,7 +134,7 @@ final class PantherBrowserTest extends PantherTestCase
         $this->browser()
             ->visit('/javascript')
             ->click('log')
-            ->saveConsoleLog($file)
+            ->saveConsoleLog('console.log')
         ;
 
         $this->assertFileExists($file);

@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser;
 
 use PHPUnit\Framework\Assert as PHPUnit;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
@@ -16,6 +17,8 @@ use Zenstruck\Browser\Mink\PantherDriver;
 class PantherBrowser extends Browser
 {
     private Client $client;
+    private ?string $screenshotDir = null;
+    private ?string $consoleLogDir = null;
 
     final public function __construct(Client $client)
     {
@@ -25,6 +28,20 @@ class PantherBrowser extends Browser
     final public function client(): Client
     {
         return $this->client;
+    }
+
+    final public function setScreenshotDir(string $dir): self
+    {
+        $this->screenshotDir = $dir;
+
+        return $this;
+    }
+
+    final public function setConsoleLogDir(string $dir): self
+    {
+        $this->consoleLogDir = $dir;
+
+        return $this;
     }
 
     /**
@@ -127,6 +144,10 @@ class PantherBrowser extends Browser
      */
     final public function takeScreenshot(string $filename): self
     {
+        if ($this->screenshotDir) {
+            $filename = \sprintf('%s/%s', \rtrim($this->screenshotDir, '/'), \ltrim($filename, '/'));
+        }
+
         $this->client->takeScreenshot($filename);
 
         return $this;
@@ -134,10 +155,14 @@ class PantherBrowser extends Browser
 
     final public function saveConsoleLog(string $filename): self
     {
+        if ($this->consoleLogDir) {
+            $filename = \sprintf('%s/%s', \rtrim($this->consoleLogDir, '/'), \ltrim($filename, '/'));
+        }
+
         $log = $this->client->manage()->getLog('browser');
         $log = \json_encode($log, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
 
-        \file_put_contents($filename, $log);
+        (new Filesystem())->dumpFile($filename, $log);
 
         return $this;
     }
@@ -153,6 +178,14 @@ class PantherBrowser extends Browser
     {
         $this->dumpConsoleLog();
         exit(1);
+    }
+
+    final public function dumpCurrentState(string $filename): void
+    {
+        parent::dumpCurrentState($filename);
+
+        $this->takeScreenshot("{$filename}.png");
+        $this->saveConsoleLog("{$filename}.log");
     }
 
     protected function rawResponse(): string

@@ -452,7 +452,7 @@ trait BrowserTests
      */
     public function can_save_source(): void
     {
-        $file = \sys_get_temp_dir().'/zenstruck-browser/source.txt';
+        $file = __DIR__.'/../var/browser/source/source.txt';
 
         if (\file_exists($file)) {
             \unlink($file);
@@ -460,7 +460,7 @@ trait BrowserTests
 
         $this->browser()
             ->visit('/page1')
-            ->saveSource($file)
+            ->saveSource('source.txt')
         ;
 
         $this->assertFileExists($file);
@@ -478,7 +478,7 @@ trait BrowserTests
      */
     public function can_save_formatted_json_source(): void
     {
-        $file = \sys_get_temp_dir().'/zenstruck-browser/source.txt';
+        $file = __DIR__.'/../var/browser/source/source.txt';
 
         if (\file_exists($file)) {
             \unlink($file);
@@ -486,7 +486,7 @@ trait BrowserTests
 
         $this->browser()
             ->visit('/http-method')
-            ->saveSource($file)
+            ->saveSource('/source.txt')
         ;
 
         $this->assertFileExists($file);
