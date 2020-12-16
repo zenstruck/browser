@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
  *
  * @method SymfonyKernelBrowser inner()
  */
-class KernelBrowser extends BrowserKitBrowser
+class KernelBrowser extends BrowserKitBrowser implements ProfileAware
 {
     final public function __construct(SymfonyKernelBrowser $inner)
     {

@@ -12,7 +12,7 @@ use Zenstruck\Browser\Extension\ContainerAware;
  *
  * @method SymfonyHttpBrowser inner()
  */
-class HttpBrowser extends BrowserKitBrowser implements ContainerAwareInterface
+class HttpBrowser extends BrowserKitBrowser implements ContainerAwareInterface, ProfileAware
 {
     use ContainerAware;
 

@@ -9,7 +9,7 @@ use Zenstruck\Browser\Mink\BrowserKitDriver;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class BrowserKitBrowser extends Browser implements ProfileAware
+abstract class BrowserKitBrowser extends Browser
 {
     private AbstractBrowser $inner;
 
