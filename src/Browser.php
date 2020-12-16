@@ -103,13 +103,7 @@ class Browser
             return $this->documentElement()->find('css', $selector)->getHtml();
         }
 
-        $array = \json_decode($this->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        if (\function_exists('JmesPath\search')) {
-            return search($selector, $array);
-        }
-
-        return $array[$selector];
+        return search($selector, \json_decode($this->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR));
     }
 
     protected function rawResponse(): string

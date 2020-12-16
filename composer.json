@@ -14,12 +14,12 @@
     "require": {
         "php": ">=7.4",
         "behat/mink": "^1.8",
+        "mtdowling/jmespath.php": "^2.6",
         "symfony/browser-kit": "^4.4.9|^5.0.9",
         "symfony/framework-bundle": "^4.4|^5.0",
         "symfony/polyfill-php80": "^1.20"
     },
     "require-dev": {
-        "mtdowling/jmespath.php": "^2.6",
         "symfony/mailer": "^4.4|^5.0",
         "symfony/mime": ">=4.4.1",
         "symfony/panther": "dev-main",

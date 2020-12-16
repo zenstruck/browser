@@ -252,13 +252,13 @@ $browser
     ->dump() // raw response body or array if json
     ->dump('h1') // html element
     ->dump('foo') // if json response, array key
-    ->dump('foo.*.baz') // if json response and mtdowling/jmespath.php installed, can use jmes path notation
+    ->dump('foo.*.baz') // if json response, JMESPath notation can be used
 
     // the following use symfony/var-dumper's dd() function ("dump & die")
     ->dd() // raw response body or array if json
     ->dd('h1') // html element
     ->dd('foo') // if json response, array key
-    ->dd('foo.*.baz') // if json response and mtdowling/jmespath.php installed, can use jmes path notation
+    ->dd('foo.*.baz') // if json response, JMESPath notation can be used
 ;
 ```
 
@@ -306,8 +306,7 @@ $browser
 *Only available on `KernelBrowser`/`HttpBrowser`.*
 
 Make assertions about json responses using [JMESPath expressions](https://jmespath.org/)
-Requires [mtdowling/jmespath.php](https://github.com/jmespath/jmespath.php) (`composer require
---dev mtdowling/jmespath.php`).
+See the [JMESPath Tutorials](https://jmespath.org/tutorial.html) to learn more.
 
 ```php
 /** @var \Zenstruck\Browser $browser **/
