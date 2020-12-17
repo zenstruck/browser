@@ -38,12 +38,24 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
-    public function can_assert_redirected_to(): void
+    public function assert_redirected_to_follows_all_redirects_by_default(): void
     {
         $this->browser()
             ->interceptRedirects()
-            ->visit('/redirect3')
+            ->visit('/redirect1')
             ->assertRedirectedTo('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function assert_redirected_to_can_configure_number_of_redirects_to_follow(): void
+    {
+        $this->browser()
+            ->interceptRedirects()
+            ->visit('/redirect1')
+            ->assertRedirectedTo('/redirect2', 1)
         ;
     }
 }

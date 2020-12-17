@@ -297,7 +297,8 @@ $browser
     ->followRedirect()
 
     // combination of assertRedirected(), followRedirect(), assertOn()
-    ->assertRedirectedTo('/some/page')
+    ->assertRedirectedTo('/some/page') // follows all redirects by default
+    ->assertRedirectedTo('/some/page', 1) // just follow 1 redirect
 ;
 ````
 
