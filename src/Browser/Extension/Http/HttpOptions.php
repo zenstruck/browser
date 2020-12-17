@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Browser;
+namespace Zenstruck\Browser\Extension\Http;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

@@ -3,7 +3,7 @@
 namespace Zenstruck\Browser\Extension;
 
 use PHPUnit\Framework\Assert as PHPUnit;
-use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Extension\Http\HttpOptions;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -11,7 +11,7 @@ use Zenstruck\Browser\HttpOptions;
 trait Http
 {
     /**
-     * @param HttpOptions|array $options @see HttpOptions::DEFAULT_OPTIONS
+     * @param HttpOptions|array $options HttpOptions::DEFAULT_OPTIONS
      *
      * @return static
      */

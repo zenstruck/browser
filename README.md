@@ -341,8 +341,7 @@ $browser
 ```php
 /** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
-// http request actions (NOTE: these are not available for PantherBrowser)
-use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Extension\Http\HttpOptions;
 
 $browser
     ->get('/api/endpoint')
@@ -366,7 +365,7 @@ $browser
         'ajax' => true,
     ])
 
-    // optionally use the provided Zenstruck\Browser\HttpOptions object
+    // optionally use the provided Zenstruck\Browser\Extension\Http\HttpOptions object
     ->post('/api/endpoint',
         HttpOptions::create()->withHeader('X-Token', 'my-token')->withBody('request body')
     )
@@ -643,7 +642,7 @@ create and use a custom `HttpOptions` object:
 ```php
 namespace App\Tests;
 
-use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Extension\Http\HttpOptions;
 
 class AppHttpOptions extends HttpOptions
 {
@@ -659,7 +658,7 @@ class AppHttpOptions extends HttpOptions
 Then, in your tests:
 
 ```php
-use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Extension\Http\HttpOptions;
 
 /** @var \Zenstruck\Browser $browser **/
 

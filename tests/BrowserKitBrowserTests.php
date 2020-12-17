@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
-use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Extension\Http\HttpOptions;
 use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
 
 /**

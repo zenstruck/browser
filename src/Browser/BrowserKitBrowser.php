@@ -6,6 +6,7 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Extension\Html;
 use Zenstruck\Browser\Extension\Http;
+use Zenstruck\Browser\Extension\Http\HttpOptions;
 use Zenstruck\Browser\Extension\Json;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
 
