@@ -16,20 +16,35 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
-    public function can_intercept_redirects(): void
+    public function following_redirect_follows_all_by_default(): void
+    {
+        $this->browser()
+            ->interceptRedirects()
+            ->visit('/redirect1')
+            ->assertOn('/redirect1')
+            ->followRedirect()
+            ->assertOn('/page1')
+            ->assertSuccessful()
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_limit_redirects_followed(): void
     {
         $this->browser()
             ->interceptRedirects()
             ->visit('/redirect1')
             ->assertOn('/redirect1')
             ->assertRedirected()
-            ->followRedirect()
+            ->followRedirect(1)
             ->assertOn('/redirect2')
             ->assertRedirected()
-            ->followRedirect()
+            ->followRedirect(1)
             ->assertOn('/redirect3')
             ->assertRedirected()
-            ->followRedirect()
+            ->followRedirect(1)
             ->assertOn('/page1')
             ->assertSuccessful()
         ;

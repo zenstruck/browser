@@ -190,7 +190,8 @@ $browser
     ->interceptRedirects()
 
     // Follows a redirect if ->interceptRedirects() has been turned on
-    ->followRedirect()
+    ->followRedirect() // follows all redirects by default
+    ->followRedirect(1) // just follow 1 redirect
 
     // combination of assertRedirected(), followRedirect(), assertOn()
     ->assertRedirectedTo('/some/page') // follows all redirects by default

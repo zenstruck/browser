@@ -42,11 +42,21 @@ abstract class BrowserKitBrowser extends Browser
     }
 
     /**
+     * @param int $max The maximum number of redirects to follow (defaults to "infinite")
+     *
      * @return static
      */
-    final public function followRedirect(): self
+    final public function followRedirect(int $max = PHP_INT_MAX): self
     {
-        $this->inner->followRedirect();
+        for ($i = 0; $i < $max; ++$i) {
+            $status = $this->minkSession()->getStatusCode();
+
+            if ($status < 300 || $status > 400) {
+                break;
+            }
+
+            $this->inner->followRedirect();
+        }
 
         return $this;
     }
@@ -59,17 +69,7 @@ abstract class BrowserKitBrowser extends Browser
     final public function assertRedirectedTo(string $expected, int $max = PHP_INT_MAX): self
     {
         $this->assertRedirected();
-
-        for ($i = 0; $i < $max; ++$i) {
-            $status = $this->minkSession()->getStatusCode();
-
-            if ($status < 300 || $status > 400) {
-                break;
-            }
-
-            $this->followRedirect();
-        }
-
+        $this->followRedirect($max);
         $this->assertOn($expected);
 
         return $this;
