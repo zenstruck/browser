@@ -29,32 +29,40 @@ trait HasHttpBrowser
 
     protected function createBrowser(): HttpBrowser
     {
-        if (!$this instanceof PantherTestCase) {
-            throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, PantherTestCase::class));
-        }
-
         $class = static::httpBrowserClass();
 
         if (!\is_a($class, HttpBrowser::class, true)) {
             throw new \RuntimeException(\sprintf('"HTTP_BROWSER_CLASS" env variable must reference a class that extends %s.', HttpBrowser::class));
         }
 
-        if (empty(self::$httpBrowserClients)) {
-            return new $class(self::$httpBrowserClients[] = static::createHttpBrowserClient());
-        }
-
-        $additionalClient = new HttpBrowserClient();
+        $client = new HttpBrowserClient();
+        $urlComponents = \parse_url($this->httpBrowserBaseUri());
 
         // copied from PantherTestCaseTrait::createHttpBrowserClient()
-        $urlComponents = \parse_url(self::$baseUri);
+        $host = $urlComponents['host'];
 
-        $additionalClient->setServerParameter('HTTP_HOST', \sprintf('%s:%s', $urlComponents['host'], $urlComponents['port']));
-
-        if ('https' === $urlComponents['scheme']) {
-            self::$httpBrowserClient->setServerParameter('HTTPS', 'true');
+        if (isset($urlComponents['port'])) {
+            $host .= ":{$urlComponents['port']}";
         }
 
-        return new $class(self::$httpBrowserClients[] = $additionalClient);
+        $client->setServerParameter('HTTP_HOST', $host);
+
+        if ('https' === ($urlComponents['scheme'] ?? 'http')) {
+            $client->setServerParameter('HTTPS', 'true');
+        }
+
+        return new $class(self::$httpBrowserClients[] = $client);
+    }
+
+    protected function httpBrowserBaseUri(): string
+    {
+        if (!$this instanceof PantherTestCase) {
+            throw new \RuntimeException(\sprintf('If not using "%s", you must override "%s" and return a base uri.', PantherTestCase::class, __METHOD__));
+        }
+
+        self::startWebServer();
+
+        return self::$baseUri;
     }
 
     protected static function httpBrowserClass(): string
