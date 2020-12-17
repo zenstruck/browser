@@ -187,7 +187,8 @@ $browser
 /** @var \Zenstruck\Browser $browser **/
 
 $browser
-    ->assertOn('/my/page')
+    ->assertOn('/my/page') // by default checks "path", "query" and "fragment"
+    ->assertOn('/a/page', ['path']) // check just the "path"
 
     // these look in the entire response body (useful for non-html pages)
     ->assertContains('some text')

@@ -13,6 +13,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Response;
+use Zenstruck\Browser\Test\Constraint\UrlMatches;
 use Zenstruck\Browser\Util\FunctionExecutor;
 
 /**
@@ -66,21 +67,28 @@ class Browser
     }
 
     /**
+     * @param array $parts The url parts to check (@see parse_url)
+     *
      * @return static
      */
-    final public function assertOn(string $expected): self
+    final public function assertOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        PHPUnit::assertSame(self::cleanUrl($expected), self::cleanUrl($this->minkSession()->getCurrentUrl()));
+        PHPUnit::assertThat($expected, new UrlMatches($this->minkSession()->getCurrentUrl(), $parts));
 
         return $this;
     }
 
     /**
+     * @param array $parts The url parts to check (@see parse_url)
+     *
      * @return static
      */
-    final public function assertNotOn(string $expected): self
+    final public function assertNotOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        PHPUnit::assertNotSame(self::cleanUrl($expected), self::cleanUrl($this->minkSession()->getCurrentUrl()));
+        PHPUnit::assertThat(
+            $expected,
+            PHPUnit::logicalNot(new UrlMatches($this->minkSession()->getCurrentUrl(), $parts))
+        );
 
         return $this;
     }
@@ -173,14 +181,5 @@ class Browser
         }
 
         return $this;
-    }
-
-    private static function cleanUrl(string $url): array
-    {
-        $parts = \parse_url(\urldecode($url));
-
-        unset($parts['host'], $parts['scheme'], $parts['port']);
-
-        return $parts;
     }
 }

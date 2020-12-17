@@ -42,9 +42,13 @@ trait BrowserTests
         $this->browser()
             ->visit('/page1')
             ->assertOn('/page1')
+            ->assertOn('http://www.example.com/page1')
             ->assertNotOn('/page2')
+            ->assertNotOn('http://www.example.com/page1', ['path', 'host'])
             ->visit('/page1?foo=bar')
             ->assertOn('/page1?foo=bar')
+            ->assertOn('/page1', ['path'])
+            ->assertOn('/page1', ['path', 'fragment'])
             ->assertNotOn('/page1?foo=baz')
         ;
     }
