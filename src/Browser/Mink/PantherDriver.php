@@ -72,7 +72,16 @@ final class PantherDriver extends CoreDriver
 
     public function getText($xpath): string
     {
-        $text = $this->filteredCrawler($xpath)->text();
+        $crawler = $this->filteredCrawler($xpath);
+
+        if (($element = $crawler->getElement(0)) && 'title' === $element->getTagName()) {
+            // hack to get the text of the title html element
+            // for this element, WebDriverElement::getText() returns an empty string
+            // the only way to get the value is to get the html
+            return \strip_tags($crawler->html());
+        }
+
+        $text = $crawler->text();
         $text = \str_replace("\n", ' ', $text);
         $text = \preg_replace('/ {2,}/', ' ', $text);
 
@@ -206,6 +215,11 @@ final class PantherDriver extends CoreDriver
         $crawler = $this->filteredCrawler($xpath);
 
         return $crawler->html();
+    }
+
+    public function getAttribute($xpath, $name): ?string
+    {
+        return $this->crawlerElement($this->filteredCrawler($xpath))->getAttribute($name);
     }
 
     protected function findElementXpaths($xpath): array

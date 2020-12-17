@@ -36,6 +36,7 @@ trait HtmlTests
             ->assertSeeIn('title', 'meta title')
             ->assertElementAttributeContains('meta[name="description"]', 'content', 'meta')
             ->assertElementAttributeNotContains('meta[name="description"]', 'content', 'invalid')
+            ->assertElementAttributeContains('html', 'lang', 'en')
         ;
     }
 

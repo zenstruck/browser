@@ -173,16 +173,6 @@ final class PantherBrowserTest extends PantherTestCase
         $this->assertStringContainsString('error!', $dumpedValues[0][0]['message']);
     }
 
-    /**
-     * TODO - this should be possible as Panther has access to the page source.
-     *
-     * @test
-     */
-    public function html_head_assertions(): void
-    {
-        $this->markTestIncomplete('Panther cannot access <head>.');
-    }
-
     protected static function browserClass(): string
     {
         return PantherBrowser::class;
