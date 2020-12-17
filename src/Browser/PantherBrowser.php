@@ -9,6 +9,7 @@ use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Extension\Html;
 use Zenstruck\Browser\Mink\PantherDriver;
+use Zenstruck\Browser\Response\PantherResponse;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -191,13 +192,8 @@ class PantherBrowser extends Browser
         $this->saveConsoleLog("{$filename}.log");
     }
 
-    protected function rawResponse(): string
+    protected function response(): PantherResponse
     {
-        return "URL: {$this->minkSession()->getCurrentUrl()}\n\n{$this->documentElement()->getContent()}";
-    }
-
-    protected function normalizeDumpVariable(string $selector)
-    {
-        return $this->documentElement()->find('css', $selector)->getHtml();
+        return new PantherResponse($this->minkSession());
     }
 }

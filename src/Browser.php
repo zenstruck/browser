@@ -12,8 +12,8 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Component;
+use Zenstruck\Browser\Response;
 use Zenstruck\Browser\Util\FunctionExecutor;
-use function JmesPath\search;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -129,7 +129,7 @@ class Browser
             $filename = \sprintf('%s/%s', \rtrim($this->sourceDir, '/'), \ltrim($filename, '/'));
         }
 
-        (new Filesystem())->dumpFile($filename, $this->rawResponse());
+        (new Filesystem())->dumpFile($filename, $this->response()->raw());
 
         return $this;
     }
@@ -139,7 +139,7 @@ class Browser
      */
     final public function dump(?string $selector = null): self
     {
-        VarDumper::dump($selector ? $this->normalizeDumpVariable($selector) : $this->rawResponse());
+        VarDumper::dump($selector ? $this->response()->find($selector) : $this->response()->raw());
 
         return $this;
     }
@@ -155,36 +155,9 @@ class Browser
         $this->saveSource("{$filename}.txt");
     }
 
-    protected function normalizeDumpVariable(string $selector)
+    protected function response(): Response
     {
-        $contentType = $this->minkSession()->getResponseHeader('content-type');
-
-        if (!str_contains((string) $contentType, 'application/json')) {
-            return $this->documentElement()->find('css', $selector)->getHtml();
-        }
-
-        return search($selector, \json_decode($this->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR));
-    }
-
-    protected function rawResponse(): string
-    {
-        $response = "URL: {$this->minkSession()->getCurrentUrl()} ({$this->minkSession()->getStatusCode()})\n\n";
-
-        foreach ($this->minkSession()->getResponseHeaders() as $header => $values) {
-            foreach ($values as $value) {
-                $response .= "{$header}: {$value}\n";
-            }
-        }
-
-        $body = $this->documentElement()->getContent();
-        $contentType = $this->minkSession()->getResponseHeader('content-type');
-
-        if (str_contains((string) $contentType, 'application/json')) {
-            $body = \json_decode($body, true, 512, JSON_THROW_ON_ERROR);
-            $body = \json_encode($body, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
-        }
-
-        return "{$response}\n{$body}";
+        return Response::createFor($this->minkSession());
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Zenstruck\Browser\Extension;
 
 use PHPUnit\Framework\Assert as PHPUnit;
-use function JmesPath\search;
+use Zenstruck\Browser\Response\JsonResponse;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -25,11 +25,11 @@ trait Json
      */
     final public function assertJsonMatches(string $expression, $expected): self
     {
-        $this->assertJson();
+        if (!$this->response() instanceof JsonResponse) {
+            PHPUnit::fail('Not a json response.');
+        }
 
-        $data = \json_decode($this->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        PHPUnit::assertSame($expected, search($expression, $data));
+        PHPUnit::assertSame($expected, $this->response()->find($expression));
 
         return $this;
     }
