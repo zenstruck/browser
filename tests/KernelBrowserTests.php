@@ -4,14 +4,13 @@ namespace Zenstruck\Browser\Tests;
 
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Test\HasKernelBrowser;
-use Zenstruck\Browser\Tests\Component\EmailTests;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 trait KernelBrowserTests
 {
-    use BrowserKitBrowserTests, BrowserTests, EmailTests, HasKernelBrowser, ProfileAwareTests;
+    use BrowserKitBrowserTests, HasKernelBrowser;
 
     /**
      * @test

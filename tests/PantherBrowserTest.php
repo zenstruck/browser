@@ -174,22 +174,6 @@ final class PantherBrowserTest extends PantherTestCase
     }
 
     /**
-     * @test
-     */
-    public function exceptions_are_caught_by_default(): void
-    {
-        $this->markTestSkipped('Panther does not support response status codes.');
-    }
-
-    /**
-     * @test
-     */
-    public function response_header_assertions(): void
-    {
-        $this->markTestSkipped('Panther cannot access the response headers.');
-    }
-
-    /**
      * TODO - this should be possible as Panther has access to the page source.
      *
      * @test
@@ -197,38 +181,6 @@ final class PantherBrowserTest extends PantherTestCase
     public function html_head_assertions(): void
     {
         $this->markTestIncomplete('Panther cannot access <head>.');
-    }
-
-    /**
-     * @test
-     */
-    public function can_dump_json_response_as_array(): void
-    {
-        $this->markTestSkipped('Panther does not support json responses.');
-    }
-
-    /**
-     * @test
-     */
-    public function can_dump_json_array_key(): void
-    {
-        $this->markTestSkipped('Panther does not support json responses.');
-    }
-
-    /**
-     * @test
-     */
-    public function can_dump_json_path_expression(): void
-    {
-        $this->markTestSkipped('Panther does not support json responses.');
-    }
-
-    /**
-     * @test
-     */
-    public function can_save_formatted_json_source(): void
-    {
-        $this->markTestSkipped('Panther does not support json responses.');
     }
 
     protected static function browserClass(): string
