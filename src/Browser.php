@@ -4,13 +4,13 @@ namespace Zenstruck;
 
 use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Element\DocumentElement;
+use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
+use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
-use Zenstruck\Browser\Actions;
-use Zenstruck\Browser\Assertions;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\FunctionExecutor;
 use function JmesPath\search;
@@ -20,8 +20,6 @@ use function JmesPath\search;
  */
 class Browser
 {
-    use Actions, Assertions;
-
     private const SESSION = 'app';
 
     private Mink $mink;
@@ -32,6 +30,9 @@ class Browser
         $this->mink = new Mink([self::SESSION => new Session($driver)]);
     }
 
+    /**
+     * @return static
+     */
     final public function setSourceDir(string $dir): self
     {
         $this->sourceDir = $dir;
@@ -54,6 +55,59 @@ class Browser
         return $this->minkSession()->getPage();
     }
 
+    /**
+     * @return static
+     */
+    final public function visit(string $uri): self
+    {
+        $this->minkSession()->visit($uri);
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertOn(string $expected): self
+    {
+        PHPUnit::assertSame(self::cleanUrl($expected), self::cleanUrl($this->minkSession()->getCurrentUrl()));
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertNotOn(string $expected): self
+    {
+        PHPUnit::assertNotSame(self::cleanUrl($expected), self::cleanUrl($this->minkSession()->getCurrentUrl()));
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertContains(string $expected): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseContains($expected)
+        );
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertNotContains(string $expected): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseNotContains($expected)
+        );
+    }
+
+    /**
+     * @return static
+     */
     final public function use(callable $callback): self
     {
         FunctionExecutor::createFor($callback)
@@ -66,6 +120,9 @@ class Browser
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function saveSource(string $filename): self
     {
         if ($this->sourceDir) {
@@ -77,6 +134,9 @@ class Browser
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function dump(?string $selector = null): self
     {
         VarDumper::dump($selector ? $this->normalizeDumpVariable($selector) : $this->rawResponse());
@@ -125,5 +185,29 @@ class Browser
         }
 
         return "{$response}\n{$body}";
+    }
+
+    /**
+     * @return static
+     */
+    final protected function wrapMinkExpectation(callable $callback): self
+    {
+        try {
+            $callback();
+            PHPUnit::assertTrue(true);
+        } catch (ExpectationException $e) {
+            PHPUnit::fail($e->getMessage());
+        }
+
+        return $this;
+    }
+
+    private static function cleanUrl(string $url): array
+    {
+        $parts = \parse_url(\urldecode($url));
+
+        unset($parts['host'], $parts['scheme'], $parts['port']);
+
+        return $parts;
     }
 }

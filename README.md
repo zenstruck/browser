@@ -312,7 +312,8 @@ See the [JMESPath Tutorials](https://jmespath.org/tutorial.html) to learn more.
 /** @var \Zenstruck\Browser $browser **/
 $browser
     ->get('/api/endpoint')
-    ->assertJsonMatches('foo.bar.baz', 1) // automatically asserts the content-type is application/json
+    ->assertJson() // ensures the content-type is application/json
+    ->assertJsonMatches('foo.bar.baz', 1) // automatically calls ->assertJson()
     ->assertJsonMatches('foo.*.baz', [1, 2, 3])
     ->assertJsonMatches('length(foo)', 3)
 ;

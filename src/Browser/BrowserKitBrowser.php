@@ -4,6 +4,9 @@ namespace Zenstruck\Browser;
 
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Zenstruck\Browser;
+use Zenstruck\Browser\Extension\Html;
+use Zenstruck\Browser\Extension\Http;
+use Zenstruck\Browser\Extension\Json;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
 
 /**
@@ -11,6 +14,8 @@ use Zenstruck\Browser\Mink\BrowserKitDriver;
  */
 abstract class BrowserKitBrowser extends Browser
 {
+    use Html, Http, Json;
+
     private AbstractBrowser $inner;
 
     public function __construct(AbstractBrowser $inner)
@@ -58,9 +63,7 @@ abstract class BrowserKitBrowser extends Browser
     }
 
     /**
-     * @param HttpOptions|array $options @see HttpOptions::DEFAULT_OPTIONS
-     *
-     * @return static
+     * @see Http::request()
      */
     final public function request(string $method, string $url, $options = []): self
     {
@@ -69,45 +72,5 @@ abstract class BrowserKitBrowser extends Browser
         $this->inner->request($method, $url, $options->parameters(), $options->files(), $options->server(), $options->body());
 
         return $this;
-    }
-
-    /**
-     * @see request()
-     *
-     * @return static
-     */
-    final public function get(string $url, $options = []): self
-    {
-        return $this->request('GET', $url, $options);
-    }
-
-    /**
-     * @see request()
-     *
-     * @return static
-     */
-    final public function post(string $url, $options = []): self
-    {
-        return $this->request('POST', $url, $options);
-    }
-
-    /**
-     * @see request()
-     *
-     * @return static
-     */
-    final public function put(string $url, $options = []): self
-    {
-        return $this->request('PUT', $url, $options);
-    }
-
-    /**
-     * @see request()
-     *
-     * @return static
-     */
-    final public function delete(string $url, $options = []): self
-    {
-        return $this->request('DELETE', $url, $options);
     }
 }

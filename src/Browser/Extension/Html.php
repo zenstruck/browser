@@ -1,22 +1,22 @@
 <?php
 
-namespace Zenstruck\Browser;
+namespace Zenstruck\Browser\Extension;
 
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use PHPUnit\Framework\Assert as PHPUnit;
-use function JmesPath\search;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-trait Assertions
+trait Html
 {
     /**
      * @return static
      */
-    final public function assertOn(string $expected): self
+    final public function follow(string $link): self
     {
-        PHPUnit::assertSame(self::cleanUrl($expected), self::cleanUrl($this->minkSession()->getCurrentUrl()));
+        $this->documentElement()->clickLink($link);
 
         return $this;
     }
@@ -24,9 +24,9 @@ trait Assertions
     /**
      * @return static
      */
-    final public function assertNotOn(string $expected): self
+    final public function fillField(string $selector, string $value): self
     {
-        PHPUnit::assertNotSame(self::cleanUrl($expected), self::cleanUrl($this->minkSession()->getCurrentUrl()));
+        $this->documentElement()->fillField($selector, $value);
 
         return $this;
     }
@@ -34,21 +34,9 @@ trait Assertions
     /**
      * @return static
      */
-    final public function assertStatus(int $expected): self
+    public function checkField(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->statusCodeEquals($expected)
-        );
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertSuccessful(): self
-    {
-        $status = $this->minkSession()->getStatusCode();
-
-        PHPUnit::assertTrue($status >= 200 && $status < 300, "Expected successful status code (2xx), [{$status}] received.");
+        $this->documentElement()->checkField($selector);
 
         return $this;
     }
@@ -56,11 +44,9 @@ trait Assertions
     /**
      * @return static
      */
-    final public function assertRedirected(): self
+    public function uncheckField(string $selector): self
     {
-        $status = $this->minkSession()->getStatusCode();
-
-        PHPUnit::assertTrue($status >= 300 && $status < 400, "Expected redirect status code (3xx), [{$status}] received.");
+        $this->documentElement()->uncheckField($selector);
 
         return $this;
     }
@@ -68,41 +54,48 @@ trait Assertions
     /**
      * @return static
      */
-    final public function assertContains(string $expected): self
+    public function selectFieldOption(string $selector, string $value): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseContains($expected)
-        );
+        $this->documentElement()->selectFieldOption($selector, $value);
+
+        return $this;
     }
 
     /**
      * @return static
      */
-    final public function assertNotContains(string $expected): self
+    public function selectFieldOptions(string $selector, array $values): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseNotContains($expected)
-        );
+        foreach ($values as $value) {
+            $this->documentElement()->selectFieldOption($selector, $value, true);
+        }
+
+        return $this;
     }
 
     /**
      * @return static
      */
-    final public function assertHeaderEquals(string $header, string $expected): self
+    final public function attachFile(string $selector, string $path): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseHeaderEquals($header, $expected)
-        );
+        $this->documentElement()->attachFileToField($selector, $path);
+
+        return $this;
     }
 
     /**
      * @return static
      */
-    final public function assertHeaderContains(string $header, string $expected): self
+    final public function click(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseHeaderContains($header, $expected)
-        );
+        try {
+            $this->documentElement()->pressButton($selector);
+        } catch (ElementNotFoundException $e) {
+            // try link
+            $this->documentElement()->clickLink($selector);
+        }
+
+        return $this;
     }
 
     /**
@@ -267,46 +260,5 @@ trait Assertions
         return $this->wrapMinkExpectation(
             fn() => $this->webAssert()->elementAttributeNotContains('css', $selector, $attribute, $expected)
         );
-    }
-
-    /**
-     * @param string $expression JMESPath expression
-     * @param mixed  $expected
-     *
-     * @return static
-     */
-    final public function assertJsonMatches(string $expression, $expected): self
-    {
-        $this->assertHeaderContains('Content-Type', 'application/json');
-
-        $data = \json_decode($this->documentElement()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        PHPUnit::assertSame($expected, search($expression, $data));
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final protected function wrapMinkExpectation(callable $callback): self
-    {
-        try {
-            $callback();
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
-    }
-
-    private static function cleanUrl(string $url): array
-    {
-        $parts = \parse_url(\urldecode($url));
-
-        unset($parts['host'], $parts['scheme'], $parts['port']);
-
-        return $parts;
     }
 }
