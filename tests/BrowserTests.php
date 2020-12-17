@@ -167,8 +167,8 @@ trait BrowserTests
         $dumped = \array_values(\array_filter($dumpedValues))[0];
 
         $this->assertStringContainsString('/page1', $dumped);
+        $this->assertStringContainsString('<html', $dumped);
         $this->assertStringContainsString('<h1>h1 title</h1>', $dumped);
-        $this->assertStringContainsString('/page1', $dumped);
     }
 
     /**
@@ -192,6 +192,7 @@ trait BrowserTests
         $contents = \file_get_contents($file);
 
         $this->assertStringContainsString('/page1', $contents);
+        $this->assertStringContainsString('<html', $contents);
         $this->assertStringContainsString('<h1>h1 title</h1>', $contents);
 
         \unlink($file);
