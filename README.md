@@ -190,8 +190,8 @@ $browser
     ->assertOn('/my/page')
 
     // these look in the entire response body (useful for non-html pages)
-    ->assertResponseContains('some text')
-    ->assertResponseNotContains('some text')
+    ->assertContains('some text')
+    ->assertNotContains('some text')
 
     // these look in the html only
     ->assertSee('some text')

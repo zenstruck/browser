@@ -148,8 +148,8 @@ trait BrowserTests
     {
         $this->browser()
             ->visit('/page1')
-            ->assertResponseContains('h1 title')
-            ->assertResponseNotContains('invalid text')
+            ->assertContains('h1 title')
+            ->assertNotContains('invalid text')
         ;
     }
 
@@ -262,12 +262,12 @@ trait BrowserTests
             ->selectFieldOptions('Input 6', ['option 1', 'option 3'])
             ->click('Submit')
             ->assertOn('/submit-form')
-            ->assertResponseContains('"input_1":"Kevin"')
-            ->assertResponseContains('"input_2":"on"')
-            ->assertResponseNotContains('"input_3')
-            ->assertResponseContains('"input_4":"option 2"')
-            ->assertResponseContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
-            ->assertResponseContains('"input_6":["option 1","option 3"]')
+            ->assertContains('"input_1":"Kevin"')
+            ->assertContains('"input_2":"on"')
+            ->assertNotContains('"input_3')
+            ->assertContains('"input_4":"option 2"')
+            ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+            ->assertContains('"input_6":["option 1","option 3"]')
         ;
     }
 
@@ -286,12 +286,12 @@ trait BrowserTests
             ->selectFieldOptions('input6', ['option 1', 'option 3'])
             ->click('Submit')
             ->assertOn('/submit-form')
-            ->assertResponseContains('"input_1":"Kevin"')
-            ->assertResponseContains('"input_2":"on"')
-            ->assertResponseNotContains('"input_3')
-            ->assertResponseContains('"input_4":"option 2"')
-            ->assertResponseContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
-            ->assertResponseContains('"input_6":["option 1","option 3"]')
+            ->assertContains('"input_1":"Kevin"')
+            ->assertContains('"input_2":"on"')
+            ->assertNotContains('"input_3')
+            ->assertContains('"input_4":"option 2"')
+            ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+            ->assertContains('"input_6":["option 1","option 3"]')
         ;
     }
 
@@ -310,12 +310,12 @@ trait BrowserTests
             ->selectFieldOptions('input_6[]', ['option 1', 'option 3'])
             ->click('Submit')
             ->assertOn('/submit-form')
-            ->assertResponseContains('"input_1":"Kevin"')
-            ->assertResponseContains('"input_2":"on"')
-            ->assertResponseNotContains('"input_3')
-            ->assertResponseContains('"input_4":"option 2"')
-            ->assertResponseContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
-            ->assertResponseContains('"input_6":["option 1","option 3"]')
+            ->assertContains('"input_1":"Kevin"')
+            ->assertContains('"input_2":"on"')
+            ->assertNotContains('"input_3')
+            ->assertContains('"input_4":"option 2"')
+            ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+            ->assertContains('"input_6":["option 1","option 3"]')
         ;
     }
 

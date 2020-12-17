@@ -68,7 +68,7 @@ trait Assertions
     /**
      * @return static
      */
-    final public function assertResponseContains(string $expected): self
+    final public function assertContains(string $expected): self
     {
         return $this->wrapMinkExpectation(
             fn() => $this->webAssert()->responseContains($expected)
@@ -78,7 +78,7 @@ trait Assertions
     /**
      * @return static
      */
-    final public function assertResponseNotContains(string $expected): self
+    final public function assertNotContains(string $expected): self
     {
         return $this->wrapMinkExpectation(
             fn() => $this->webAssert()->responseNotContains($expected)
