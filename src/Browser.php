@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Component;
-use Zenstruck\Browser\FunctionExecutor;
+use Zenstruck\Browser\Util\FunctionExecutor;
 use function JmesPath\search;
 
 /**

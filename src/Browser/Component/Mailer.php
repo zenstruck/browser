@@ -8,8 +8,8 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Component\Mailer\TestEmail;
-use Zenstruck\Browser\FunctionExecutor;
 use Zenstruck\Browser\ProfileAware;
+use Zenstruck\Browser\Util\FunctionExecutor;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

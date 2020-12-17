@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Browser;
+namespace Zenstruck\Browser\Util;
 
 /**
  * Utility to manipulate and validate \Closure arguments.
