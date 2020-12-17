@@ -197,7 +197,21 @@ $browser
     ->assertRedirectedTo('/some/page', 1) // just follow 1 redirect
 ;
 
+// Access the Symfony Profiler for the last request
+$queryCount = $browser
+    // HttpBrowser requires profiling have collect globally enabled.
+    // If not globally enabled and using KernelBrowser, ->withProfiling()
+    // must be called before the request.
+    ->profile()->getCollector('db')->getQueryCount()
+;
+```
+
+#### HTTP Requests
+
+```php
 use Zenstruck\Browser\Extension\Http\HttpOptions;
+
+/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
 
 $browser
     // http methods
@@ -238,14 +252,6 @@ $browser
 
     // simulates a JSON AJAX request
     ->post('/api/endpoint', HttpOptions::jsonAjax())
-;
-
-// Access the Symfony Profiler for the last request
-$queryCount = $browser
-    // HttpBrowser requires profiling have collect globally enabled.
-    // If not globally enabled and using KernelBrowser, ->withProfiling()
-    // must be called before the request.
-    ->profile()->getCollector('db')->getQueryCount()
 ;
 ```
 
@@ -615,7 +621,7 @@ $browser->use(function(Component1 $component1, Component2 $component2) {
 
 ### Custom HttpOptions
 
-If you find yourself creating a lot of http requests with the same options
+If you find yourself creating a lot of [http requests](#http-requests) with the same options
 (ie an `X-Token` header) there are a couple ways to reduce this duplication. You can either
 create a [custom browser](#custom-browser) with a custom method (ie `->apiRequest()`) or
 create and use a custom `HttpOptions` object:
