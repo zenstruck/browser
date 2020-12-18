@@ -37,7 +37,7 @@ final class UrlMatches extends Constraint
 
     private function parseUrl(string $url): array
     {
-        $parts = \parse_url($url);
+        $parts = \parse_url(\urldecode($url));
 
         if (empty($this->partsToMatch)) {
             return $parts;

@@ -55,6 +55,30 @@ trait BrowserTests
 
     /**
      * @test
+     * @dataProvider encodedUrlProvider
+     */
+    public function assert_on_encoded($url, $expected): void
+    {
+        $this->browser()
+            ->visit($url)
+            ->assertOn($expected)
+        ;
+    }
+
+    public static function encodedUrlProvider(): iterable
+    {
+        yield ['/page1?filter[q]=value', '/page1?filter[q]=value'];
+        yield ['/page1?filter%5Bq%5D=value', '/page1?filter[q]=value'];
+        yield ['/page1?filter[q]=value', '/page1?filter%5Bq%5D=value'];
+        yield ['/page1#foo bar', '/page1#foo bar'];
+        yield ['/page1#foo%20bar', '/page1#foo bar'];
+        yield ['/page1#foo bar', '/page1#foo%20bar'];
+        yield ['/page1#foo+bar', '/page1#foo bar'];
+        yield ['/page1#foo bar', '/page1#foo+bar'];
+    }
+
+    /**
+     * @test
      */
     public function can_use_current_browser(): void
     {
