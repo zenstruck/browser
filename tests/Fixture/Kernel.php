@@ -35,6 +35,11 @@ final class Kernel extends BaseKernel
         return new Response('success');
     }
 
+    public function text(): Response
+    {
+        return new Response('text content', 200, ['Content-Type' => 'text/plain']);
+    }
+
     public function javascript(): Response
     {
         return new Response(\file_get_contents(__DIR__.'/files/javascript.html'));
@@ -141,6 +146,7 @@ final class Kernel extends BaseKernel
     {
         $routes->add('/page1', 'kernel::page1');
         $routes->add('/page2', 'kernel::page2');
+        $routes->add('/text', 'kernel::text');
         $routes->add('/submit-form', 'kernel::submitForm');
         $routes->add('/http-method', 'kernel::httpMethod');
         $routes->add('/exception', 'kernel::exception');

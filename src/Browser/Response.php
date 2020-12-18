@@ -9,7 +9,7 @@ use Zenstruck\Browser\Response\JsonResponse;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class Response
+class Response
 {
     private Session $session;
 
@@ -35,7 +35,7 @@ abstract class Response
             return new HtmlResponse($session);
         }
 
-        throw new \RuntimeException("Unable to create browser response for \"{$contentType}\".");
+        return new self($session);
     }
 
     public function body()
@@ -61,7 +61,10 @@ abstract class Response
     /**
      * @return mixed
      */
-    abstract public function find(string $selector);
+    public function find(string $selector)
+    {
+        throw new \LogicException('Find cannot be used on this response type.');
+    }
 
     final protected function session(): Session
     {

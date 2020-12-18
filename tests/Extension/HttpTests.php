@@ -86,4 +86,18 @@ trait HttpTests
             ->assertContains('"x-foo":["Bar"]')
         ;
     }
+
+    /**
+     * @test
+     */
+    public function can_handle_any_content_type(): void
+    {
+        $this->browser()
+            ->get('/text')
+            ->assertHeaderContains('content-type', 'text/plain')
+            ->assertSuccessful()
+            ->assertStatus(200)
+            ->assertContains('text content')
+        ;
+    }
 }
