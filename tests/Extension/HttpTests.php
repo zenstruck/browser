@@ -71,4 +71,19 @@ trait HttpTests
             ->assertContains('"x-token":["my-token"]')
         ;
     }
+
+    /**
+     * @test
+     */
+    public function can_set_default_http_options(): void
+    {
+        $this->browser()
+            ->setDefaultHttpOptions(['headers' => ['x-foo' => 'bar']])
+            ->post('/http-method')
+            ->assertContains('"x-foo":["Bar"]')
+            ->post('/http-method', ['headers' => ['x-bar' => 'foo']])
+            ->assertContains('"x-bar":["Foo"]')
+            ->assertContains('"x-foo":["Bar"]')
+        ;
+    }
 }

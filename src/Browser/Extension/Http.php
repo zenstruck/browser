@@ -10,12 +10,35 @@ use Zenstruck\Browser\Extension\Http\HttpOptions;
  */
 trait Http
 {
+    private ?HttpOptions $defaultHttpOptions = null;
+
+    /**
+     * @param HttpOptions|array $options
+     *
+     * @return static
+     */
+    final public function setDefaultHttpOptions($options): self
+    {
+        $this->defaultHttpOptions = HttpOptions::create($options);
+
+        return $this;
+    }
+
     /**
      * @param HttpOptions|array $options HttpOptions::DEFAULT_OPTIONS
      *
      * @return static
      */
-    abstract public function request(string $method, string $url, $options = []): self;
+    final public function request(string $method, string $url, $options = []): self
+    {
+        if ($this->defaultHttpOptions) {
+            $options = $this->defaultHttpOptions->merge($options);
+        }
+
+        $this->makeRequest($method, $url, HttpOptions::create($options));
+
+        return $this;
+    }
 
     /**
      * @see request()
@@ -110,4 +133,6 @@ trait Http
             fn() => $this->webAssert()->responseHeaderContains($header, $expected)
         );
     }
+
+    abstract protected function makeRequest(string $method, string $url, HttpOptions $options): void;
 }

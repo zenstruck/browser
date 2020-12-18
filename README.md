@@ -496,7 +496,7 @@ and `assertEmailSentTo()` methods right onto your custom browser.
 ### Test Browser Configuration
 
 You can configure default options or a starting state for your browser in your tests by
-overriding the `configureBrowser`:
+overriding the `configureBrowser()` method:
 
 ```php
 namespace App\Tests;
@@ -623,41 +623,91 @@ $browser->use(function(Component1 $component1, Component2 $component2) {
 ### Custom HttpOptions
 
 If you find yourself creating a lot of [http requests](#http-requests) with the same options
-(ie an `X-Token` header) there are a couple ways to reduce this duplication. You can either
-create a [custom browser](#custom-browser) with a custom method (ie `->apiRequest()`) or
-create and use a custom `HttpOptions` object:
+(ie an `X-Token` header) there are a couple ways to reduce this duplication:
 
-```php
-namespace App\Tests;
+1. Use `->setDefaultHttpOptions()` for the current browser:
+   ```php
+   /** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+   
+   $browser
+       ->setDefaultHttpOptions(['headers' => ['X-Token' => 'my-token']])
+   
+       // now all http requests will have the X-Token header
+       ->get('/endpoint')
+   
+       // "per-request" options will be merged with the default
+       ->get('/endpoint', ['headers' => ['Another' => 'Header']])
+   ;
+   ```
 
-use Zenstruck\Browser\Extension\Http\HttpOptions;
+2. Use `->setDefaultHttpOptions()` in your test case's [`configureBrowser()`](#test-browser-configuration) method:
+   ```php
+   namespace App\Tests;
+   
+   use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+   use Zenstruck\Browser;
+   use Zenstruck\Browser\KernelBrowser;
+   use Zenstruck\Browser\Test\HasKernelBrowser;
+   
+   class MyTest extends KernelTestCase
+   {
+       use HasKernelBrowser;
+   
+       public function testDemo(): void
+       {
+           $this->browser()
+               // all http requests in this test class will have the X-Token header
+               ->get('/endpoint')
+   
+               // "per-request" options will be merged with the default
+               ->get('/endpoint', ['headers' => ['Another' => 'Header']])
+           ;
+       }
+   
+       /**
+        * @param Browser|KernelBrowser $browser
+        */
+       protected function configureBrowser(Browser $browser): void
+       {
+           $browser->setDefaultHttpOptions(['headers' => ['X-Token' => 'my-token']]);
+       }
+   }
+   ```
 
-class AppHttpOptions extends HttpOptions
-{
-    public static function api(string $token, $json = null): self
-    {
-        return self::json($json)
-            ->withHeader('X-Token', $token)
-        ;
-    }
-}
-```
+3. Create a custom `HttpOptions` object:
+   ```php
+   namespace App\Tests;
 
-Then, in your tests:
+   use Zenstruck\Browser\Extension\Http\HttpOptions;
 
-```php
-use Zenstruck\Browser\Extension\Http\HttpOptions;
+   class AppHttpOptions extends HttpOptions
+   {
+       public static function api(string $token, $json = null): self
+       {
+           return self::json($json)
+               ->withHeader('X-Token', $token)
+           ;
+       }
+   }
+   ```
 
-/** @var \Zenstruck\Browser $browser **/
+   Then, in your tests:
 
-$browser
-    // instead of
-    ->post('/api/endpoint', HttpOptions::json()->withHeader('X-Token', 'my-token'))
+   ```php
+   use Zenstruck\Browser\Extension\Http\HttpOptions;
 
-    // use your ApiHttpOptions object
-    ->post('/api/endpoint', AppHttpOptions::api('my-token'))
-;
-```
+   /** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+
+   $browser
+       // instead of
+       ->post('/api/endpoint', HttpOptions::json()->withHeader('X-Token', 'my-token'))
+
+       // use your ApiHttpOptions object
+       ->post('/api/endpoint', AppHttpOptions::api('my-token'))
+   ;
+   ```
+
+4. Create a [custom browser](#custom-browser) with your own request method (ie `->apiRequest()`).
 
 ### Custom Browser
 

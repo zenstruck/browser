@@ -75,15 +75,8 @@ abstract class BrowserKitBrowser extends Browser
         return $this;
     }
 
-    /**
-     * @see Http::request()
-     */
-    final public function request(string $method, string $url, $options = []): self
+    final protected function makeRequest(string $method, string $url, HttpOptions $options): void
     {
-        $options = HttpOptions::create($options);
-
         $this->inner->request($method, $url, $options->parameters(), $options->files(), $options->server(), $options->body());
-
-        return $this;
     }
 }
