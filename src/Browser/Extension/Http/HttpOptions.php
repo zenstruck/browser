@@ -34,6 +34,8 @@ class HttpOptions
 
     /**
      * @param self|array $value
+     *
+     * @return static
      */
     final public static function create($value = []): self
     {
@@ -44,21 +46,33 @@ class HttpOptions
         return new static($value);
     }
 
+    /**
+     * @return static
+     */
     final public static function json($body = null): self
     {
         return static::create()->asJson($body);
     }
 
+    /**
+     * @return static
+     */
     final public static function ajax(): self
     {
         return static::create()->asAjax();
     }
 
+    /**
+     * @return static
+     */
     final public static function jsonAjax($body = null): self
     {
         return static::json($body)->asAjax();
     }
 
+    /**
+     * @return static
+     */
     final public function withHeader(string $header, string $value): self
     {
         $this->options['headers'][$header] = $value;
@@ -66,6 +80,9 @@ class HttpOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function withHeaders(array $headers): self
     {
         $this->options['headers'] = $headers;
@@ -73,6 +90,9 @@ class HttpOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function withParameters(array $parameters): self
     {
         $this->options['parameters'] = $parameters;
@@ -80,6 +100,9 @@ class HttpOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function withServer(array $server): self
     {
         $this->options['server'] = $server;
@@ -87,6 +110,9 @@ class HttpOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function withFiles(array $files): self
     {
         $this->options['files'] = $files;
@@ -94,6 +120,9 @@ class HttpOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function withBody(?string $body): self
     {
         $this->options['body'] = $body;
@@ -101,6 +130,9 @@ class HttpOptions
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function asJson($body = null): self
     {
         return $this->withBody(null !== $body ? \json_encode($body, JSON_THROW_ON_ERROR) : null)
@@ -109,6 +141,9 @@ class HttpOptions
         ;
     }
 
+    /**
+     * @return static
+     */
     final public function asAjax(): self
     {
         return $this->withHeader('X-Requested-With', 'XMLHttpRequest');
