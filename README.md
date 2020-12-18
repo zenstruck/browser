@@ -190,6 +190,7 @@ $browser
     ->interceptRedirects()
 
     // re-enable following redirects by default
+    // if currently on a redirect response, follows
     ->followRedirects()
 
     // Follows a redirect if ->interceptRedirects() has been turned on

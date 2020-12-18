@@ -46,6 +46,35 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function calling_follow_redirects_when_the_response_is_a_redirect_follows_the_redirect(): void
+    {
+        $this->browser()
+            ->interceptRedirects()
+            ->visit('/redirect1')
+            ->followRedirects()
+            ->assertOn('/page1')
+            ->interceptRedirects()
+            ->visit('/page1')
+            ->followRedirects()
+            ->assertOn('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function calling_follow_redirects_before_a_request_has_been_made_just_enables_following_redirects(): void
+    {
+        $this->browser()
+            ->followRedirects()
+            ->visit('/redirect1')
+            ->assertOn('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_limit_redirects_followed(): void
     {
         $this->browser()

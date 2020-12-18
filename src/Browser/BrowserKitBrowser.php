@@ -48,6 +48,10 @@ abstract class BrowserKitBrowser extends Browser
     {
         $this->inner->followRedirects(true);
 
+        if ($this->minkSession()->isStarted() && $this->response()->isRedirect()) {
+            $this->followRedirect();
+        }
+
         return $this;
     }
 
