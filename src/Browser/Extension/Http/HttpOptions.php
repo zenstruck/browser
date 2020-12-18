@@ -75,7 +75,7 @@ class HttpOptions
      */
     final public function withHeader(string $header, string $value): self
     {
-        $this->options['headers'][$header] = $value;
+        $this->options['headers'][$header][] = $value;
 
         return $this;
     }
