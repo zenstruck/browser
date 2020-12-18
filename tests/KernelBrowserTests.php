@@ -29,6 +29,28 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    public function can_re_enable_catching_exceptions(): void
+    {
+        $browser = $this->browser();
+
+        try {
+            $browser->throwExceptions()->visit('/exception');
+        } catch (\Exception $e) {
+            $browser
+                ->catchExceptions()
+                ->visit('/exception')
+                ->assertStatus(500)
+            ;
+
+            return;
+        }
+
+        $this->fail('Exception was not caught.');
+    }
+
+    /**
+     * @test
+     */
     public function can_enable_the_profiler(): void
     {
         $profile = $this->browser()

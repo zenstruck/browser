@@ -310,6 +310,9 @@ $browser
     // this disables that behaviour allowing you to use TestCase::expectException()
     ->throwExceptions()
 
+    // re-enable catching exceptions
+    ->catchExceptions()
+
     // enable the profiler for the next request (if not globally enabled)
     ->withProfiling()
 ;

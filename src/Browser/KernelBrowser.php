@@ -32,6 +32,18 @@ class KernelBrowser extends BrowserKitBrowser implements ProfileAware
     }
 
     /**
+     * Re-enables catching exceptions.
+     *
+     * @return static
+     */
+    final public function catchExceptions(): self
+    {
+        $this->inner()->catchExceptions(true);
+
+        return $this;
+    }
+
+    /**
      * Enable profiling for the next request. Not required if profiling is
      * globally enabled.
      *
