@@ -51,7 +51,8 @@ final class HttpOptionsTest extends TestCase
     {
         $options = (new HttpOptions())
             ->withBody($expectedBody = 'body value')
-            ->withHeaders(['header' => 'header value'])
+            ->withHeaders(['header1' => 'header1 value'])
+            ->withHeader('header2', 'header2 value')
             ->withFiles($expectedFiles = ['file' => 'file value'])
             ->withServer(['server' => 'server value'])
             ->withParameters($expectedParameters = ['param' => 'param value'])
@@ -59,8 +60,15 @@ final class HttpOptionsTest extends TestCase
 
         $this->assertSame($expectedParameters, $options->parameters());
         $this->assertSame($expectedFiles, $options->files());
-        $this->assertSame(['server' => 'server value', 'HTTP_HEADER' => 'header value'], $options->server());
         $this->assertSame($expectedBody, $options->body());
+        $this->assertSame(
+            [
+                'server' => 'server value',
+                'HTTP_HEADER1' => 'header1 value',
+                'HTTP_HEADER2' => ['header2 value'],
+            ],
+            $options->server()
+        );
     }
 
     /**
@@ -79,8 +87,8 @@ final class HttpOptionsTest extends TestCase
         $expectedServer = [
             'server' => 'server value',
             'HTTP_HEADER' => 'header value',
-            'CONTENT_TYPE' => ['application/json'],
             'HTTP_ACCEPT' => ['application/json'],
+            'CONTENT_TYPE' => ['application/json'],
             'HTTP_X_REQUESTED_WITH' => ['XMLHttpRequest'],
         ];
 
@@ -114,8 +122,8 @@ final class HttpOptionsTest extends TestCase
         $this->assertSame('"value"', $options->body());
         $this->assertSame(
             [
-                'CONTENT_TYPE' => ['application/json'],
                 'HTTP_ACCEPT' => ['application/json'],
+                'CONTENT_TYPE' => ['application/json'],
             ],
             $options->server()
         );
@@ -131,8 +139,8 @@ final class HttpOptionsTest extends TestCase
         $this->assertNull($options->body());
         $this->assertSame(
             [
-                'CONTENT_TYPE' => ['application/json'],
                 'HTTP_ACCEPT' => ['application/json'],
+                'CONTENT_TYPE' => ['application/json'],
             ],
             $options->server()
         );
@@ -148,8 +156,8 @@ final class HttpOptionsTest extends TestCase
         $this->assertSame('"value"', $options->body());
         $this->assertSame(
             [
-                'CONTENT_TYPE' => ['application/json'],
                 'HTTP_ACCEPT' => ['application/json'],
+                'CONTENT_TYPE' => ['application/json'],
                 'HTTP_X_REQUESTED_WITH' => ['XMLHttpRequest'],
             ],
             $options->server()
@@ -166,8 +174,8 @@ final class HttpOptionsTest extends TestCase
         $this->assertNull($options->body());
         $this->assertSame(
             [
-                'CONTENT_TYPE' => ['application/json'],
                 'HTTP_ACCEPT' => ['application/json'],
+                'CONTENT_TYPE' => ['application/json'],
                 'HTTP_X_REQUESTED_WITH' => ['XMLHttpRequest'],
             ],
             $options->server()
