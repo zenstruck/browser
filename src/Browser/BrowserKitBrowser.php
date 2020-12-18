@@ -42,6 +42,16 @@ abstract class BrowserKitBrowser extends Browser
     }
 
     /**
+     * @return static
+     */
+    final public function followRedirects(): self
+    {
+        $this->inner->followRedirects(true);
+
+        return $this;
+    }
+
+    /**
      * @param int $max The maximum number of redirects to follow (defaults to "infinite")
      *
      * @return static

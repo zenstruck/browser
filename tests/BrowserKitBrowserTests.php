@@ -31,6 +31,21 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function can_re_enable_following_redirects(): void
+    {
+        $this->browser()
+            ->interceptRedirects()
+            ->visit('/redirect1')
+            ->assertOn('/redirect1')
+            ->followRedirects()
+            ->visit('/redirect1')
+            ->assertOn('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_limit_redirects_followed(): void
     {
         $this->browser()

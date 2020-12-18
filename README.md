@@ -189,6 +189,9 @@ $browser
     // by default, redirects are followed, this disables that behaviour
     ->interceptRedirects()
 
+    // re-enable following redirects by default
+    ->followRedirects()
+
     // Follows a redirect if ->interceptRedirects() has been turned on
     ->followRedirect() // follows all redirects by default
     ->followRedirect(1) // just follow 1 redirect
