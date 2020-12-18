@@ -59,9 +59,7 @@ abstract class BrowserKitBrowser extends Browser
     final public function followRedirect(int $max = PHP_INT_MAX): self
     {
         for ($i = 0; $i < $max; ++$i) {
-            $status = $this->minkSession()->getStatusCode();
-
-            if ($status < 300 || $status > 400) {
+            if (!$this->response()->isRedirect()) {
                 break;
             }
 

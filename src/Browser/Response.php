@@ -18,6 +18,11 @@ abstract class Response
         $this->session = $session;
     }
 
+    final public function statusCode(): int
+    {
+        return $this->session->getStatusCode();
+    }
+
     final public static function createFor(Session $session): self
     {
         $contentType = $session->getResponseHeader('content-type');
@@ -43,6 +48,16 @@ abstract class Response
         return "{$this->rawMetadata()}\n{$this->rawBody()}";
     }
 
+    final public function isSuccessful(): bool
+    {
+        return $this->statusCode() >= 200 && $this->statusCode() < 300;
+    }
+
+    final public function isRedirect(): bool
+    {
+        return $this->statusCode() >= 300 && $this->statusCode() < 400;
+    }
+
     /**
      * @return mixed
      */
@@ -55,7 +70,7 @@ abstract class Response
 
     protected function rawMetadata(): string
     {
-        $ret = "URL: {$this->session->getCurrentUrl()} ({$this->session->getStatusCode()})\n\n";
+        $ret = "URL: {$this->session->getCurrentUrl()} ({$this->statusCode()})\n\n";
 
         foreach ($this->session->getResponseHeaders() as $header => $values) {
             foreach ($values as $value) {

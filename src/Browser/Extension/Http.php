@@ -95,9 +95,7 @@ trait Http
      */
     final public function assertSuccessful(): self
     {
-        $status = $this->minkSession()->getStatusCode();
-
-        PHPUnit::assertTrue($status >= 200 && $status < 300, "Expected successful status code (2xx), [{$status}] received.");
+        PHPUnit::assertTrue($this->response()->isSuccessful(), "Expected successful status code (2xx), [{$this->response()->statusCode()}] received.");
 
         return $this;
     }
@@ -107,9 +105,7 @@ trait Http
      */
     final public function assertRedirected(): self
     {
-        $status = $this->minkSession()->getStatusCode();
-
-        PHPUnit::assertTrue($status >= 300 && $status < 400, "Expected redirect status code (3xx), [{$status}] received.");
+        PHPUnit::assertTrue($this->response()->isRedirect(), "Expected redirect status code (3xx), [{$this->response()->statusCode()}] received.");
 
         return $this;
     }
