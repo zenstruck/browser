@@ -65,7 +65,7 @@ final class HttpOptionsTest extends TestCase
             [
                 'server' => 'server value',
                 'HTTP_HEADER1' => 'header1 value',
-                'HTTP_HEADER2' => ['header2 value'],
+                'HTTP_HEADER2' => 'header2 value',
             ],
             $options->server()
         );
@@ -87,9 +87,9 @@ final class HttpOptionsTest extends TestCase
         $expectedServer = [
             'server' => 'server value',
             'HTTP_HEADER' => 'header value',
-            'HTTP_ACCEPT' => ['application/json'],
-            'CONTENT_TYPE' => ['application/json'],
-            'HTTP_X_REQUESTED_WITH' => ['XMLHttpRequest'],
+            'HTTP_ACCEPT' => 'application/json',
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
         ];
 
         $this->assertSame(\json_encode($json), $options->body());
@@ -106,7 +106,7 @@ final class HttpOptionsTest extends TestCase
         $this->assertNull($options->body());
         $this->assertSame(
             [
-                'HTTP_X_REQUESTED_WITH' => ['XMLHttpRequest'],
+                'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
             ],
             $options->server()
         );
@@ -122,8 +122,8 @@ final class HttpOptionsTest extends TestCase
         $this->assertSame('"value"', $options->body());
         $this->assertSame(
             [
-                'HTTP_ACCEPT' => ['application/json'],
-                'CONTENT_TYPE' => ['application/json'],
+                'HTTP_ACCEPT' => 'application/json',
+                'CONTENT_TYPE' => 'application/json',
             ],
             $options->server()
         );
@@ -139,8 +139,8 @@ final class HttpOptionsTest extends TestCase
         $this->assertNull($options->body());
         $this->assertSame(
             [
-                'HTTP_ACCEPT' => ['application/json'],
-                'CONTENT_TYPE' => ['application/json'],
+                'HTTP_ACCEPT' => 'application/json',
+                'CONTENT_TYPE' => 'application/json',
             ],
             $options->server()
         );
@@ -156,9 +156,9 @@ final class HttpOptionsTest extends TestCase
         $this->assertSame('"value"', $options->body());
         $this->assertSame(
             [
-                'HTTP_ACCEPT' => ['application/json'],
-                'CONTENT_TYPE' => ['application/json'],
-                'HTTP_X_REQUESTED_WITH' => ['XMLHttpRequest'],
+                'HTTP_ACCEPT' => 'application/json',
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
             ],
             $options->server()
         );
@@ -174,9 +174,9 @@ final class HttpOptionsTest extends TestCase
         $this->assertNull($options->body());
         $this->assertSame(
             [
-                'HTTP_ACCEPT' => ['application/json'],
-                'CONTENT_TYPE' => ['application/json'],
-                'HTTP_X_REQUESTED_WITH' => ['XMLHttpRequest'],
+                'HTTP_ACCEPT' => 'application/json',
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
             ],
             $options->server()
         );
@@ -190,5 +190,70 @@ final class HttpOptionsTest extends TestCase
         $options = new class() extends HttpOptions {};
 
         $this->assertSame($options, HttpOptions::create($options));
+    }
+
+    /**
+     * @test
+     */
+    public function can_merge_with_array(): void
+    {
+        $options = HttpOptions::create([
+            'headers' => ['header1' => 'header1 value'],
+            'parameters' => $expectedParameters = ['param' => 'param value'],
+            'files' => $expectedFiles = ['file' => 'file value'],
+            'server' => ['server' => 'server value'],
+            'body' => null,
+            'json' => null,
+            'ajax' => true,
+        ]);
+        $options = $options->merge([
+            'headers' => ['header2' => 'header2 value'],
+            'json' => $json = ['json' => 'body'],
+        ]);
+
+        $this->assertSame($expectedParameters, $options->parameters());
+        $this->assertSame($expectedFiles, $options->files());
+        $this->assertSame(\json_encode($json), $options->body());
+        $this->assertSame(
+            [
+                'server' => 'server value',
+                'HTTP_HEADER1' => 'header1 value',
+                'HTTP_HEADER2' => 'header2 value',
+                'HTTP_ACCEPT' => 'application/json',
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+            ],
+            $options->server()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function can_merge_with_http_options_object(): void
+    {
+        $options = HttpOptions::create([
+            'headers' => ['header1' => 'header1 value'],
+            'parameters' => $expectedParameters = ['param' => 'param value'],
+            'files' => $expectedFiles = ['file' => 'file value'],
+            'server' => ['server' => 'server value'],
+            'body' => null,
+            'json' => null,
+            'ajax' => true,
+        ]);
+        $options = $options->merge(new class(['headers' => ['header2' => 'header2 value']]) extends HttpOptions {});
+
+        $this->assertSame($expectedParameters, $options->parameters());
+        $this->assertSame($expectedFiles, $options->files());
+        $this->assertNull($options->body());
+        $this->assertSame(
+            [
+                'server' => 'server value',
+                'HTTP_HEADER1' => 'header1 value',
+                'HTTP_HEADER2' => 'header2 value',
+                'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+            ],
+            $options->server()
+        );
     }
 }

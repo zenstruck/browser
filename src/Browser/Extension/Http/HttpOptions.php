@@ -40,17 +40,17 @@ class HttpOptions
     }
 
     /**
-     * @param self|array $value
+     * @param self|array $options
      *
      * @return static
      */
-    final public static function create($value = []): self
+    final public static function create($options = []): self
     {
-        if ($value instanceof static) {
-            return $value;
+        if ($options instanceof static) {
+            return $options;
         }
 
-        return new static($value);
+        return new static($options);
     }
 
     /**
@@ -78,11 +78,42 @@ class HttpOptions
     }
 
     /**
+     * @param self|array $options
+     *
+     * @return static
+     */
+    final public function merge($options = []): self
+    {
+        $other = self::create($options);
+
+        // merge array options
+        $this->options['headers'] = \array_merge($this->options['headers'], $other->options['headers']);
+        $this->options['parameters'] = \array_merge($this->options['parameters'], $other->options['parameters']);
+        $this->options['files'] = \array_merge($this->options['files'], $other->options['files']);
+        $this->options['server'] = \array_merge($this->options['server'], $other->options['server']);
+
+        // override value options only if different from default
+        if ($other->options['body'] !== self::DEFAULT_OPTIONS['body']) {
+            $this->options['body'] = $other->options['body'];
+        }
+
+        if ($other->options['json'] !== self::DEFAULT_OPTIONS['json']) {
+            $this->options['json'] = $other->options['json'];
+        }
+
+        if ($other->options['ajax'] !== self::DEFAULT_OPTIONS['ajax']) {
+            $this->options['ajax'] = $other->options['ajax'];
+        }
+
+        return $this;
+    }
+
+    /**
      * @return static
      */
     final public function withHeader(string $header, string $value): self
     {
-        $this->options['headers'][$header][] = $value;
+        $this->options['headers'][$header] = $value;
 
         return $this;
     }
@@ -178,11 +209,11 @@ class HttpOptions
         $headers = $this->options['headers'];
 
         if (null !== $this->options['json']) {
-            $headers['Content-Type'][] = $headers['Accept'][] = 'application/json';
+            $headers['Content-Type'] = $headers['Accept'] = 'application/json';
         }
 
         if (false !== $this->options['ajax']) {
-            $headers['X-Requested-With'][] = 'XMLHttpRequest';
+            $headers['X-Requested-With'] = 'XMLHttpRequest';
         }
 
         foreach ($headers as $header => $value) {
