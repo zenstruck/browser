@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Browser;
 
-use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\VarDumper\VarDumper;
@@ -53,11 +52,13 @@ class PantherBrowser extends Browser
      */
     final public function assertVisible(string $selector): self
     {
-        return $this->wrapMinkExpectation(function() use ($selector) {
+        Assert::wrapMinkExpectation(function() use ($selector) {
             $element = $this->webAssert()->elementExists('css', $selector);
 
-            PHPUnit::assertTrue($element->isVisible());
+            Assert::true($element->isVisible(), 'Element "%s" is not visible.', $selector);
         });
+
+        return $this;
     }
 
     /**
@@ -65,15 +66,14 @@ class PantherBrowser extends Browser
      */
     final public function assertNotVisible(string $selector): self
     {
-        $element = $this->documentElement()->find('css', $selector);
-
-        if (!$element) {
-            PHPUnit::assertTrue(true);
+        if (!$element = $this->documentElement()->find('css', $selector)) {
+            // element does not exist and is therefore not visible
+            Assert::pass();
 
             return $this;
         }
 
-        PHPUnit::assertFalse($element->isVisible());
+        Assert::false($element->isVisible(), 'Element "%s" is visible but it should not be.', $selector);
 
         return $this;
     }

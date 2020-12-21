@@ -4,16 +4,15 @@ namespace Zenstruck;
 
 use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Element\DocumentElement;
-use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
-use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
+use Zenstruck\Browser\Assert;
+use Zenstruck\Browser\Assert\Assertion\Url;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Response;
-use Zenstruck\Browser\Test\Constraint\UrlMatches;
 use Zenstruck\Browser\Util\FunctionExecutor;
 
 /**
@@ -87,7 +86,7 @@ class Browser
      */
     final public function assertOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        PHPUnit::assertThat($expected, new UrlMatches($this->minkSession()->getCurrentUrl(), $parts));
+        Assert::that((new Url($this->minkSession()->getCurrentUrl(), $parts))->matches($expected));
 
         return $this;
     }
@@ -99,10 +98,7 @@ class Browser
      */
     final public function assertNotOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        PHPUnit::assertThat(
-            $expected,
-            PHPUnit::logicalNot(new UrlMatches($this->minkSession()->getCurrentUrl(), $parts))
-        );
+        Assert::that((new Url($this->minkSession()->getCurrentUrl(), $parts))->notMatches($expected));
 
         return $this;
     }
@@ -112,9 +108,11 @@ class Browser
      */
     final public function assertContains(string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->responseContains($expected)
         );
+
+        return $this;
     }
 
     /**
@@ -122,9 +120,11 @@ class Browser
      */
     final public function assertNotContains(string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->responseNotContains($expected)
         );
+
+        return $this;
     }
 
     /**
@@ -180,20 +180,5 @@ class Browser
     protected function response(): Response
     {
         return Response::createFor($this->minkSession());
-    }
-
-    /**
-     * @return static
-     */
-    final protected function wrapMinkExpectation(callable $callback): self
-    {
-        try {
-            $callback();
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
-
-        return $this;
     }
 }

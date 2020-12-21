@@ -4,7 +4,7 @@ namespace Zenstruck\Browser\Extension;
 
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
-use PHPUnit\Framework\Assert as PHPUnit;
+use Zenstruck\Browser\Assert;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -103,9 +103,11 @@ trait Html
      */
     final public function assertSee(string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->pageTextContains($expected)
         );
+
+        return $this;
     }
 
     /**
@@ -113,9 +115,11 @@ trait Html
      */
     final public function assertNotSee(string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->pageTextNotContains($expected)
         );
+
+        return $this;
     }
 
     /**
@@ -123,9 +127,11 @@ trait Html
      */
     final public function assertSeeIn(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->elementTextContains('css', $selector, $expected)
         );
+
+        return $this;
     }
 
     /**
@@ -133,9 +139,11 @@ trait Html
      */
     final public function assertNotSeeIn(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->elementTextNotContains('css', $selector, $expected)
         );
+
+        return $this;
     }
 
     /**
@@ -143,9 +151,11 @@ trait Html
      */
     final public function assertSeeElement(string $selector): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->elementExists('css', $selector)
         );
+
+        return $this;
     }
 
     /**
@@ -153,9 +163,11 @@ trait Html
      */
     final public function assertNotSeeElement(string $selector): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->elementNotExists('css', $selector)
         );
+
+        return $this;
     }
 
     /**
@@ -163,9 +175,11 @@ trait Html
      */
     final public function assertElementCount(string $selector, int $count): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->elementsCount('css', $selector, $count)
         );
+
+        return $this;
     }
 
     /**
@@ -173,9 +187,11 @@ trait Html
      */
     final public function assertFieldEquals(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->fieldValueEquals($selector, $expected)
         );
+
+        return $this;
     }
 
     /**
@@ -183,9 +199,11 @@ trait Html
      */
     final public function assertFieldNotEquals(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->fieldValueNotEquals($selector, $expected)
         );
+
+        return $this;
     }
 
     /**
@@ -195,12 +213,16 @@ trait Html
     {
         try {
             $field = $this->webAssert()->fieldExists($selector);
-            PHPUnit::assertTrue(true);
         } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
+            Assert::fail($e->getMessage());
         }
 
-        PHPUnit::assertContains($expected, (array) $field->getValue());
+        Assert::true(
+            \in_array($expected, (array) $field->getValue(), true),
+            'Expected "%s" to be selected in element "%s" but it was not.',
+            $expected,
+            $selector
+        );
 
         return $this;
     }
@@ -212,12 +234,16 @@ trait Html
     {
         try {
             $field = $this->webAssert()->fieldExists($selector);
-            PHPUnit::assertTrue(true);
         } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
+            Assert::fail($e->getMessage());
         }
 
-        PHPUnit::assertNotContains($expected, (array) $field->getValue());
+        Assert::false(
+            \in_array($expected, (array) $field->getValue(), true),
+            'Expected "%s" to not be selected in element "%s" but it was.',
+            $expected,
+            $selector
+        );
 
         return $this;
     }
@@ -227,9 +253,11 @@ trait Html
      */
     final public function assertChecked(string $selector): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->checkboxChecked($selector)
         );
+
+        return $this;
     }
 
     /**
@@ -237,9 +265,11 @@ trait Html
      */
     final public function assertNotChecked(string $selector): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->checkboxNotChecked($selector)
         );
+
+        return $this;
     }
 
     /**
@@ -247,9 +277,11 @@ trait Html
      */
     final public function assertElementAttributeContains(string $selector, string $attribute, string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->elementAttributeContains('css', $selector, $attribute, $expected)
         );
+
+        return $this;
     }
 
     /**
@@ -257,8 +289,10 @@ trait Html
      */
     final public function assertElementAttributeNotContains(string $selector, string $attribute, string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->elementAttributeNotContains('css', $selector, $attribute, $expected)
         );
+
+        return $this;
     }
 }
