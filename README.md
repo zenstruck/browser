@@ -305,8 +305,13 @@ class MyTest extends KernelTestCase
 
 ```php
 /** @var \Zenstruck\Browser\KernelBrowser $browser **/
+/** @var \Symfony\Component\Security\Core\User\UserInterface $user **/
 
 $browser
+    // authenticate a user for subsequent actions
+    // NOTE: only available in Symfony 5.1+
+    ->actingAs($user)
+
     // by default, exceptions are caught and converted to a response
     // this disables that behaviour allowing you to use TestCase::expectException()
     ->throwExceptions()

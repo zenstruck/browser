@@ -4,6 +4,7 @@ namespace Zenstruck\Browser;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -52,6 +53,13 @@ class KernelBrowser extends BrowserKitBrowser implements ProfileAware
     final public function withProfiling(): self
     {
         $this->inner()->enableProfiler();
+
+        return $this;
+    }
+
+    final public function actingAs(UserInterface $user): self
+    {
+        $this->inner()->loginUser($user);
 
         return $this;
     }

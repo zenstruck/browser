@@ -23,7 +23,8 @@
         "symfony/mailer": "^4.4|^5.0",
         "symfony/mime": ">=4.4.1",
         "symfony/panther": "dev-main",
-        "symfony/phpunit-bridge": "^5.1"
+        "symfony/phpunit-bridge": "^5.1",
+        "symfony/security-bundle": "^4.4|^5.0"
     },
     "config": {
         "preferred-install": "dist",

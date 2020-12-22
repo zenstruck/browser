@@ -5,6 +5,7 @@ namespace Zenstruck\Browser\Tests\Fixture;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -17,6 +18,8 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -114,9 +117,15 @@ final class Kernel extends BaseKernel
         return new Response('success');
     }
 
+    public function user(?UserInterface $user = null): Response
+    {
+        return new Response($user ? "user: {$user->getUsername()}/{$user->getPassword()}" : 'anon');
+    }
+
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
+        yield new SecurityBundle();
     }
 
     public function getLogDir(): string
@@ -137,6 +146,12 @@ final class Kernel extends BaseKernel
             'test' => true,
             'profiler' => ['enabled' => true, 'collect' => true],
             'mailer' => ['dsn' => 'null://null'],
+            'session' => ['storage_id' => 'session.storage.mock_file'],
+        ]);
+        $c->loadFromExtension('security', [
+            'encoders' => [User::class => 'plaintext'],
+            'providers' => ['users' => ['memory' => ['users' => ['kevin' => ['password' => 'pass']]]]],
+            'firewalls' => ['main' => ['anonymous' => true]],
         ]);
         $c->register('logger', NullLogger::class); // disable logging
         $c->setAlias('mailer', MailerInterface::class)->setPublic(true);
@@ -156,5 +171,6 @@ final class Kernel extends BaseKernel
         $routes->add('/send-email', 'kernel::sendEmail');
         $routes->add('/json', 'kernel::json');
         $routes->add('/javascript', 'kernel::javascript');
+        $routes->add('/user', 'kernel::user');
     }
 }
