@@ -128,16 +128,6 @@ final class Kernel extends BaseKernel
         yield new SecurityBundle();
     }
 
-    public function getLogDir(): string
-    {
-        return \sys_get_temp_dir().'/zenstruck-browser/logs';
-    }
-
-    public function getCacheDir(): string
-    {
-        return \sys_get_temp_dir().'/zenstruck-browser/cache';
-    }
-
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->loadFromExtension('framework', [
