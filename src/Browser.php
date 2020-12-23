@@ -34,6 +34,20 @@ class Browser
     /**
      * @return static
      */
+    public static function create(callable $factory): self
+    {
+        $browser = $factory();
+
+        if (!$browser instanceof self) {
+            throw new \RuntimeException(\sprintf('The factory callable must return an instance of "%s".', self::class));
+        }
+
+        return $browser;
+    }
+
+    /**
+     * @return static
+     */
     final public function setSourceDir(string $dir): self
     {
         $this->sourceDir = $dir;

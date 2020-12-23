@@ -5,7 +5,6 @@ namespace Zenstruck\Browser\Tests;
 use Symfony\Component\Panther\PantherTestCase;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\PantherBrowser;
-use Zenstruck\Browser\Test\HasPantherBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -14,7 +13,7 @@ use Zenstruck\Browser\Test\HasPantherBrowser;
  */
 final class PantherBrowserTest extends PantherTestCase
 {
-    use BrowserTests, HasPantherBrowser;
+    use BrowserTests;
 
     /**
      * @test
@@ -173,8 +172,8 @@ final class PantherBrowserTest extends PantherTestCase
         $this->assertStringContainsString('error!', $dumpedValues[0][0]['message']);
     }
 
-    protected static function browserClass(): string
+    protected function browser(): PantherBrowser
     {
-        return PantherBrowser::class;
+        return $this->pantherBrowser();
     }
 }

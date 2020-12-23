@@ -4,6 +4,7 @@ namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
+use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Tests\Extension\HtmlTests;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
@@ -13,7 +14,7 @@ use Zenstruck\Browser\Tests\Fixture\TestComponent2;
  */
 trait BrowserTests
 {
-    use HtmlTests;
+    use HasBrowser, HtmlTests;
 
     /**
      * @test
@@ -128,12 +129,14 @@ trait BrowserTests
      */
     public function with_can_accept_multiple_browsers_and_components(): void
     {
-        $this->browser()
-            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2) {
+        $browser = $this->browser();
+
+        $browser
+            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2) use ($browser) {
                 $this->assertInstanceOf(Browser::class, $browser1);
                 $this->assertInstanceOf(Browser::class, $browser2);
-                $this->assertInstanceOf($this->browserClass(), $browser1);
-                $this->assertInstanceOf($this->browserClass(), $browser2);
+                $this->assertInstanceOf(\get_class($browser), $browser1);
+                $this->assertInstanceOf(\get_class($browser), $browser2);
                 $this->assertInstanceOf(TestComponent1::class, $component1);
                 $this->assertInstanceOf(TestComponent2::class, $component2);
             })
@@ -226,5 +229,5 @@ trait BrowserTests
         \unlink($file);
     }
 
-    abstract protected static function browserClass(): string;
+    abstract protected function browser(): Browser;
 }

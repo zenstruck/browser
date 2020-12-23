@@ -3,26 +3,28 @@
 namespace Zenstruck\Browser\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Zenstruck\Browser;
-use Zenstruck\Browser\Test\HasKernelBrowser;
+use Zenstruck\Browser\KernelBrowser;
+use Zenstruck\Browser\Test\HasBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class ConfigureBrowserTest extends WebTestCase
 {
-    use HasKernelBrowser;
+    use HasBrowser {
+        kernelBrowser as baseKernelBrowser;
+    }
 
     /**
      * @test
      */
     public function browser_has_been_configured(): void
     {
-        $this->browser()->assertOn('/page1');
+        $this->kernelBrowser()->assertOn('/page1');
     }
 
-    protected function configureBrowser(Browser $browser): void
+    protected function kernelBrowser(): KernelBrowser
     {
-        $browser->visit('/page1');
+        return $this->baseKernelBrowser()->visit('/page1');
     }
 }
