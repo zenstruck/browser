@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Browser\Extension;
 
-use PHPUnit\Framework\Assert as PHPUnit;
+use Zenstruck\Browser\Assert;
 use Zenstruck\Browser\Response\JsonResponse;
 
 /**
@@ -12,9 +12,11 @@ trait Json
 {
     final public function assertJson(): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->responseHeaderContains('Content-Type', 'application/json')
         );
+
+        return $this;
     }
 
     /**
@@ -26,10 +28,18 @@ trait Json
     final public function assertJsonMatches(string $expression, $expected): self
     {
         if (!$this->response() instanceof JsonResponse) {
-            PHPUnit::fail('Not a json response.');
+            Assert::fail('Not a json response.');
         }
 
-        PHPUnit::assertSame($expected, $this->response()->find($expression));
+        $actual = $this->response()->find($expression);
+
+        Assert::true(
+            $expected === $actual,
+            'Expected: %s using JMESPath "%s" but found: %s.',
+            \json_encode($expected, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+            $expression,
+            \json_encode($actual, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+        );
 
         return $this;
     }

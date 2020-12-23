@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Browser\Extension;
 
-use PHPUnit\Framework\Assert as PHPUnit;
+use Zenstruck\Browser\Assert;
 use Zenstruck\Browser\Extension\Http\HttpOptions;
 
 /**
@@ -85,9 +85,11 @@ trait Http
      */
     final public function assertStatus(int $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->statusCodeEquals($expected)
         );
+
+        return $this;
     }
 
     /**
@@ -95,7 +97,7 @@ trait Http
      */
     final public function assertSuccessful(): self
     {
-        PHPUnit::assertTrue($this->response()->isSuccessful(), "Expected successful status code (2xx), [{$this->response()->statusCode()}] received.");
+        Assert::true($this->response()->isSuccessful(), 'Expected successful status code (2xx) but got %d.', $this->response()->statusCode());
 
         return $this;
     }
@@ -105,7 +107,7 @@ trait Http
      */
     final public function assertRedirected(): self
     {
-        PHPUnit::assertTrue($this->response()->isRedirect(), "Expected redirect status code (3xx), [{$this->response()->statusCode()}] received.");
+        Assert::true($this->response()->isRedirect(), 'Expected redirect status code (3xx) but got %d.', $this->response()->statusCode());
 
         return $this;
     }
@@ -115,9 +117,11 @@ trait Http
      */
     final public function assertHeaderEquals(string $header, string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->responseHeaderEquals($header, $expected)
         );
+
+        return $this;
     }
 
     /**
@@ -125,9 +129,11 @@ trait Http
      */
     final public function assertHeaderContains(string $header, string $expected): self
     {
-        return $this->wrapMinkExpectation(
+        Assert::wrapMinkExpectation(
             fn() => $this->webAssert()->responseHeaderContains($header, $expected)
         );
+
+        return $this;
     }
 
     abstract protected function makeRequest(string $method, string $url, HttpOptions $options): void;

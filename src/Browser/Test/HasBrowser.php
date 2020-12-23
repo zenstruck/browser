@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\HttpBrowser as HttpBrowserClient;
 use Symfony\Component\Panther\Client as PantherClient;
 use Symfony\Component\Panther\PantherTestCase;
+use Zenstruck\Browser\Assert;
+use Zenstruck\Browser\Assert\Handler\PHPUnitHandler;
 use Zenstruck\Browser\HttpBrowser;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\PantherBrowser;
@@ -28,6 +30,15 @@ trait HasBrowser
     {
         self::$httpBrowserClients = [];
         self::$primaryPantherClient = null;
+    }
+
+    /**
+     * @internal
+     * @beforeClass
+     */
+    final public static function _configurePHPUnitAssertionHandler(): void
+    {
+        Assert::setHandler(new PHPUnitHandler());
     }
 
     protected function pantherBrowser(): PantherBrowser

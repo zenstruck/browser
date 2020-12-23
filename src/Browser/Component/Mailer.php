@@ -2,10 +2,10 @@
 
 namespace Zenstruck\Browser\Component;
 
-use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
+use Zenstruck\Browser\Assert;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Component\Mailer\TestEmail;
 use Zenstruck\Browser\ProfileAware;
@@ -18,7 +18,9 @@ final class Mailer extends Component
 {
     public function assertNoEmailSent(): self
     {
-        PHPUnit::assertCount(0, $this->mailerEvents(), \sprintf('Expected no email to be sent, but %d emails were sent.', \count($this->mailerEvents())));
+        $count = \count($this->mailerEvents());
+
+        Assert::true(0 === $count, 'Expected no email to be sent, but %d emails were sent.', $count);
 
         return $this;
     }
@@ -31,7 +33,7 @@ final class Mailer extends Component
         $events = $this->mailerEvents();
 
         if (0 === \count($events)) {
-            PHPUnit::fail('No emails have been sent.');
+            Assert::fail('No emails have been sent.');
         }
 
         if (!\is_callable($callback)) {
@@ -64,7 +66,7 @@ final class Mailer extends Component
             }
         }
 
-        PHPUnit::fail(\sprintf('Email sent, but "%s" is not among to-addresses: %s', $expectedTo, \implode(', ', \array_merge(...$foundToAddresses))));
+        Assert::fail('Email sent, but "%s" is not among to-addresses: %s', $expectedTo, \implode(', ', \array_merge(...$foundToAddresses)));
     }
 
     protected function preAssertions(): void
