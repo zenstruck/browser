@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Test;
 
+use PHPUnit\Runner\AfterLastTestHook;
 use PHPUnit\Runner\AfterTestErrorHook;
 use PHPUnit\Runner\AfterTestFailureHook;
 use PHPUnit\Runner\AfterTestHook;
@@ -12,11 +13,12 @@ use Zenstruck\Browser;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class BrowserExtension implements BeforeFirstTestHook, BeforeTestHook, AfterTestHook, AfterTestErrorHook, AfterTestFailureHook
+final class BrowserExtension implements BeforeFirstTestHook, BeforeTestHook, AfterTestHook, AfterTestErrorHook, AfterTestFailureHook, AfterLastTestHook
 {
     /** @var Browser[] */
     private static array $registeredBrowsers = [];
     private static bool $enabled = false;
+    private array $savedArtifacts = [];
 
     /**
      * @internal
@@ -42,7 +44,38 @@ final class BrowserExtension implements BeforeFirstTestHook, BeforeTestHook, Aft
 
     public function executeAfterTest(string $test, float $time): void
     {
+        foreach (self::$registeredBrowsers as $browser) {
+            foreach ($browser->savedArtifacts() as $category => $artifacts) {
+                if (!\count($artifacts)) {
+                    continue;
+                }
+
+                $this->savedArtifacts[$test][$category] = $artifacts;
+            }
+        }
+
         self::reset();
+    }
+
+    public function executeAfterLastTest(): void
+    {
+        if (empty($this->savedArtifacts)) {
+            return;
+        }
+
+        echo "\n\nSaved Browser Artifacts:";
+
+        foreach ($this->savedArtifacts as $test => $categories) {
+            echo "\n\n  {$test}";
+
+            foreach ($categories as $category => $artifacts) {
+                echo "\n    {$category}:";
+
+                foreach ($artifacts as $artifact) {
+                    echo "\n      * {$artifact}:";
+                }
+            }
+        }
     }
 
     public function executeAfterTestError(string $test, string $message, float $time): void

@@ -54,9 +54,7 @@ public function testViewPostAndAddComment()
 $ composer require zenstruck/browser --dev
 ```
 
-Optionally, enable the provided extension in your `phpunit.xml`. This extension intercepts test
-errors/failures and saves the current browser's source to the filesystem. If using the `PantherBrowser`,
-a screenshot and the javascript console is also saved.
+Optionally, enable the provided extension in your `phpunit.xml`: 
 
 ```xml
 <!-- phpunit.xml -->
@@ -65,6 +63,13 @@ a screenshot and the javascript console is also saved.
     <extension class="Zenstruck\Browser\Test\BrowserExtension" />
 </extensions>
 ```
+
+This extension provides the following features:
+
+1. Intercepts test errors/failures and saves the browser's source (and screenshot/js console log if
+   applicable) to the filesystem.
+2. After your test suite is finished, list of summary of all saved artifacts (source/screenshots/js
+   console logs) in your console.
 
 ## Configuration
 

@@ -23,6 +23,8 @@ class PantherBrowser extends Browser
     private Client $client;
     private ?string $screenshotDir = null;
     private ?string $consoleLogDir = null;
+    private array $savedScreenshots = [];
+    private array $savedConsoleLogs = [];
 
     final public function __construct(Client $client)
     {
@@ -152,7 +154,7 @@ class PantherBrowser extends Browser
             $filename = \sprintf('%s/%s', \rtrim($this->screenshotDir, '/'), \ltrim($filename, '/'));
         }
 
-        $this->client->takeScreenshot($filename);
+        $this->client->takeScreenshot($this->savedScreenshots[] = $filename);
 
         return $this;
     }
@@ -166,7 +168,7 @@ class PantherBrowser extends Browser
         $log = $this->client->manage()->getLog('browser');
         $log = \json_encode($log, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
 
-        (new Filesystem())->dumpFile($filename, $log);
+        (new Filesystem())->dumpFile($this->savedConsoleLogs[] = $filename, $log);
 
         return $this;
     }
@@ -188,8 +190,7 @@ class PantherBrowser extends Browser
     {
         $this->takeScreenshot($filename);
 
-        // todo show real filename
-        echo "\n\nScreenshot saved as \"{$filename}\".\n\n";
+        echo \sprintf("\n\nScreenshot saved as \"%s\".\n\n", \end($this->savedScreenshots));
 
         $this->die();
     }
@@ -203,6 +204,17 @@ class PantherBrowser extends Browser
 
         $this->takeScreenshot("{$filename}.png");
         $this->saveConsoleLog("{$filename}.log");
+    }
+
+    /**
+     * @internal
+     */
+    public function savedArtifacts(): array
+    {
+        return \array_merge(
+            parent::savedArtifacts(),
+            ['Saved Console Logs' => $this->savedConsoleLogs, 'Saved Screenshots' => $this->savedScreenshots]
+        );
     }
 
     protected function response(): PantherResponse

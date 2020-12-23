@@ -25,6 +25,7 @@ class Browser
 
     private Mink $mink;
     private ?string $sourceDir = null;
+    private array $savedSources = [];
 
     public function __construct(DriverInterface $driver)
     {
@@ -151,7 +152,7 @@ class Browser
             $filename = \sprintf('%s/%s', \rtrim($this->sourceDir, '/'), \ltrim($filename, '/'));
         }
 
-        (new Filesystem())->dumpFile($filename, $this->response()->raw());
+        (new Filesystem())->dumpFile($this->savedSources[] = $filename, $this->response()->raw());
 
         return $this;
     }
@@ -178,6 +179,14 @@ class Browser
     public function dumpCurrentState(string $filename): void
     {
         $this->saveSource("{$filename}.txt");
+    }
+
+    /**
+     * @internal
+     */
+    public function savedArtifacts(): array
+    {
+        return ['Saved Source Files' => $this->savedSources];
     }
 
     protected function response(): Response
