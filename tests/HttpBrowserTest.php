@@ -4,17 +4,16 @@ namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Browser\HttpBrowser;
-use Zenstruck\Browser\Test\HasHttpBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class HttpBrowserTest extends PantherTestCase
 {
-    use BrowserKitBrowserTests, HasHttpBrowser;
+    use BrowserKitBrowserTests;
 
-    protected static function browserClass(): string
+    protected function browser(): HttpBrowser
     {
-        return HttpBrowser::class;
+        return $this->httpBrowser();
     }
 }
