@@ -184,6 +184,9 @@ class PantherBrowser extends Browser
         exit(1);
     }
 
+    /**
+     * @internal
+     */
     final public function dumpCurrentState(string $filename): void
     {
         parent::dumpCurrentState($filename);

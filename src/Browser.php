@@ -172,6 +172,9 @@ class Browser
         exit(1);
     }
 
+    /**
+     * @internal
+     */
     public function dumpCurrentState(string $filename): void
     {
         $this->saveSource("{$filename}.txt");
