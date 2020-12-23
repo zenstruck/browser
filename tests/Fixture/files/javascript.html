@@ -33,6 +33,7 @@
 <h1>Console Log Test</h1>
 <button id="log-error">log error</button>
 <button id="throw-error">throw error</button>
+<button id="throw-raw">throw raw</button>
 <hr>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -65,6 +66,9 @@
         });
         $('#throw-error').click(function() {
             throw new Error('error object message');
+        });
+        $('#throw-raw').click(function() {
+            throw 'raw error message';
         });
     });
 </script>
