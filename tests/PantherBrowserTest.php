@@ -188,6 +188,22 @@ final class PantherBrowserTest extends TestCase
         ;
     }
 
+    /**
+     * @test
+     */
+    public function can_dump_console_log_with_throw_raw(): void
+    {
+        $output = self::catchVarDumperOutput(function() {
+            $this->browser()
+                ->visit('/javascript')
+                ->click('throw raw')
+                ->dumpConsoleLog()
+            ;
+        });
+
+        $this->assertStringContainsString('raw error message', \json_encode($output, JSON_THROW_ON_ERROR));
+    }
+
     protected function browser(): PantherBrowser
     {
         return $this->pantherBrowser();
