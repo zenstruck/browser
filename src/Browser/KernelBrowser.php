@@ -19,6 +19,30 @@ class KernelBrowser extends BrowserKitBrowser implements ProfileAware
     }
 
     /**
+     * @see SymfonyKernelBrowser::disableReboot()
+     *
+     * @return static
+     */
+    public function disableReboot(): self
+    {
+        $this->inner()->disableReboot();
+
+        return $this;
+    }
+
+    /**
+     * @see SymfonyKernelBrowser::enableReboot()
+     *
+     * @return static
+     */
+    public function enableReboot(): self
+    {
+        $this->inner()->enableReboot();
+
+        return $this;
+    }
+
+    /**
      * By default, exceptions made during a request are caught and converted
      * to responses by Symfony. This disables this behaviour and actually
      * throws the exception.

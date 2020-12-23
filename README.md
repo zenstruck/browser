@@ -346,6 +346,13 @@ $browser
     // re-enable catching exceptions
     ->catchExceptions()
 
+    // by default, the kernel is rebooted between requests
+    // this disables this behaviour
+    ->disableReboot()
+
+    // re-enable rebooting between requests if previously disabled
+    ->enableReboot()
+
     // enable the profiler for the next request (if not globally enabled)
     ->withProfiling()
 ;
