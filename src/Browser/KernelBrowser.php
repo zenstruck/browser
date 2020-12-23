@@ -57,7 +57,7 @@ class KernelBrowser extends BrowserKitBrowser implements ProfileAware
         return $this;
     }
 
-    final public function actingAs(UserInterface $user, string $firewall = null): self
+    final public function actingAs(UserInterface $user, ?string $firewall = null): self
     {
         if (null === $firewall) {
             $this->inner()->loginUser($user);
