@@ -211,6 +211,28 @@ trait BrowserTests
         $this->assertStringContainsString('<h1>h1 title</h1>', $contents);
     }
 
+    /**
+     * @test
+     */
+    public function can_interact_with_inputs_not_in_form_element(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->assertChecked('Input 8')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_interact_with_inputs_without_name_attribute(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->assertChecked('Input 9')
+        ;
+    }
+
     protected static function catchFileContents(string $expectedFile, callable $callback): string
     {
         (new Filesystem())->remove($expectedFile);
