@@ -404,6 +404,9 @@ $browser
     
     // dd() the browser's console error log
     ->ddConsoleLog()
+    
+    // take screenshot (default filename is "screenshot.png")
+    ->ddScreenshot()
 ;
 ```
 

@@ -184,6 +184,16 @@ class PantherBrowser extends Browser
         $this->die();
     }
 
+    final public function ddScreenshot(string $filename = 'screenshot.png'): void
+    {
+        $this->takeScreenshot($filename);
+
+        // todo show real filename
+        echo "\n\nScreenshot saved as \"{$filename}\".\n\n";
+
+        $this->die();
+    }
+
     /**
      * @internal
      */
