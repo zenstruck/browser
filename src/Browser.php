@@ -169,7 +169,7 @@ class Browser
     final public function dd(?string $selector = null): void
     {
         $this->dump($selector);
-        exit(1);
+        $this->die();
     }
 
     /**
@@ -198,5 +198,10 @@ class Browser
         }
 
         return $this;
+    }
+
+    protected function die(): void
+    {
+        exit(1);
     }
 }

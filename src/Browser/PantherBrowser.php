@@ -181,7 +181,7 @@ class PantherBrowser extends Browser
     final public function ddConsoleLog(): void
     {
         $this->dumpConsoleLog();
-        exit(1);
+        $this->die();
     }
 
     /**
@@ -198,5 +198,11 @@ class PantherBrowser extends Browser
     protected function response(): PantherResponse
     {
         return new PantherResponse($this->minkSession());
+    }
+
+    protected function die(): void
+    {
+        $this->client->quit();
+        parent::die();
     }
 }
