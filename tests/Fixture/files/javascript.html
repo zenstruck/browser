@@ -31,7 +31,7 @@
 <hr>
 
 <h1>Console Log Test</h1>
-<button id="log">log</button>
+<button id="log-error">log error</button>
 <hr>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -59,8 +59,8 @@
         $('#toggle').click(function() {
             $('#toggle-box').toggle();
         });
-        $('#log').click(function() {
-            console.error('error!');
+        $('#log-error').click(function() {
+            console.error('console.error message');
         });
     });
 </script>

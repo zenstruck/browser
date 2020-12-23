@@ -118,30 +118,29 @@ final class PantherBrowserTest extends PantherTestCase
         $contents = self::catchFileContents(__DIR__.'/../var/browser/console-logs/console.log', function() {
             $this->browser()
                 ->visit('/javascript')
-                ->click('log')
+                ->click('log error')
                 ->saveConsoleLog('console.log')
             ;
         });
 
         $this->assertStringContainsString('        "level": "SEVERE",', $contents);
-        $this->assertStringContainsString('error!', $contents);
+        $this->assertStringContainsString('console.error message', $contents);
     }
 
     /**
      * @test
      */
-    public function can_dump_console_log(): void
+    public function can_dump_console_log_with_console_error(): void
     {
         $output = self::catchVarDumperOutput(function() {
             $this->browser()
                 ->visit('/javascript')
-                ->click('log')
+                ->click('log error')
                 ->dumpConsoleLog()
             ;
         });
 
-        $this->assertSame('SEVERE', $output[0][0]['level']);
-        $this->assertStringContainsString('error!', $output[0][0]['message']);
+        $this->assertStringContainsString('console.error message', \json_encode($output, JSON_THROW_ON_ERROR));
     }
 
     protected function browser(): PantherBrowser
