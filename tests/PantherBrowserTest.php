@@ -19,20 +19,12 @@ final class PantherBrowserTest extends PantherTestCase
      */
     public function can_take_screenshot(): void
     {
-        $file = __DIR__.'/../var/browser/screenshots/screen.png';
-
-        if (\file_exists($file)) {
-            \unlink($file);
-        }
-
-        $this->browser()
-            ->visit('/page1')
-            ->takeScreenshot('screen.png')
-        ;
-
-        $this->assertFileExists($file);
-
-        \unlink($file);
+        self::catchFileContents(__DIR__.'/../var/browser/screenshots/screen.png', function() {
+            $this->browser()
+                ->visit('/page1')
+                ->takeScreenshot('screen.png')
+            ;
+        });
     }
 
     /**
@@ -123,26 +115,16 @@ final class PantherBrowserTest extends PantherTestCase
      */
     public function can_save_console_log(): void
     {
-        $file = __DIR__.'/../var/browser/console-logs/console.log';
-
-        if (\file_exists($file)) {
-            \unlink($file);
-        }
-
-        $this->browser()
-            ->visit('/javascript')
-            ->click('log')
-            ->saveConsoleLog('console.log')
-        ;
-
-        $this->assertFileExists($file);
-
-        $contents = \file_get_contents($file);
+        $contents = self::catchFileContents(__DIR__.'/../var/browser/console-logs/console.log', function() {
+            $this->browser()
+                ->visit('/javascript')
+                ->click('log')
+                ->saveConsoleLog('console.log')
+            ;
+        });
 
         $this->assertStringContainsString('        "level": "SEVERE",', $contents);
         $this->assertStringContainsString('error!', $contents);
-
-        \unlink($file);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Test\HasBrowser;
@@ -198,26 +199,27 @@ trait BrowserTests
      */
     public function can_save_source(): void
     {
-        $file = __DIR__.'/../var/browser/source/source.txt';
-
-        if (\file_exists($file)) {
-            \unlink($file);
-        }
-
-        $this->browser()
-            ->visit('/page1')
-            ->saveSource('source.txt')
-        ;
-
-        $this->assertFileExists($file);
-
-        $contents = \file_get_contents($file);
+        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/source.txt', function() {
+            $this->browser()
+                ->visit('/page1')
+                ->saveSource('source.txt')
+            ;
+        });
 
         $this->assertStringContainsString('/page1', $contents);
         $this->assertStringContainsString('<html', $contents);
         $this->assertStringContainsString('<h1>h1 title</h1>', $contents);
+    }
 
-        \unlink($file);
+    protected static function catchFileContents(string $expectedFile, callable $callback): string
+    {
+        (new Filesystem())->remove($expectedFile);
+
+        $callback();
+
+        self::assertFileExists($expectedFile);
+
+        return \file_get_contents($expectedFile);
     }
 
     protected static function catchVarDumperOutput(callable $callback): array

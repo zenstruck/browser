@@ -82,24 +82,14 @@ trait JsonTests
      */
     public function can_save_formatted_json_source(): void
     {
-        $file = __DIR__.'/../../var/browser/source/source.txt';
-
-        if (\file_exists($file)) {
-            \unlink($file);
-        }
-
-        $this->browser()
-            ->visit('/http-method')
-            ->saveSource('/source.txt')
-        ;
-
-        $this->assertFileExists($file);
-
-        $contents = \file_get_contents($file);
+        $contents = self::catchFileContents(__DIR__.'/../../var/browser/source/source.txt', function() {
+            $this->browser()
+                ->visit('/http-method')
+                ->saveSource('/source.txt')
+            ;
+        });
 
         $this->assertStringContainsString('/http-method', $contents);
         $this->assertStringContainsString('    "content": "",', $contents);
-
-        \unlink($file);
     }
 }
