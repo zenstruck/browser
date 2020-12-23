@@ -3,7 +3,6 @@
 namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\Panther\PantherTestCase;
-use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\PantherBrowser;
 
 /**
@@ -151,25 +150,16 @@ final class PantherBrowserTest extends PantherTestCase
      */
     public function can_dump_console_log(): void
     {
-        $dumpedValues[] = null;
-
-        VarDumper::setHandler(function($var) use (&$dumpedValues) {
-            $dumpedValues[] = $var;
+        $output = self::catchVarDumperOutput(function() {
+            $this->browser()
+                ->visit('/javascript')
+                ->click('log')
+                ->dumpConsoleLog()
+            ;
         });
 
-        $this->browser()
-            ->visit('/javascript')
-            ->click('log')
-            ->dumpConsoleLog()
-        ;
-
-        VarDumper::setHandler();
-
-        // a null value is added to the beginning
-        $dumpedValues = \array_values(\array_filter($dumpedValues));
-
-        $this->assertSame('SEVERE', $dumpedValues[0][0]['level']);
-        $this->assertStringContainsString('error!', $dumpedValues[0][0]['message']);
+        $this->assertSame('SEVERE', $output[0][0]['level']);
+        $this->assertStringContainsString('error!', $output[0][0]['message']);
     }
 
     protected function browser(): PantherBrowser

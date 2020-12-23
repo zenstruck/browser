@@ -2,8 +2,6 @@
 
 namespace Zenstruck\Browser\Tests\Extension;
 
-use Symfony\Component\VarDumper\VarDumper;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -169,22 +167,13 @@ trait HtmlTests
      */
     public function can_dump_html_element(): void
     {
-        $dumpedValues[] = null;
-
-        VarDumper::setHandler(function($var) use (&$dumpedValues) {
-            $dumpedValues[] = $var;
+        $output = self::catchVarDumperOutput(function() {
+            $this->browser()
+                ->visit('/page1')
+                ->dump('p#link')
+            ;
         });
 
-        $this->browser()
-            ->visit('/page1')
-            ->dump('p#link')
-        ;
-
-        VarDumper::setHandler();
-
-        // a null value is added to the beginning
-        $dumped = \array_values(\array_filter($dumpedValues))[0];
-
-        $this->assertSame('<a href="/page2">a link</a> not a link', $dumped);
+        $this->assertSame('<a href="/page2">a link</a> not a link', $output[0]);
     }
 }

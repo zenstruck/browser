@@ -181,25 +181,16 @@ trait BrowserTests
      */
     public function can_dump_response(): void
     {
-        $dumpedValues[] = null;
-
-        VarDumper::setHandler(function($var) use (&$dumpedValues) {
-            $dumpedValues[] = $var;
+        $output = self::catchVarDumperOutput(function() {
+            $this->browser()
+                ->visit('/page1')
+                ->dump()
+            ;
         });
 
-        $this->browser()
-            ->visit('/page1')
-            ->dump()
-        ;
-
-        VarDumper::setHandler();
-
-        // a null value is added to the beginning
-        $dumped = \array_values(\array_filter($dumpedValues))[0];
-
-        $this->assertStringContainsString('/page1', $dumped);
-        $this->assertStringContainsString('<html', $dumped);
-        $this->assertStringContainsString('<h1>h1 title</h1>', $dumped);
+        $this->assertStringContainsString('/page1', $output[0]);
+        $this->assertStringContainsString('<html', $output[0]);
+        $this->assertStringContainsString('<h1>h1 title</h1>', $output[0]);
     }
 
     /**
@@ -227,6 +218,23 @@ trait BrowserTests
         $this->assertStringContainsString('<h1>h1 title</h1>', $contents);
 
         \unlink($file);
+    }
+
+    protected static function catchVarDumperOutput(callable $callback): array
+    {
+        $output[] = null;
+
+        VarDumper::setHandler(function($var) use (&$output) {
+            $output[] = $var;
+        });
+
+        $callback();
+
+        // reset to default handler
+        VarDumper::setHandler();
+
+        // a null value is added to the beginning
+        return \array_values(\array_filter($output));
     }
 
     abstract protected function browser(): Browser;
