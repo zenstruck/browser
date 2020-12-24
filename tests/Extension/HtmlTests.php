@@ -174,6 +174,24 @@ trait HtmlTests
             ;
         });
 
+        $this->assertCount(1, $output);
         $this->assertSame('<a href="/page2">a link</a> not a link', $output[0]);
+    }
+
+    /**
+     * @test
+     */
+    public function if_dump_selector_matches_multiple_elements_all_are_dumped(): void
+    {
+        $output = self::catchVarDumperOutput(function() {
+            $this->browser()
+                ->visit('/page1')
+                ->dump('li')
+            ;
+        });
+
+        $this->assertCount(2, $output);
+        $this->assertSame('list 1', $output[0]);
+        $this->assertSame('list 2', $output[1]);
     }
 }

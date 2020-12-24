@@ -10,7 +10,6 @@ use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Response;
 use Zenstruck\Browser\Test\Constraint\UrlMatches;
@@ -162,7 +161,7 @@ class Browser
      */
     final public function dump(?string $selector = null): self
     {
-        VarDumper::dump($selector ? $this->response()->find($selector) : $this->response()->raw());
+        $this->response()->dump($selector);
 
         return $this;
     }

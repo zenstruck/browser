@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser;
 
 use Behat\Mink\Session;
+use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Response\HtmlResponse;
 use Zenstruck\Browser\Response\JsonResponse;
 
@@ -56,6 +57,15 @@ class Response
     final public function isRedirect(): bool
     {
         return $this->statusCode() >= 300 && $this->statusCode() < 400;
+    }
+
+    public function dump(?string $selector = null): void
+    {
+        if (null !== $selector) {
+            throw new \LogicException('$selector cannot be used with this response type.');
+        }
+
+        VarDumper::dump($this->raw());
     }
 
     /**
