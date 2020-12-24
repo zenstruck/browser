@@ -26,7 +26,7 @@ class Response
 
     final public static function createFor(Session $session): self
     {
-        $contentType = $session->getResponseHeader('content-type');
+        $contentType = (string) $session->getResponseHeader('content-type');
 
         if (str_contains($contentType, 'json')) {
             return new JsonResponse($session);
@@ -39,7 +39,7 @@ class Response
         return new self($session);
     }
 
-    public function body()
+    final public function body(): string
     {
         return $this->session->getPage()->getContent();
     }
@@ -66,14 +66,6 @@ class Response
         }
 
         VarDumper::dump($this->raw());
-    }
-
-    /**
-     * @return mixed
-     */
-    public function find(string $selector)
-    {
-        throw new \LogicException('Find cannot be used on this response type.');
     }
 
     final protected function session(): Session

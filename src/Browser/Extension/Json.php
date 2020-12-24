@@ -29,7 +29,7 @@ trait Json
             PHPUnit::fail('Not a json response.');
         }
 
-        PHPUnit::assertSame($expected, $this->response()->find($expression));
+        PHPUnit::assertSame($expected, $this->response()->search($expression));
 
         return $this;
     }
