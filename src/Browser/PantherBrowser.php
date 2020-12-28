@@ -53,6 +53,24 @@ class PantherBrowser extends Browser
     /**
      * @return static
      */
+    public function follow(string $link): self
+    {
+        if (!$element = $this->documentElement()->findLink($link)) {
+            PHPUnit::fail(\sprintf('Link "%s" not found.', $link));
+        }
+
+        if (!$element->isVisible()) {
+            PHPUnit::fail(\sprintf('Link "%s" is not visible.', $link));
+        }
+
+        $this->documentElement()->clickLink($link);
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
     final public function assertVisible(string $selector): self
     {
         return $this->wrapMinkExpectation(function() use ($selector) {

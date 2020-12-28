@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Browser\PantherBrowser;
 
@@ -157,6 +158,20 @@ final class PantherBrowserTest extends PantherTestCase
         });
 
         $this->assertStringContainsString('Error: error object message', \json_encode($output, JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_follow_invisible_link(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectErrorMessage('Link "invisible link" is not visible.');
+
+        $this->browser()
+            ->visit('/javascript')
+            ->follow('invisible link')
+        ;
     }
 
     protected function browser(): PantherBrowser
