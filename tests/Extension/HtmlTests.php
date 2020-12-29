@@ -78,21 +78,6 @@ trait HtmlTests
     /**
      * @test
      */
-    public function link_action(): void
-    {
-        $this->browser()
-            ->visit('/page1')
-            ->follow('a link')
-            ->assertOn('/page2')
-            ->visit('/page1')
-            ->click('a link')
-            ->assertOn('/page2')
-        ;
-    }
-
-    /**
-     * @test
-     */
     public function form_actions_by_field_label(): void
     {
         $this->browser()
