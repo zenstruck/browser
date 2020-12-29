@@ -18,6 +18,14 @@ final class PantherBrowserTest extends PantherTestCase
     /**
      * @test
      */
+    public function can_click_any_element(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
     public function can_take_screenshot(): void
     {
         self::catchFileContents(__DIR__.'/../var/browser/screenshots/screen.png', function() {

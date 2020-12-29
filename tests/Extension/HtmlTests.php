@@ -165,6 +165,14 @@ trait HtmlTests
     /**
      * @test
      */
+    public function form_actions_by_css_selector(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_html_element(): void
     {
         $output = self::catchVarDumperOutput(function() {
@@ -193,5 +201,149 @@ trait HtmlTests
         $this->assertCount(2, $output);
         $this->assertSame('list 1', $output[0]);
         $this->assertSame('list 2', $output[1]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_follow_link_by_link_id(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_follow_link_by_link_title(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_follow_link_by_link_text(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_follow_link_by_image_alt(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_follow_link_by_css_selector(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_follow_button_by_id(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_follow_button_by_value(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_follow_button_by_text(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_follow_button_by_css_selector(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_click_button_by_id(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_click_button_by_value(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_click_button_by_text(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_click_button_by_css_selector(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_click_link_by_link_id(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_click_link_by_link_title(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_click_link_by_link_text(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_click_link_by_image_alt(): void
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function can_click_link_by_css_selector(): void
+    {
+        $this->markTestIncomplete();
     }
 }
