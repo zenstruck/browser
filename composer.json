@@ -23,7 +23,7 @@
         "dbrekelmans/bdi": "^0.3.0",
         "symfony/mailer": "^4.4|^5.0",
         "symfony/mime": ">=4.4.1",
-        "symfony/panther": "dev-main",
+        "symfony/panther": "^0.9",
         "symfony/phpunit-bridge": "^5.2",
         "symfony/security-bundle": "^4.4|^5.0"
     },
