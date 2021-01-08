@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Browser\Tests\Fixture;
 
-use Zenstruck\Browser\Extension\Http\HttpOptions;
+use Zenstruck\Browser\HttpOptions;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

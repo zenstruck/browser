@@ -269,7 +269,7 @@ $queryCount = $browser
 #### HTTP Requests
 
 ```php
-use Zenstruck\Browser\Extension\Http\HttpOptions;
+use Zenstruck\Browser\HttpOptions;
 
 /** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
 
@@ -296,7 +296,7 @@ $browser
         'ajax' => true,
     ])
 
-    // optionally use the provided Zenstruck\Browser\Extension\Http\HttpOptions object
+    // optionally use the provided Zenstruck\Browser\HttpOptions object
     ->post('/api/endpoint',
         HttpOptions::create()->withHeader('X-Token', 'my-token')->withBody('request body')
     )
@@ -678,7 +678,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
    ```php
    namespace App\Tests;
 
-   use Zenstruck\Browser\Extension\Http\HttpOptions;
+   use Zenstruck\Browser\HttpOptions;
 
    class AppHttpOptions extends HttpOptions
    {
@@ -694,7 +694,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
    Then, in your tests:
 
    ```php
-   use Zenstruck\Browser\Extension\Http\HttpOptions;
+   use Zenstruck\Browser\HttpOptions;
 
    /** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
 

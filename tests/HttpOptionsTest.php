@@ -1,9 +1,9 @@
 <?php
 
-namespace Zenstruck\Browser\Tests\Extension\Http;
+namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Browser\Extension\Http\HttpOptions;
+use Zenstruck\Browser\HttpOptions;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

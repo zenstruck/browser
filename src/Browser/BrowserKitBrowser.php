@@ -5,7 +5,6 @@ namespace Zenstruck\Browser;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Extension\Http\HttpOptions;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
 use Zenstruck\Browser\Response\JsonResponse;
 
