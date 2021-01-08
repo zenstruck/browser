@@ -14,7 +14,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Response;
 use Zenstruck\Browser\Test\Constraint\UrlMatches;
-use Zenstruck\Browser\Util\FunctionExecutor;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -133,7 +132,7 @@ class Browser
      */
     final public function use(callable $callback): self
     {
-        FunctionExecutor::createFor($callback)
+        Callback::createFor($callback)
             ->replaceUntypedArgument($this)
             ->replaceTypedArgument(self::class, $this)
             ->replaceTypedArgument(Component::class, fn(string $class) => new $class($this))

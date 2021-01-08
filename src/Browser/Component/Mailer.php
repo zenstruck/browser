@@ -9,7 +9,7 @@ use Symfony\Component\Mime\Email as MailerEmail;
 use Zenstruck\Browser\BrowserKitBrowser;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Component\Mailer\TestEmail;
-use Zenstruck\Browser\Util\FunctionExecutor;
+use Zenstruck\Callback;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -54,7 +54,7 @@ final class Mailer extends Component
 
             if (\in_array($expectedTo, $toAddresses, true)) {
                 // address matches
-                FunctionExecutor::createFor($callback)
+                Callback::createFor($callback)
                     ->minArguments(1)
                     ->replaceTypedArgument(TestEmail::class, fn(string $class) => new $class($message))
                     ->execute()
