@@ -13,7 +13,7 @@ class HttpOptions
         'headers' => [],
 
         // query parameters
-        'parameters' => [],
+        'query' => [],
 
         // files to include
         'files' => [],
@@ -88,7 +88,7 @@ class HttpOptions
 
         // merge array options
         $this->options['headers'] = \array_merge($this->options['headers'], $other->options['headers']);
-        $this->options['parameters'] = \array_merge($this->options['parameters'], $other->options['parameters']);
+        $this->options['query'] = \array_merge($this->options['query'], $other->options['query']);
         $this->options['files'] = \array_merge($this->options['files'], $other->options['files']);
         $this->options['server'] = \array_merge($this->options['server'], $other->options['server']);
 
@@ -131,9 +131,9 @@ class HttpOptions
     /**
      * @return static
      */
-    final public function withParameters(array $parameters): self
+    final public function withQuery(array $query): self
     {
-        $this->options['parameters'] = $parameters;
+        $this->options['query'] = $query;
 
         return $this;
     }
@@ -190,9 +190,9 @@ class HttpOptions
         return $this;
     }
 
-    final public function parameters(): array
+    final public function query(): array
     {
-        return $this->options['parameters'];
+        return $this->options['query'];
     }
 
     final public function files(): array

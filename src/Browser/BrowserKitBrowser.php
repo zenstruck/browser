@@ -110,7 +110,7 @@ abstract class BrowserKitBrowser extends Browser
 
         $options = HttpOptions::create($options);
 
-        $this->inner->request($method, $url, $options->parameters(), $options->files(), $options->server(), $options->body());
+        $this->inner->request($method, $url, $options->query(), $options->files(), $options->server(), $options->body());
 
         return $this;
     }
