@@ -7,7 +7,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Extension\Html;
 use Zenstruck\Browser\Mink\PantherDriver;
 use Zenstruck\Browser\Response\PantherResponse;
 
@@ -18,8 +17,6 @@ use Zenstruck\Browser\Response\PantherResponse;
  */
 class PantherBrowser extends Browser
 {
-    use Html;
-
     private Client $client;
     private ?string $screenshotDir = null;
     private ?string $consoleLogDir = null;

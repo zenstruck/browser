@@ -2,22 +2,20 @@
 
 namespace Zenstruck\Browser;
 
+use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Extension\Html;
-use Zenstruck\Browser\Extension\Http;
 use Zenstruck\Browser\Extension\Http\HttpOptions;
-use Zenstruck\Browser\Extension\Json;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
+use Zenstruck\Browser\Response\JsonResponse;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 abstract class BrowserKitBrowser extends Browser
 {
-    use Html, Http, Json;
-
     private AbstractBrowser $inner;
+    private ?HttpOptions $defaultHttpOptions = null;
 
     public function __construct(AbstractBrowser $inner)
     {
@@ -87,8 +85,150 @@ abstract class BrowserKitBrowser extends Browser
         return $this;
     }
 
-    final protected function makeRequest(string $method, string $url, HttpOptions $options): void
+    /**
+     * @param HttpOptions|array $options
+     *
+     * @return static
+     */
+    final public function setDefaultHttpOptions($options): self
     {
+        $this->defaultHttpOptions = HttpOptions::create($options);
+
+        return $this;
+    }
+
+    /**
+     * @param HttpOptions|array $options HttpOptions::DEFAULT_OPTIONS
+     *
+     * @return static
+     */
+    final public function request(string $method, string $url, $options = []): self
+    {
+        if ($this->defaultHttpOptions) {
+            $options = $this->defaultHttpOptions->merge($options);
+        }
+
+        $options = HttpOptions::create($options);
+
         $this->inner->request($method, $url, $options->parameters(), $options->files(), $options->server(), $options->body());
+
+        return $this;
+    }
+
+    /**
+     * @see request()
+     *
+     * @return static
+     */
+    final public function get(string $url, $options = []): self
+    {
+        return $this->request('GET', $url, $options);
+    }
+
+    /**
+     * @see request()
+     *
+     * @return static
+     */
+    final public function post(string $url, $options = []): self
+    {
+        return $this->request('POST', $url, $options);
+    }
+
+    /**
+     * @see request()
+     *
+     * @return static
+     */
+    final public function put(string $url, $options = []): self
+    {
+        return $this->request('PUT', $url, $options);
+    }
+
+    /**
+     * @see request()
+     *
+     * @return static
+     */
+    final public function delete(string $url, $options = []): self
+    {
+        return $this->request('DELETE', $url, $options);
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertStatus(int $expected): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->statusCodeEquals($expected)
+        );
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertSuccessful(): self
+    {
+        PHPUnit::assertTrue($this->response()->isSuccessful(), "Expected successful status code (2xx), [{$this->response()->statusCode()}] received.");
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertRedirected(): self
+    {
+        PHPUnit::assertTrue($this->response()->isRedirect(), "Expected redirect status code (3xx), [{$this->response()->statusCode()}] received.");
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertHeaderEquals(string $header, string $expected): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseHeaderEquals($header, $expected)
+        );
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertHeaderContains(string $header, string $expected): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseHeaderContains($header, $expected)
+        );
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertJson(): self
+    {
+        return $this->wrapMinkExpectation(
+            fn() => $this->webAssert()->responseHeaderContains('Content-Type', 'application/json')
+        );
+    }
+
+    /**
+     * @param string $expression JMESPath expression
+     * @param mixed  $expected
+     *
+     * @return static
+     */
+    final public function assertJsonMatches(string $expression, $expected): self
+    {
+        if (!$this->response() instanceof JsonResponse) {
+            PHPUnit::fail('Not a json response.');
+        }
+
+        PHPUnit::assertSame($expected, $this->response()->search($expression));
+
+        return $this;
     }
 }
