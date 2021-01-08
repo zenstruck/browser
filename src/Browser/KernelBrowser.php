@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @method SymfonyKernelBrowser inner()
  */
-class KernelBrowser extends BrowserKitBrowser implements ProfileAware
+class KernelBrowser extends BrowserKitBrowser
 {
     final public function __construct(SymfonyKernelBrowser $inner)
     {

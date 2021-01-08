@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  *
  * @method SymfonyHttpBrowser inner()
  */
-class HttpBrowser extends BrowserKitBrowser implements ProfileAware
+class HttpBrowser extends BrowserKitBrowser
 {
     private ?Profiler $profiler = null;
 

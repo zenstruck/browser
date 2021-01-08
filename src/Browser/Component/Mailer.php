@@ -6,9 +6,9 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email as MailerEmail;
+use Zenstruck\Browser\BrowserKitBrowser;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Component\Mailer\TestEmail;
-use Zenstruck\Browser\ProfileAware;
 use Zenstruck\Browser\Util\FunctionExecutor;
 
 /**
@@ -69,8 +69,8 @@ final class Mailer extends Component
 
     protected function preAssertions(): void
     {
-        if (!$this->browser() instanceof ProfileAware) {
-            throw new \RuntimeException(\sprintf('The "Email" component requires the browser implement %s.', ProfileAware::class));
+        if (!$this->browser() instanceof BrowserKitBrowser) {
+            throw new \RuntimeException(\sprintf('The "Email" component requires the browser be a %s.', BrowserKitBrowser::class));
         }
     }
 

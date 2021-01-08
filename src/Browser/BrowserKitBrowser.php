@@ -4,6 +4,7 @@ namespace Zenstruck\Browser;
 
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
 use Zenstruck\Browser\Response\JsonResponse;
@@ -230,4 +231,6 @@ abstract class BrowserKitBrowser extends Browser
 
         return $this;
     }
+
+    abstract public function profile(): Profile;
 }

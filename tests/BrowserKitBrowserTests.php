@@ -11,7 +11,7 @@ use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
  */
 trait BrowserKitBrowserTests
 {
-    use BrowserTests, EmailTests, ProfileAwareTests;
+    use BrowserTests, EmailTests;
 
     /**
      * @test
@@ -293,5 +293,18 @@ trait BrowserKitBrowserTests
 
         $this->assertStringContainsString('/http-method', $contents);
         $this->assertStringContainsString('    "content": "",', $contents);
+    }
+
+    /**
+     * @test
+     */
+    public function can_access_the_profiler(): void
+    {
+        $profile = $this->browser()
+            ->visit('/page1')
+            ->profile()
+        ;
+
+        $this->assertTrue($profile->hasCollector('request'));
     }
 }
