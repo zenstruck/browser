@@ -121,6 +121,34 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function exception_thrown_if_asserting_redirected_and_not_intercepting_redirects(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot assert redirected if not intercepting redirects. Call ->interceptRedirects() before making the request.');
+
+        $this->browser()
+            ->visit('/redirect1')
+            ->assertRedirected()
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function exception_thrown_if_asserting_redirected_to_and_not_intercepting_redirects(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot assert redirected if not intercepting redirects. Call ->interceptRedirects() before making the request.');
+
+        $this->browser()
+            ->visit('/redirect1')
+            ->assertRedirectedTo('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function exceptions_are_caught_by_default(): void
     {
         $this->browser()

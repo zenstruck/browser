@@ -180,6 +180,10 @@ abstract class BrowserKitBrowser extends Browser
      */
     final public function assertRedirected(): self
     {
+        if ($this->inner->isFollowingRedirects()) {
+            throw new \RuntimeException('Cannot assert redirected if not intercepting redirects. Call ->interceptRedirects() before making the request.');
+        }
+
         PHPUnit::assertTrue($this->response()->isRedirect(), "Expected redirect status code (3xx), [{$this->response()->statusCode()}] received.");
 
         return $this;
