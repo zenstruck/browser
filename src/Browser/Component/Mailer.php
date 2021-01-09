@@ -10,6 +10,7 @@ use Zenstruck\Browser\BrowserKitBrowser;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Component\Mailer\TestEmail;
 use Zenstruck\Callback;
+use Zenstruck\Callback\Parameter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -54,11 +55,9 @@ final class Mailer extends Component
 
             if (\in_array($expectedTo, $toAddresses, true)) {
                 // address matches
-                Callback::createFor($callback)
-                    ->minArguments(1)
-                    ->replaceTypedArgument(TestEmail::class, fn(string $class) => new $class($message))
-                    ->execute()
-                ;
+                Callback::createFor($callback)->invoke(
+                    Parameter::typed(TestEmail::class, Parameter::factory(fn(string $class) => new $class($message)))
+                );
 
                 return $this;
             }

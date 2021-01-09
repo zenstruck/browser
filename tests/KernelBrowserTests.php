@@ -16,6 +16,19 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    public function can_use_kernel_browser_as_typehint(): void
+    {
+        $this->browser()
+            ->use(function(KernelBrowser $browser) {
+                $browser->visit('/redirect1');
+            })
+            ->assertOn('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_act_as_user(): void
     {
         if (!\method_exists(SymfonyKernelBrowser::class, 'loginUser')) {

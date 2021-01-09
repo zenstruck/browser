@@ -18,6 +18,19 @@ final class PantherBrowserTest extends PantherTestCase
     /**
      * @test
      */
+    public function can_use_panther_browser_as_typehint(): void
+    {
+        $this->browser()
+            ->use(function(PantherBrowser $browser) {
+                $browser->visit('/page1');
+            })
+            ->assertOn('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_take_screenshot(): void
     {
         self::catchFileContents(__DIR__.'/../var/browser/screenshots/screen.png', function() {

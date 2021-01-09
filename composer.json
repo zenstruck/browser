@@ -18,7 +18,7 @@
         "symfony/browser-kit": "^4.4.9|^5.0.9",
         "symfony/framework-bundle": "^4.4|^5.0",
         "symfony/polyfill-php80": "^1.20",
-        "zenstruck/callback": "^1.0"
+        "zenstruck/callback": "^1.1"
     },
     "require-dev": {
         "dbrekelmans/bdi": "^0.3.0",

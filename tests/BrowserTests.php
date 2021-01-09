@@ -8,6 +8,7 @@ use Zenstruck\Browser;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
+use Zenstruck\Callback\Exception\UnresolveableArgument;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -146,9 +147,9 @@ trait BrowserTests
     /**
      * @test
      */
-    public function invalid_with_callback_parameter_throws_type_error(): void
+    public function invalid_use_callback_parameter_throws_type_error(): void
     {
-        $this->expectException(\TypeError::class);
+        $this->expectException(UnresolveableArgument::class);
 
         $this->browser()->use(function(string $invalidType) {});
     }
