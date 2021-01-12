@@ -91,22 +91,30 @@ There are several environment variables available to configure:
 
 This library provides 3 different "browsers":
 
-1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel *(this is the fastest browser)*.
+1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel, like [the Symfony BrowserKit component](https://symfony.com/doc/current/components/browser_kit.html)
+   *(this is the fastest browser)*.
 2. [HttpBrowser](#httpbrowser): makes requests to a webserver using `symfony/http-client`.
 3. [PantherBrowser](#pantherbrowser): makes requests to a webserver with a real browser using `symfony/panther` which
    allows testing javascript *(this is the slowest browser)*.
 
-You can use these Browsers in your tests by having your test class use the `HasBrowser` trait:
+You can use these Browsers in your tests using traits:
 
 ```php
 namespace App\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Browser\Test\HasBrowser;
+use Zenstruck\Browser\Test\HasHttpBrowser;
+use Zenstruck\Browser\Test\HasPantherBrowser;
 
 class MyTest extends TestCase
 {
+    // provides a browser() method that returns the KernelBrowser
     use HasBrowser;
+    // provides httpBrowser()
+    use HasHttpBrowser;
+    // provides pantherBrowser()
+    use HasPantherBrowser;
 
     /**
      * Requires this test extend either Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
@@ -114,7 +122,7 @@ class MyTest extends TestCase
      */
     public function test_using_kernel_browser(): void
     {
-        $this->kernelBrowser()
+        $this->browser()
             ->visit('/my/page')
             ->assertSuccessful()
         ;
