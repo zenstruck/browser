@@ -13,7 +13,7 @@ final class JsonResponse extends Response
 {
     public function json()
     {
-        return \json_decode($this->body(), true, 512, JSON_THROW_ON_ERROR);
+        return \json_decode($this->body(), true, 512, \JSON_THROW_ON_ERROR);
     }
 
     public function dump(?string $selector = null): void
@@ -32,6 +32,6 @@ final class JsonResponse extends Response
 
     protected function rawBody(): string
     {
-        return \json_encode($this->json(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        return \json_encode($this->json(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);
     }
 }

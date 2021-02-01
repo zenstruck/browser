@@ -58,7 +58,7 @@ abstract class BrowserKitBrowser extends Browser
      *
      * @return static
      */
-    final public function followRedirect(int $max = PHP_INT_MAX): self
+    final public function followRedirect(int $max = \PHP_INT_MAX): self
     {
         for ($i = 0; $i < $max; ++$i) {
             if (!$this->response()->isRedirect()) {
@@ -76,7 +76,7 @@ abstract class BrowserKitBrowser extends Browser
      *
      * @return static
      */
-    final public function assertRedirectedTo(string $expected, int $max = PHP_INT_MAX): self
+    final public function assertRedirectedTo(string $expected, int $max = \PHP_INT_MAX): self
     {
         $this->assertRedirected();
         $this->followRedirect($max);

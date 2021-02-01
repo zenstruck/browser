@@ -62,7 +62,7 @@ final class BrowserKitDriver extends CoreDriver
         $this->client->followRedirects(true);
 
         if (null !== $baseUrl && $client instanceof HttpKernelBrowser) {
-            $client->setServerParameter('SCRIPT_FILENAME', \parse_url($baseUrl, PHP_URL_PATH));
+            $client->setServerParameter('SCRIPT_FILENAME', \parse_url($baseUrl, \PHP_URL_PATH));
         }
     }
 
@@ -87,7 +87,7 @@ final class BrowserKitDriver extends CoreDriver
     {
         @\trigger_error(
             'setRemoveHostFromUrl() is deprecated as of 1.2 and will be removed in 2.0. Pass the base url in the constructor instead.',
-            E_USER_DEPRECATED
+            \E_USER_DEPRECATED
         );
         $this->removeHostFromUrl = (bool) $remove;
     }
@@ -103,7 +103,7 @@ final class BrowserKitDriver extends CoreDriver
     {
         @\trigger_error(
             'setRemoveScriptFromUrl() is deprecated as of 1.2 and will be removed in 2.0. Pass the base url in the constructor instead.',
-            E_USER_DEPRECATED
+            \E_USER_DEPRECATED
         );
         $this->removeScriptFromUrl = (bool) $remove;
     }
@@ -529,7 +529,7 @@ final class BrowserKitDriver extends CoreDriver
      */
     private function getCookiePath()
     {
-        $path = \dirname(\parse_url($this->getCurrentUrl(), PHP_URL_PATH));
+        $path = \dirname(\parse_url($this->getCurrentUrl(), \PHP_URL_PATH));
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $path = \str_replace('\\', '/', $path);

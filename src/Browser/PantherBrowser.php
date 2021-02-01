@@ -154,8 +154,8 @@ class PantherBrowser extends Browser
             throw new \RuntimeException('The "PANTHER_NO_HEADLESS" env variable must be set to inspect.');
         }
 
-        \fwrite(STDIN, "\n\nInspecting the browser.\n\nPress enter to continue...");
-        \fgets(STDIN);
+        \fwrite(\STDIN, "\n\nInspecting the browser.\n\nPress enter to continue...");
+        \fgets(\STDIN);
 
         return $this;
     }
@@ -181,7 +181,7 @@ class PantherBrowser extends Browser
         }
 
         $log = $this->client->manage()->getLog('browser');
-        $log = \json_encode($log, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        $log = \json_encode($log, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);
 
         (new Filesystem())->dumpFile($this->savedConsoleLogs[] = $filename, $log);
 

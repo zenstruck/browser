@@ -154,7 +154,7 @@ final class PantherBrowserTest extends PantherTestCase
             ;
         });
 
-        $this->assertStringContainsString('console.error message', \json_encode($output, JSON_THROW_ON_ERROR));
+        $this->assertStringContainsString('console.error message', \json_encode($output, \JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -170,7 +170,7 @@ final class PantherBrowserTest extends PantherTestCase
             ;
         });
 
-        $this->assertStringContainsString('Error: error object message', \json_encode($output, JSON_THROW_ON_ERROR));
+        $this->assertStringContainsString('Error: error object message', \json_encode($output, \JSON_THROW_ON_ERROR));
     }
 
     /**

@@ -240,6 +240,6 @@ class HttpOptions
             return null;
         }
 
-        return \json_encode($this->options['json'], JSON_THROW_ON_ERROR);
+        return \json_encode($this->options['json'], \JSON_THROW_ON_ERROR);
     }
 }

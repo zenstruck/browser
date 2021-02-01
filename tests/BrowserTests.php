@@ -313,7 +313,7 @@ trait BrowserTests
             ->assertContains('"input_2":"on"')
             ->assertNotContains('"input_3')
             ->assertContains('"input_4":"option 2"')
-            ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+            ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, \PATHINFO_BASENAME)))
             ->assertContains('"input_6":["option 1","option 3"]')
         ;
     }
@@ -337,7 +337,7 @@ trait BrowserTests
             ->assertContains('"input_2":"on"')
             ->assertNotContains('"input_3')
             ->assertContains('"input_4":"option 2"')
-            ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+            ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, \PATHINFO_BASENAME)))
             ->assertContains('"input_6":["option 1","option 3"]')
         ;
     }
@@ -361,7 +361,7 @@ trait BrowserTests
             ->assertContains('"input_2":"on"')
             ->assertNotContains('"input_3')
             ->assertContains('"input_4":"option 2"')
-            ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, PATHINFO_BASENAME)))
+            ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, \PATHINFO_BASENAME)))
             ->assertContains('"input_6":["option 1","option 3"]')
         ;
     }
