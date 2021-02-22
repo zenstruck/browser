@@ -8,6 +8,8 @@ use function JmesPath\search;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class JsonResponse extends Response
 {

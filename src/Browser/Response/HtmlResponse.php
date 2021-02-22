@@ -8,6 +8,8 @@ use Zenstruck\Browser\Response;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 class HtmlResponse extends Response
 {

@@ -232,6 +232,9 @@ class PantherBrowser extends Browser
         );
     }
 
+    /**
+     * @internal
+     */
     final protected function response(): PantherResponse
     {
         return new PantherResponse($this->minkSession());

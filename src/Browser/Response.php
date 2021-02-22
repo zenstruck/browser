@@ -10,6 +10,8 @@ use Zenstruck\Browser\Response\XmlResponse;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 class Response
 {

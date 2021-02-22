@@ -455,6 +455,9 @@ class Browser
         return $this->minkSession()->getPage();
     }
 
+    /**
+     * @internal
+     */
     protected function response(): Response
     {
         return Response::createFor($this->minkSession());
