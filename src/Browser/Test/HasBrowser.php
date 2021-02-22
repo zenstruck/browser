@@ -30,9 +30,9 @@ trait HasBrowser
         self::$primaryPantherClient = null;
     }
 
-    protected function pantherBrowser(): PantherBrowser
+    protected function pantherBrowser(array $options = [], array $kernelOptions = [], array $managerOptions = []): PantherBrowser
     {
-        $browser = PantherBrowser::create(function() {
+        $browser = PantherBrowser::create(function() use ($options, $kernelOptions, $managerOptions) {
             if (!$this instanceof PantherTestCase) {
                 throw new \RuntimeException(\sprintf('The "%s" method can only be used on TestCases that extend "%s".', __METHOD__, PantherTestCase::class));
             }
@@ -48,7 +48,9 @@ trait HasBrowser
             }
 
             self::$primaryPantherClient = static::createPantherClient(
-                ['browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME]
+                \array_merge(['browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME], $options),
+                $kernelOptions,
+                $managerOptions
             );
 
             return new $class(self::$primaryPantherClient);
@@ -63,9 +65,9 @@ trait HasBrowser
         ;
     }
 
-    protected function httpBrowser(): HttpBrowser
+    protected function httpBrowser(array $kernelOptions = [], array $pantherOptions = []): HttpBrowser
     {
-        $browser = HttpBrowser::create(function() {
+        $browser = HttpBrowser::create(function() use ($kernelOptions, $pantherOptions) {
             $class = $_SERVER['HTTP_BROWSER_CLASS'] ?? HttpBrowser::class;
 
             if (!\is_a($class, HttpBrowser::class, true)) {
@@ -79,7 +81,7 @@ trait HasBrowser
             }
 
             if (!$baseUri) {
-                self::startWebServer();
+                self::startWebServer($pantherOptions);
 
                 $baseUri = self::$baseUri;
             }
@@ -107,7 +109,7 @@ trait HasBrowser
             }
 
             if (!static::$booted) {
-                static::bootKernel();
+                static::bootKernel($kernelOptions);
             }
 
             if (static::$container->has('profiler')) {
@@ -124,13 +126,13 @@ trait HasBrowser
         ;
     }
 
-    protected function kernelBrowser(): KernelBrowser
+    protected function kernelBrowser(array $options = []): KernelBrowser
     {
         if (!$this instanceof KernelTestCase) {
             throw new \RuntimeException(\sprintf('The "%s" method can only be used on TestCases that extend "%s".', __METHOD__, KernelTestCase::class));
         }
 
-        $browser = KernelBrowser::create(function() {
+        $browser = KernelBrowser::create(function() use ($options) {
             $class = $_SERVER['KERNEL_BROWSER_CLASS'] ?? KernelBrowser::class;
 
             if (!\is_a($class, KernelBrowser::class, true)) {
@@ -140,11 +142,11 @@ trait HasBrowser
             if ($this instanceof WebTestCase) {
                 static::ensureKernelShutdown();
 
-                return new $class(static::createClient());
+                return new $class(static::createClient($options));
             }
 
             // reboot kernel before starting browser
-            static::bootKernel();
+            static::bootKernel($options);
 
             if (!static::$container->has('test.client')) {
                 throw new \RuntimeException('The Symfony test client is not enabled.');
