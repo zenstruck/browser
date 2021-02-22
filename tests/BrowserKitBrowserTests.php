@@ -259,6 +259,21 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function can_access_decoded_json(): void
+    {
+        $json = $this->browser()
+            ->post('/json', ['json' => $expected = ['foo' => 'bar']])
+            ->assertSuccessful()
+            ->assertJson()
+            ->json()
+        ;
+
+        $this->assertSame($expected, $json);
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_json_response_as_array(): void
     {
         $output = self::catchVarDumperOutput(function() {

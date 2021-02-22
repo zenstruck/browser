@@ -231,6 +231,18 @@ abstract class BrowserKitBrowser extends Browser
         return $this;
     }
 
+    /**
+     * @return mixed The response content json decoded
+     */
+    final public function json()
+    {
+        if (!$this->response() instanceof JsonResponse) {
+            throw new \RuntimeException('Response is not json.');
+        }
+
+        return $this->response()->json();
+    }
+
     abstract public function profile(): Profile;
 
     /**

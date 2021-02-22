@@ -328,6 +328,7 @@ $browser
     ->assertJsonMatches('foo.bar.baz', 1) // automatically calls ->assertJson()
     ->assertJsonMatches('foo.*.baz', [1, 2, 3])
     ->assertJsonMatches('length(foo)', 3)
+    ->json() // the response content json decoded
 ;
 ```
 
