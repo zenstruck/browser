@@ -30,13 +30,4 @@ class HtmlResponse extends Response
             VarDumper::dump($element);
         }
     }
-
-    final public function find(string $selector): string
-    {
-        if (!$element = $this->session()->getPage()->find('css', $selector)) {
-            throw new \RuntimeException("Element \"{$selector}\" not found.");
-        }
-
-        return $element->getHtml();
-    }
 }
