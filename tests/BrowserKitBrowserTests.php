@@ -250,6 +250,7 @@ trait BrowserKitBrowserTests
                     'boo' => ['baz' => 3],
                 ],
             ]])
+            ->assertJson()
             ->assertJsonMatches('foo.bar.baz', 1)
             ->assertJsonMatches('foo.*.baz', [1, 2, 3])
             ->assertJsonMatches('length(foo)', 3)
