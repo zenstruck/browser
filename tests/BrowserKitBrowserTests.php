@@ -3,7 +3,6 @@
 namespace Zenstruck\Browser\Tests;
 
 use Zenstruck\Browser\HttpOptions;
-use Zenstruck\Browser\Tests\Component\EmailTests;
 use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
 
 /**
@@ -11,7 +10,7 @@ use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
  */
 trait BrowserKitBrowserTests
 {
-    use BrowserTests, EmailTests;
+    use BrowserTests;
 
     /**
      * @test

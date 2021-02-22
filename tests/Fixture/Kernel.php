@@ -14,9 +14,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -96,27 +93,6 @@ final class Kernel extends BaseKernel
         return new RedirectResponse('/page1');
     }
 
-    public function sendEmail(): Response
-    {
-        $email = (new Email())
-            ->from('webmaster@example.com')
-            ->to(new Address('kevin@example.com', 'Kevin'))
-            ->cc('cc@example.com')
-            ->bcc('bcc@example.com')
-            ->replyTo('reply@example.com')
-            ->attachFromPath(__DIR__.'/files/attachment.txt')
-            ->subject('email subject')
-            ->html('html body')
-            ->text('text body')
-        ;
-
-        $email->getHeaders()->addTextHeader('X-PM-Tag', 'reset-password');
-
-        $this->container->get('mailer')->send($email);
-
-        return new Response('success');
-    }
-
     public function user(?UserInterface $user = null): Response
     {
         return new Response($user ? "user: {$user->getUsername()}/{$user->getPassword()}" : 'anon');
@@ -135,7 +111,6 @@ final class Kernel extends BaseKernel
             'router' => ['utf8' => true],
             'test' => true,
             'profiler' => ['enabled' => true, 'collect' => true],
-            'mailer' => ['dsn' => 'null://null'],
             'session' => ['storage_id' => 'session.storage.mock_file'],
         ]);
         $c->loadFromExtension('security', [
@@ -144,7 +119,6 @@ final class Kernel extends BaseKernel
             'firewalls' => ['main' => ['anonymous' => true]],
         ]);
         $c->register('logger', NullLogger::class); // disable logging
-        $c->setAlias('mailer', MailerInterface::class)->setPublic(true);
     }
 
     protected function configureRoutes(RouteCollectionBuilder $routes): void
@@ -158,7 +132,6 @@ final class Kernel extends BaseKernel
         $routes->add('/redirect1', 'kernel::redirect1');
         $routes->add('/redirect2', 'kernel::redirect2');
         $routes->add('/redirect3', 'kernel::redirect3');
-        $routes->add('/send-email', 'kernel::sendEmail');
         $routes->add('/json', 'kernel::json');
         $routes->add('/javascript', 'kernel::javascript');
         $routes->add('/user', 'kernel::user');
