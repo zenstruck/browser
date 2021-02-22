@@ -27,15 +27,20 @@ class Browser
     private ?string $sourceDir = null;
     private array $savedSources = [];
 
+    /**
+     * @internal
+     */
     public function __construct(DriverInterface $driver)
     {
         $this->mink = new Mink([self::SESSION => new Session($driver)]);
     }
 
     /**
+     * @internal
+     *
      * @return static
      */
-    public static function create(callable $factory): self
+    final public static function create(callable $factory): self
     {
         $browser = $factory();
 
@@ -54,21 +59,6 @@ class Browser
         $this->sourceDir = $dir;
 
         return $this;
-    }
-
-    final public function minkSession(): Session
-    {
-        return $this->mink->getSession(self::SESSION);
-    }
-
-    final public function webAssert(): WebAssert
-    {
-        return $this->mink->assertSession(self::SESSION);
-    }
-
-    final public function documentElement(): DocumentElement
-    {
-        return $this->minkSession()->getPage();
     }
 
     /**
@@ -197,7 +187,7 @@ class Browser
     /**
      * @return static
      */
-    public function checkField(string $selector): self
+    final public function checkField(string $selector): self
     {
         $this->documentElement()->checkField($selector);
 
@@ -207,7 +197,7 @@ class Browser
     /**
      * @return static
      */
-    public function uncheckField(string $selector): self
+    final public function uncheckField(string $selector): self
     {
         $this->documentElement()->uncheckField($selector);
 
@@ -217,7 +207,7 @@ class Browser
     /**
      * @return static
      */
-    public function selectFieldOption(string $selector, string $value): self
+    final public function selectFieldOption(string $selector, string $value): self
     {
         $this->documentElement()->selectFieldOption($selector, $value);
 
@@ -227,7 +217,7 @@ class Browser
     /**
      * @return static
      */
-    public function selectFieldOptions(string $selector, array $values): self
+    final public function selectFieldOptions(string $selector, array $values): self
     {
         foreach ($values as $value) {
             $this->documentElement()->selectFieldOption($selector, $value, true);
@@ -441,12 +431,38 @@ class Browser
         return ['Saved Source Files' => $this->savedSources];
     }
 
+    /**
+     * @internal
+     */
+    final protected function minkSession(): Session
+    {
+        return $this->mink->getSession(self::SESSION);
+    }
+
+    /**
+     * @internal
+     */
+    final protected function webAssert(): WebAssert
+    {
+        return $this->mink->assertSession(self::SESSION);
+    }
+
+    /**
+     * @internal
+     */
+    final protected function documentElement(): DocumentElement
+    {
+        return $this->minkSession()->getPage();
+    }
+
     protected function response(): Response
     {
         return Response::createFor($this->minkSession());
     }
 
     /**
+     * @internal
+     *
      * @return static
      */
     final protected function wrapMinkExpectation(callable $callback): self
@@ -461,6 +477,9 @@ class Browser
         return $this;
     }
 
+    /**
+     * @internal
+     */
     protected function die(): void
     {
         exit(1);

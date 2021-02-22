@@ -24,11 +24,6 @@ abstract class BrowserKitBrowser extends Browser
         parent::__construct(new BrowserKitDriver($inner));
     }
 
-    final public function inner(): AbstractBrowser
-    {
-        return $this->inner;
-    }
-
     /**
      * @return static
      */
@@ -237,4 +232,12 @@ abstract class BrowserKitBrowser extends Browser
     }
 
     abstract public function profile(): Profile;
+
+    /**
+     * @internal
+     */
+    final protected function inner(): AbstractBrowser
+    {
+        return $this->inner;
+    }
 }

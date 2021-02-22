@@ -23,7 +23,7 @@ class KernelBrowser extends BrowserKitBrowser
      *
      * @return static
      */
-    public function disableReboot(): self
+    final public function disableReboot(): self
     {
         $this->inner()->disableReboot();
 
@@ -35,7 +35,7 @@ class KernelBrowser extends BrowserKitBrowser
      *
      * @return static
      */
-    public function enableReboot(): self
+    final public function enableReboot(): self
     {
         $this->inner()->enableReboot();
 
@@ -81,13 +81,9 @@ class KernelBrowser extends BrowserKitBrowser
         return $this;
     }
 
-    final public function actingAs(UserInterface $user, ?string $firewall = null): self
+    public function actingAs(UserInterface $user, ?string $firewall = null): self
     {
-        if (null === $firewall) {
-            $this->inner()->loginUser($user);
-        } else {
-            $this->inner()->loginUser($user, $firewall);
-        }
+        $this->inner()->loginUser(...\array_filter([$user, $firewall]));
 
         return $this;
     }

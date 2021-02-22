@@ -50,7 +50,7 @@ class PantherBrowser extends Browser
     /**
      * @return static
      */
-    public function follow(string $link): self
+    final public function follow(string $link): self
     {
         if (!$element = $this->documentElement()->findLink($link)) {
             PHPUnit::fail(\sprintf('Link "%s" not found.', $link));
@@ -224,7 +224,7 @@ class PantherBrowser extends Browser
     /**
      * @internal
      */
-    public function savedArtifacts(): array
+    final public function savedArtifacts(): array
     {
         return \array_merge(
             parent::savedArtifacts(),
@@ -232,12 +232,15 @@ class PantherBrowser extends Browser
         );
     }
 
-    protected function response(): PantherResponse
+    final protected function response(): PantherResponse
     {
         return new PantherResponse($this->minkSession());
     }
 
-    protected function die(): void
+    /**
+     * @internal
+     */
+    final protected function die(): void
     {
         $this->client->quit();
         parent::die();

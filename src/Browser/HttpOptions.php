@@ -190,11 +190,17 @@ class HttpOptions
         return $this;
     }
 
+    /**
+     * @internal
+     */
     final public function query(): array
     {
         return $this->options['query'];
     }
 
+    /**
+     * @internal
+     */
     final public function files(): array
     {
         return $this->options['files'];
@@ -202,6 +208,8 @@ class HttpOptions
 
     /**
      * @co-author Kévin Dunglas <dunglas@gmail.com>
+     *
+     * @internal
      */
     final public function server(): array
     {
@@ -230,6 +238,9 @@ class HttpOptions
         return $server;
     }
 
+    /**
+     * @internal
+     */
     final public function body(): ?string
     {
         if (null === $this->options['json']) {
