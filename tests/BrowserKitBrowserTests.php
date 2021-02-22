@@ -370,6 +370,20 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function can_access_the_xml_crawler(): void
+    {
+        $crawler = $this->browser()
+            ->visit('/xml')
+            ->crawler()
+            ->filter('url loc')
+        ;
+
+        $this->assertCount(2, $crawler);
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_xml_selector(): void
     {
         $output = self::catchVarDumperOutput(function() {

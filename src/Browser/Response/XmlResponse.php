@@ -8,9 +8,19 @@ use Zenstruck\Browser\Response;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class XmlResponse extends Response
 {
+    public function crawler(): Crawler
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML($this->body());
+
+        return new Crawler($dom);
+    }
+
     public function dump(?string $selector = null): void
     {
         if (null === $selector) {
@@ -19,10 +29,7 @@ final class XmlResponse extends Response
             return;
         }
 
-        $dom = new \DOMDocument();
-        $dom->loadXML($this->body());
-
-        $elements = (new Crawler($dom))->filter($selector);
+        $elements = $this->crawler()->filter($selector);
 
         if (!\count($elements)) {
             throw new \RuntimeException("Element \"{$selector}\" not found.");

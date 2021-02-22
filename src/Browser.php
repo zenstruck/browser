@@ -10,6 +10,7 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Response;
@@ -413,6 +414,11 @@ class Browser
         return $this->wrapMinkExpectation(
             fn() => $this->webAssert()->elementAttributeNotContains('css', $selector, $attribute, $expected)
         );
+    }
+
+    final public function crawler(): Crawler
+    {
+        return $this->response()->crawler();
     }
 
     /**

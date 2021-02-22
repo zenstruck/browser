@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser;
 
 use Behat\Mink\Session;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Response\HtmlResponse;
 use Zenstruck\Browser\Response\JsonResponse;
@@ -64,6 +65,11 @@ class Response
     final public function isRedirect(): bool
     {
         return $this->statusCode() >= 300 && $this->statusCode() < 400;
+    }
+
+    public function crawler(): Crawler
+    {
+        throw new \LogicException('Crawler is not available for this response type.');
     }
 
     public function dump(?string $selector = null): void

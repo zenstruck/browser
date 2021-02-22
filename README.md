@@ -224,6 +224,8 @@ $browser
     ->dd('foo') // if json response, array key
     ->dd('foo.*.baz') // if json response, JMESPath notation can be used
 ;
+
+$browser->crawler(); // instance of Symfony\Component\DomCrawler\Crawler (assuming the current response supports this)
 ```
 
 ### KernelBrowser/HttpBrowser
