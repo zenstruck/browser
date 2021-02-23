@@ -448,50 +448,7 @@ class MyTest extends PantherTestCase
 
 ### Mailer Component
 
-*Only available for `KernelBrowser`/`HttpBrowser`.*
-
-You can make assertions about emails sent in the last request:
-
-```php
-use Zenstruck\Browser\Component\Mailer;
-use Zenstruck\Browser\Component\Mailer\TestEmail;
-
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
-$browser
-    ->visit('/page/that/does/not/send/email')
-    ->use(function(Mailer $component) {
-        $component->assertNoEmailSent();
-    })
-
-    ->visit('/page/that/sends/email')
-    
-    // just check that an email was sent to an address with a subject
-    ->use(function(Mailer $component) {
-        $component->assertEmailSentTo('kevin@example.com', 'Email Subject');
-    })
-    
-    // advanced assertions
-    ->use(function(Mailer $component) {
-        $component->assertEmailSentTo('kevin@example.com', function(TestEmail $email) {
-            $email
-                ->assertSubject('Email Subject')
-                ->assertFrom('from@example.com')
-                ->assertReplyTo('reply@example.com')
-                ->assertCc('cc1@example.com')
-                ->assertCc('cc2@example.com')
-                ->assertBcc('bcc@example.com')
-                ->assertTextContains('some text')
-                ->assertHtmlContains('some text')
-                ->assertContains('some text') // asserts text and html both contain a value
-                ->assertHasFile('file.txt', 'text/plain', 'Hello there!')
-            ;
-        });
-    })
-;
-```
-
-**NOTE**: There is an [Mailer Extension](#mailer-extension) that adds the `assertNoEmailSent()`
-and `assertEmailSentTo()` methods right onto your custom browser.
+See https://github.com/zenstruck/mailer-test#zenstruckbrowser-integration.
 
 ## Extending
 
@@ -764,38 +721,7 @@ There are several packaged extensions. These are traits that can be added to a
 
 #### Mailer Extension
 
-Wraps the [Mailer Component](#mailer-component) into methods directly on your browser.
-
-Add to your [Custom Browser](#custom-browser):
-
-```php
-namespace App\Tests;
-
-use Zenstruck\Browser\KernelBrowser;
-use Zenstruck\Browser\Extension\Mailer;
-
-class AppBrowser extends KernelBrowser
-{
-    use Mailer;
-}
-```
-
-Use in your tests:
-
-```php
-public function testDemo(): void
-{
-    $this->kernelBrowser()
-        ->visit('/page/that/does/not/send/email')
-        ->assertNoEmailSent()
-
-        ->visit('/page/that/sends/email')
-
-        // just check that an email was sent to an address with a subject
-        ->assertEmailSentTo('kevin@example.com', 'Email Subject')
-    ;
-}
-```
+See https://github.com/zenstruck/mailer-test#zenstruckbrowser-integration.
 
 #### Authentication Extension
 
