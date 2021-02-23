@@ -335,4 +335,21 @@ trait BrowserKitBrowserTests
 
         $this->assertTrue($profile->hasCollector('request'));
     }
+
+    /**
+     * @test
+     */
+    public function can_dump_xml_selector(): void
+    {
+        $output = self::catchVarDumperOutput(function() {
+            $this->browser()
+                ->visit('/xml')
+                ->dump('url loc')
+            ;
+        });
+
+        $this->assertCount(2, $output);
+        $this->assertSame('https://www.example.com/page1', $output[0]);
+        $this->assertSame('https://www.example.com/page2', $output[1]);
+    }
 }

@@ -6,6 +6,7 @@ use Behat\Mink\Session;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Response\HtmlResponse;
 use Zenstruck\Browser\Response\JsonResponse;
+use Zenstruck\Browser\Response\XmlResponse;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,6 +35,10 @@ class Response
 
         if (str_contains($contentType, 'html')) {
             return new HtmlResponse($session);
+        }
+
+        if (str_contains($contentType, 'xml')) {
+            return new XmlResponse($session);
         }
 
         return new self($session);
