@@ -32,29 +32,23 @@ trait HasBrowser
 
     protected function pantherBrowser(array $options = [], array $kernelOptions = [], array $managerOptions = []): PantherBrowser
     {
-        $browser = PantherBrowser::create(function() use ($options, $kernelOptions, $managerOptions) {
-            if (!$this instanceof PantherTestCase) {
-                throw new \RuntimeException(\sprintf('The "%s" method can only be used on TestCases that extend "%s".', __METHOD__, PantherTestCase::class));
-            }
+        $class = $_SERVER['PANTHER_BROWSER_CLASS'] ?? PantherBrowser::class;
 
-            $class = $_SERVER['PANTHER_BROWSER_CLASS'] ?? PantherBrowser::class;
+        if (!\is_a($class, PantherBrowser::class, true)) {
+            throw new \RuntimeException(\sprintf('"PANTHER_BROWSER_CLASS" env variable must reference a class that extends %s.', PantherBrowser::class));
+        }
 
-            if (!\is_a($class, PantherBrowser::class, true)) {
-                throw new \RuntimeException(\sprintf('"PANTHER_BROWSER_CLASS" env variable must reference a class that extends %s.', PantherBrowser::class));
-            }
-
-            if (self::$primaryPantherClient) {
-                return new $class(static::createAdditionalPantherClient());
-            }
-
+        if (self::$primaryPantherClient) {
+            $browser = new $class(static::createAdditionalPantherClient());
+        } else {
             self::$primaryPantherClient = static::createPantherClient(
                 \array_merge(['browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME], $options),
                 $kernelOptions,
                 $managerOptions
             );
 
-            return new $class(self::$primaryPantherClient);
-        });
+            $browser = new $class(self::$primaryPantherClient);
+        }
 
         BrowserExtension::registerBrowser($browser);
 
@@ -67,47 +61,42 @@ trait HasBrowser
 
     protected function httpBrowser(array $kernelOptions = [], array $pantherOptions = []): HttpBrowser
     {
-        $browser = HttpBrowser::create(function() use ($kernelOptions, $pantherOptions) {
-            $class = $_SERVER['HTTP_BROWSER_CLASS'] ?? HttpBrowser::class;
+        $class = $_SERVER['HTTP_BROWSER_CLASS'] ?? HttpBrowser::class;
 
-            if (!\is_a($class, HttpBrowser::class, true)) {
-                throw new \RuntimeException(\sprintf('"HTTP_BROWSER_CLASS" env variable must reference a class that extends %s.', HttpBrowser::class));
-            }
+        if (!\is_a($class, HttpBrowser::class, true)) {
+            throw new \RuntimeException(\sprintf('"HTTP_BROWSER_CLASS" env variable must reference a class that extends %s.', HttpBrowser::class));
+        }
 
-            $baseUri = $_SERVER['HTTP_BROWSER_URI'] ?? null;
+        $baseUri = $_SERVER['HTTP_BROWSER_URI'] ?? null;
 
-            if (!$baseUri && !$this instanceof PantherTestCase) {
-                throw new \RuntimeException(\sprintf('If not using "HTTP_BROWSER_URI", your TestCase must extend "%s".', PantherTestCase::class));
-            }
+        if (!$baseUri && !$this instanceof PantherTestCase) {
+            throw new \RuntimeException(\sprintf('If not using "HTTP_BROWSER_URI", your TestCase must extend "%s".', PantherTestCase::class));
+        }
 
-            if (!$baseUri) {
-                self::startWebServer($pantherOptions);
+        if (!$baseUri) {
+            self::startWebServer($pantherOptions);
 
-                $baseUri = self::$baseUri;
-            }
+            $baseUri = self::$baseUri;
+        }
 
-            // copied from PantherTestCaseTrait::createHttpBrowserClient()
-            $client = new HttpBrowserClient();
-            $urlComponents = \parse_url($baseUri);
-            $host = $urlComponents['host'];
+        // copied from PantherTestCaseTrait::createHttpBrowserClient()
+        $client = new HttpBrowserClient();
+        $urlComponents = \parse_url($baseUri);
+        $host = $urlComponents['host'];
 
-            if (isset($urlComponents['port'])) {
-                $host .= ":{$urlComponents['port']}";
-            }
+        if (isset($urlComponents['port'])) {
+            $host .= ":{$urlComponents['port']}";
+        }
 
-            $client->setServerParameter('HTTP_HOST', $host);
+        $client->setServerParameter('HTTP_HOST', $host);
 
-            if ('https' === ($urlComponents['scheme'] ?? 'http')) {
-                $client->setServerParameter('HTTPS', 'true');
-            }
+        if ('https' === ($urlComponents['scheme'] ?? 'http')) {
+            $client->setServerParameter('HTTPS', 'true');
+        }
 
-            /** @var HttpBrowser $browser */
-            $browser = new $class(self::$httpBrowserClients[] = $client);
+        $browser = new $class(self::$httpBrowserClients[] = $client);
 
-            if (!$this instanceof KernelTestCase) {
-                return $browser;
-            }
-
+        if ($this instanceof KernelTestCase) {
             if (!static::$booted) {
                 static::bootKernel($kernelOptions);
             }
@@ -115,9 +104,7 @@ trait HasBrowser
             if (static::$container->has('profiler')) {
                 $browser->setProfiler(static::$container->get('profiler'));
             }
-
-            return $browser;
-        });
+        }
 
         BrowserExtension::registerBrowser($browser);
 
@@ -132,19 +119,17 @@ trait HasBrowser
             throw new \RuntimeException(\sprintf('The "%s" method can only be used on TestCases that extend "%s".', __METHOD__, KernelTestCase::class));
         }
 
-        $browser = KernelBrowser::create(function() use ($options) {
-            $class = $_SERVER['KERNEL_BROWSER_CLASS'] ?? KernelBrowser::class;
+        $class = $_SERVER['KERNEL_BROWSER_CLASS'] ?? KernelBrowser::class;
 
-            if (!\is_a($class, KernelBrowser::class, true)) {
-                throw new \RuntimeException(\sprintf('"KERNEL_BROWSER_CLASS" env variable must reference a class that extends %s.', KernelBrowser::class));
-            }
+        if (!\is_a($class, KernelBrowser::class, true)) {
+            throw new \RuntimeException(\sprintf('"KERNEL_BROWSER_CLASS" env variable must reference a class that extends %s.', KernelBrowser::class));
+        }
 
-            if ($this instanceof WebTestCase) {
-                static::ensureKernelShutdown();
+        if ($this instanceof WebTestCase) {
+            static::ensureKernelShutdown();
 
-                return new $class(static::createClient($options));
-            }
-
+            $browser = new $class(static::createClient($options));
+        } else {
             // reboot kernel before starting browser
             static::bootKernel($options);
 
@@ -152,8 +137,8 @@ trait HasBrowser
                 throw new \RuntimeException('The Symfony test client is not enabled.');
             }
 
-            return new $class(static::$container->get('test.client'));
-        });
+            $browser = new $class(static::$container->get('test.client'));
+        }
 
         BrowserExtension::registerBrowser($browser);
 
