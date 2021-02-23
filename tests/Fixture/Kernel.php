@@ -45,6 +45,11 @@ final class Kernel extends BaseKernel
         return new Response(\file_get_contents(__DIR__.'/files/javascript.html'));
     }
 
+    public function xml(): Response
+    {
+        return new Response(\file_get_contents(__DIR__.'/files/xml.xml'), 200, ['Content-Type' => 'text/xml']);
+    }
+
     public function submitForm(Request $request): JsonResponse
     {
         return new JsonResponse(\array_merge(
@@ -133,6 +138,7 @@ final class Kernel extends BaseKernel
         $routes->add('/redirect2', 'kernel::redirect2');
         $routes->add('/redirect3', 'kernel::redirect3');
         $routes->add('/json', 'kernel::json');
+        $routes->add('/xml', 'kernel::xml');
         $routes->add('/javascript', 'kernel::javascript');
         $routes->add('/user', 'kernel::user');
     }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset>
+    <url>
+        <loc>https://www.example.com/page1</loc>
+        <lastmod>2020-11-18</lastmod>
+    </url>
+    <url>
+        <loc attr="attribute">https://www.example.com/page2</loc>
+        <lastmod>2021-11-18</lastmod>
+    </url>
+</urlset>
