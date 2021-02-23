@@ -20,6 +20,9 @@ final class JsonResponse extends Response
         return \json_decode($this->body(), true, 512, \JSON_THROW_ON_ERROR);
     }
 
+    /**
+     * @internal
+     */
     public function dump(?string $selector = null): void
     {
         if (null === $selector) {
@@ -34,6 +37,9 @@ final class JsonResponse extends Response
         return search($selector, $this->json());
     }
 
+    /**
+     * @internal
+     */
     protected function rawBody(): string
     {
         return \json_encode($this->json(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);

@@ -370,6 +370,22 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function can_access_json_response(): void
+    {
+        $response = $this->browser()
+            ->post('/json', ['json' => $expected = ['foo' => 'bar']])
+            ->assertSuccessful()
+            ->response()
+            ->assertJson()
+        ;
+
+        $this->assertSame($expected, $response->json());
+        $this->assertSame('bar', $response->search('foo'));
+    }
+
+    /**
+     * @test
+     */
     public function can_access_the_profiler(): void
     {
         $profile = $this->browser()
@@ -395,5 +411,21 @@ trait BrowserKitBrowserTests
         $this->assertCount(2, $output);
         $this->assertSame('https://www.example.com/page1', $output[0]);
         $this->assertSame('https://www.example.com/page2', $output[1]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_access_the_xml_crawler(): void
+    {
+        $crawler = $this->browser()
+            ->visit('/xml')
+            ->response()
+            ->assertXml()
+            ->crawler()
+            ->filter('url loc')
+        ;
+
+        $this->assertCount(2, $crawler);
     }
 }

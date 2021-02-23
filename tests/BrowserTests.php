@@ -401,6 +401,22 @@ trait BrowserTests
         $this->assertSame('list 2', $output[1]);
     }
 
+    /**
+     * @test
+     */
+    public function can_access_the_html_crawler(): void
+    {
+        $crawler = $this->browser()
+            ->visit('/page1')
+            ->response()
+            ->assertHtml()
+            ->crawler()
+            ->filter('ul li')
+        ;
+
+        $this->assertCount(2, $crawler);
+    }
+
     protected static function catchFileContents(string $expectedFile, callable $callback): string
     {
         (new Filesystem())->remove($expectedFile);

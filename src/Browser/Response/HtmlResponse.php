@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Response;
 
 use Behat\Mink\Element\NodeElement;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Response;
 
@@ -11,7 +12,18 @@ use Zenstruck\Browser\Response;
  */
 class HtmlResponse extends Response
 {
-    public function dump(?string $selector = null): void
+    public function crawler(): Crawler
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($this->body());
+
+        return $crawler;
+    }
+
+    /**
+     * @internal
+     */
+    final public function dump(?string $selector = null): void
     {
         if (null === $selector) {
             parent::dump();

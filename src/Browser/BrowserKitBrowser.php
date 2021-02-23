@@ -7,7 +7,6 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
-use Zenstruck\Browser\Response\JsonResponse;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -220,11 +219,7 @@ abstract class BrowserKitBrowser extends Browser
      */
     final public function assertJsonMatches(string $expression, $expected): self
     {
-        if (!$this->response() instanceof JsonResponse) {
-            PHPUnit::fail('Not a json response.');
-        }
-
-        PHPUnit::assertSame($expected, $this->response()->search($expression));
+        PHPUnit::assertSame($expected, $this->response()->assertJson()->search($expression));
 
         return $this;
     }

@@ -415,6 +415,11 @@ class Browser
         return ['Saved Source Files' => $this->savedSources];
     }
 
+    public function response(): Response
+    {
+        return Response::createFor($this->minkSession());
+    }
+
     /**
      * @internal
      */
@@ -437,11 +442,6 @@ class Browser
     final protected function documentElement(): DocumentElement
     {
         return $this->minkSession()->getPage();
-    }
-
-    protected function response(): Response
-    {
-        return Response::createFor($this->minkSession());
     }
 
     /**

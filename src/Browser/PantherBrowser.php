@@ -232,7 +232,7 @@ class PantherBrowser extends Browser
         );
     }
 
-    final protected function response(): PantherResponse
+    final public function response(): PantherResponse
     {
         return new PantherResponse($this->minkSession());
     }
