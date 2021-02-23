@@ -111,7 +111,8 @@ class Browser
             Parameter::union(
                 Parameter::untyped($this),
                 Parameter::typed(self::class, $this),
-                Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this)))
+                Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
+                Parameter::typed(Response::class, Parameter::factory(fn() => $this->response()))
             )
         );
 
