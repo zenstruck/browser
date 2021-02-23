@@ -274,6 +274,22 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function dump_includes_headers_and_status(): void
+    {
+        $output = self::catchVarDumperOutput(function() {
+            $this->browser()
+                ->visit('/page1')
+                ->dump()
+            ;
+        });
+
+        $this->assertStringContainsString('(200)', $output[0]);
+        $this->assertStringContainsString('content-type: text/html;', $output[0]);
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_json_array_key(): void
     {
         $output = self::catchVarDumperOutput(function() {
