@@ -31,6 +31,7 @@
 <hr>
 
 <h1>Console Log Test</h1>
+<button id="log">log</button>
 <button id="log-error">log error</button>
 <button id="throw-error">throw error</button>
 <hr>
@@ -61,6 +62,9 @@
         });
         $('#toggle').click(function() {
             $('#toggle-box').toggle();
+        });
+        $('#log').click(function() {
+            console.log('console.log message');
         });
         $('#log-error').click(function() {
             console.error('console.error message');
