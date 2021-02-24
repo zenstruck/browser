@@ -33,6 +33,7 @@
 <h1>Console Log Test</h1>
 <button id="log-error">log error</button>
 <button id="throw-error">throw error</button>
+<button id="throw-raw">throw raw</button>
 <hr>
 
 <a style="display: none;" href="/page1">invisible link</a>
@@ -67,6 +68,9 @@
         });
         $('#throw-error').click(function() {
             throw new Error('error object message');
+        });
+        $('#throw-raw').click(function() {
+            throw 'raw error message';
         });
     });
 </script>
