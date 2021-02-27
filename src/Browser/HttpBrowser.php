@@ -8,8 +8,6 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @method SymfonyHttpBrowser inner()
  */
 class HttpBrowser extends BrowserKitBrowser
 {

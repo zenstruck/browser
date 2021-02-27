@@ -233,9 +233,6 @@ abstract class BrowserKitBrowser extends Browser
 
     abstract public function profile(): Profile;
 
-    /**
-     * @internal
-     */
     final protected function inner(): AbstractBrowser
     {
         return $this->inner;
