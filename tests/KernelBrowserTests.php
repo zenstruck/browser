@@ -5,14 +5,13 @@ namespace Zenstruck\Browser\Tests;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Component\Security\Core\User\User;
 use Zenstruck\Browser\KernelBrowser;
-use Zenstruck\Browser\Test\HasBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 trait KernelBrowserTests
 {
-    use BrowserKitBrowserTests, HasBrowser;
+    use BrowserKitBrowserTests;
 
     /**
      * @test
@@ -92,5 +91,10 @@ trait KernelBrowserTests
         ;
 
         $this->assertTrue($profile->hasCollector('request'));
+    }
+
+    protected function browser(): KernelBrowser
+    {
+        return $this->kernelBrowser();
     }
 }

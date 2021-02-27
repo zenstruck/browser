@@ -21,7 +21,7 @@ final class ConfigureBrowserTest extends WebTestCase
         $this->page1Browser()->assertOn('/page1');
     }
 
-    public function page1Browser(): KernelBrowser
+    protected function page1Browser(): KernelBrowser
     {
         return $this->browser()->visit('/page1');
     }
