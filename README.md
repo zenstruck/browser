@@ -232,6 +232,9 @@ $browser
     ->dd('foo') // if json response, array key
     ->dd('foo.*.baz') // if json response, JMESPath notation can be used
 ;
+
+// access "cookies"
+$browser->cookies(); // Symfony\Component\BrowserKit\CookieJar
 ```
 
 ### KernelBrowser/HttpBrowser
