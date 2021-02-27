@@ -11,7 +11,7 @@ use Zenstruck\Browser\KernelBrowser;
  */
 trait HasBrowser
 {
-    public function browser(array $options = []): KernelBrowser
+    protected function browser(array $options = []): KernelBrowser
     {
         if (!$this instanceof KernelTestCase) {
             throw new \RuntimeException(\sprintf('The "%s" method can only be used on TestCases that extend "%s".', __METHOD__, KernelTestCase::class));
