@@ -12,7 +12,7 @@ public function testViewPostAndAddComment()
 {
     // assumes a "Post" is in the database with an id of 3
 
-    $this->kernelBrowser()
+    $this->browser()
         ->visit('/posts/3')
         ->assertSuccessful()
         ->assertSeeIn('title', 'My First Post')
@@ -34,7 +34,7 @@ public function testViewPostAndAddComment()
 {
     $post = PostFactory::new()->create(['title' => 'My First Post']);
 
-    $this->kernelBrowser()
+    $this->browser()
         ->visit("/posts/{$post->getId()}")
         ->assertSuccessful()
         ->assertSeeIn('title', 'My First Post')
@@ -91,30 +91,22 @@ There are several environment variables available to configure:
 
 This library provides 3 different "browsers":
 
-1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel, like [the Symfony BrowserKit component](https://symfony.com/doc/current/components/browser_kit.html)
-   *(this is the fastest browser)*.
+1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel *(this is the fastest browser)*.
 2. [HttpBrowser](#httpbrowser): makes requests to a webserver using `symfony/http-client`.
 3. [PantherBrowser](#pantherbrowser): makes requests to a webserver with a real browser using `symfony/panther` which
    allows testing javascript *(this is the slowest browser)*.
 
-You can use these Browsers in your tests using traits:
+You can use these Browsers in your tests by having your test class use the `HasBrowser` trait:
 
 ```php
 namespace App\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Browser\Test\HasBrowser;
-use Zenstruck\Browser\Test\HasHttpBrowser;
-use Zenstruck\Browser\Test\HasPantherBrowser;
 
 class MyTest extends TestCase
 {
-    // provides a browser() method that returns the KernelBrowser
     use HasBrowser;
-    // provides httpBrowser()
-    use HasHttpBrowser;
-    // provides pantherBrowser()
-    use HasPantherBrowser;
 
     /**
      * Requires this test extend either Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
@@ -475,17 +467,17 @@ use Zenstruck\Browser\Test\HasBrowser;
 class MyTest extends KernelTestCase
 {
     use HasBrowser {
-        kernelBrowser as baseKernelBrowser;
+        browser as baseKernelBrowser;
     }
 
     public function testDemo(): void
     {
-        $this->kernelBrowser()
+        $this->browser()
             ->assertOn('/') // browser always starts on the homepage (as defined below)
         ;
     }
 
-    protected function kernelBrowser(): KernelBrowser
+    protected function browser(): KernelBrowser
     {
         return $this->baseKernelBrowser()
             ->interceptRedirects() // always intercept redirects
@@ -616,12 +608,12 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
    class MyTest extends KernelTestCase
    {
        use HasBrowser {
-           kernelBrowser as baseKernelBrowser;
+           browser as baseKernelBrowser;
        }
    
        public function testDemo(): void
        {
-           $this->kernelBrowser()
+           $this->browser()
                // all http requests in this test class will have the X-Token header
                ->get('/endpoint')
    
@@ -714,7 +706,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Browser\Test\HasBrowser;
 
 /**
- * @method AppBrowser kernelBrowser()
+ * @method AppBrowser browser()
  */
 abstract class MyTest extends WebTestCase
 {
@@ -756,7 +748,7 @@ Use in your tests:
 ```php
 public function testDemo(): void
 {
-    $this->kernelBrowser()
+    $this->browser()
         // goes to the /login page, fills email/password fields,
         // and presses the Login button
         ->loginAs('kevin@example.com', 'password')

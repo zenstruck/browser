@@ -5,7 +5,6 @@ namespace Zenstruck\Browser\Tests;
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Browser\PantherBrowser;
-use Zenstruck\Browser\Test\HasPantherBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -14,7 +13,7 @@ use Zenstruck\Browser\Test\HasPantherBrowser;
  */
 final class PantherBrowserTest extends PantherTestCase
 {
-    use BrowserTests, HasPantherBrowser;
+    use BrowserTests;
 
     /**
      * @test
