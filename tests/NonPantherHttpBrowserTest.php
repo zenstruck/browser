@@ -4,13 +4,14 @@ namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Browser\Test\HasBrowser;
+use Zenstruck\Browser\Test\HasHttpBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class NonPantherHttpBrowserTest extends TestCase
 {
-    use HasBrowser;
+    use HasBrowser, HasHttpBrowser;
 
     protected function setUp(): void
     {

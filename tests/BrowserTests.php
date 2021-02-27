@@ -5,7 +5,6 @@ namespace Zenstruck\Browser\Tests;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
 use Zenstruck\Callback\Exception\UnresolveableArgument;
@@ -15,8 +14,6 @@ use Zenstruck\Callback\Exception\UnresolveableArgument;
  */
 trait BrowserTests
 {
-    use HasBrowser;
-
     /**
      * @test
      */
