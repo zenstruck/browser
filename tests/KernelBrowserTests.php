@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Tests;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\User;
 use Zenstruck\Browser\KernelBrowser;
 
@@ -35,9 +36,11 @@ trait KernelBrowserTests
             $this->markTestSkipped(SymfonyKernelBrowser::class.'::loginUser() is only available in Symfony 5.1+.');
         }
 
+        $userClass = \class_exists(InMemoryUser::class) ? InMemoryUser::class : User::class;
+
         $this->browser()
             ->throwExceptions()
-            ->actingAs(new User('kevin', 'pass'))
+            ->actingAs(new $userClass('kevin', 'pass'))
             ->visit('/user')
             ->assertSee('user: kevin/pass')
         ;
