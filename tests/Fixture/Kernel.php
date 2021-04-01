@@ -100,7 +100,11 @@ final class Kernel extends BaseKernel
 
     public function user(?UserInterface $user = null): Response
     {
-        return new Response($user ? "user: {$user->getUsername()}/{$user->getPassword()}" : 'anon');
+        if ($user) {
+            $username = \method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername();
+        }
+
+        return new Response($user ? "user: {$username}/{$user->getPassword()}" : 'anon');
     }
 
     public function registerBundles(): iterable
