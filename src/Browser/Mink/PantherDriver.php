@@ -77,8 +77,8 @@ final class PantherDriver extends CoreDriver
         if (($element = $crawler->getElement(0)) && 'title' === $element->getTagName()) {
             // hack to get the text of the title html element
             // for this element, WebDriverElement::getText() returns an empty string
-            // the only way to get the value is to get the html
-            return \strip_tags($crawler->html());
+            // the only way to get the value is to get title from the client
+            return $this->client->getTitle();
         }
 
         $text = $crawler->text();
