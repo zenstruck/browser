@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser;
 
 use PHPUnit\Framework\Assert as PHPUnit;
+use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\VarDumper\VarDumper;
@@ -208,6 +209,11 @@ class PantherBrowser extends Browser
         echo \sprintf("\n\nScreenshot saved as \"%s\".\n\n", \end($this->savedScreenshots));
 
         $this->die();
+    }
+
+    public function cookies(): CookieJar
+    {
+        return $this->client->getCookieJar();
     }
 
     /**
