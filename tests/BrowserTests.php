@@ -401,6 +401,16 @@ trait BrowserTests
         $this->assertSame('list 2', $output[1]);
     }
 
+    /**
+     * @test
+     */
+    public function can_access_cookies(): void
+    {
+        $cookies = $this->browser()->visit('/page1')->cookies();
+
+        $this->assertIsArray($cookies->all());
+    }
+
     protected static function catchFileContents(string $expectedFile, callable $callback): string
     {
         (new Filesystem())->remove($expectedFile);
