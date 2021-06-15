@@ -4,7 +4,6 @@ namespace Zenstruck\Browser;
 
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\BrowserKit\AbstractBrowser;
-use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
@@ -230,11 +229,6 @@ abstract class BrowserKitBrowser extends Browser
         PHPUnit::assertSame($expected, $this->response()->search($expression));
 
         return $this;
-    }
-
-    public function cookies(): CookieJar
-    {
-        return $this->inner->getCookieJar();
     }
 
     abstract public function profile(): Profile;
