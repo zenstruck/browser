@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser;
 
 use Behat\Mink\Session;
+use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Response\HtmlResponse;
 use Zenstruck\Browser\Response\JsonResponse;
@@ -15,6 +16,9 @@ class Response
 {
     private Session $session;
 
+    /**
+     * @internal
+     */
     final public function __construct(Session $session)
     {
         $this->session = $session;
@@ -25,6 +29,9 @@ class Response
         return $this->session->getStatusCode();
     }
 
+    /**
+     * @internal
+     */
     final public static function createFor(Session $session): self
     {
         $contentType = (string) $session->getResponseHeader('content-type');
@@ -49,21 +56,60 @@ class Response
         return $this->session->getPage()->getContent();
     }
 
+    final public function assertJson(): JsonResponse
+    {
+        if (!$this instanceof JsonResponse) {
+            PHPUnit::fail('Not a json response.');
+        }
+
+        return $this;
+    }
+
+    final public function assertXml(): XmlResponse
+    {
+        if (!$this instanceof XmlResponse) {
+            PHPUnit::fail('Not an xml response.');
+        }
+
+        return $this;
+    }
+
+    final public function assertHtml(): HtmlResponse
+    {
+        if (!$this instanceof HtmlResponse) {
+            PHPUnit::fail('Not an html response.');
+        }
+
+        return $this;
+    }
+
+    /**
+     * @internal
+     */
     final public function raw(): string
     {
         return "{$this->rawMetadata()}\n{$this->rawBody()}";
     }
 
+    /**
+     * @internal
+     */
     final public function isSuccessful(): bool
     {
         return $this->statusCode() >= 200 && $this->statusCode() < 300;
     }
 
+    /**
+     * @internal
+     */
     final public function isRedirect(): bool
     {
         return $this->statusCode() >= 300 && $this->statusCode() < 400;
     }
 
+    /**
+     * @internal
+     */
     public function dump(?string $selector = null): void
     {
         if (null !== $selector) {
@@ -73,11 +119,17 @@ class Response
         VarDumper::dump($this->raw());
     }
 
+    /**
+     * @internal
+     */
     final protected function session(): Session
     {
         return $this->session;
     }
 
+    /**
+     * @internal
+     */
     protected function rawMetadata(): string
     {
         $ret = "URL: {$this->session->getCurrentUrl()} ({$this->statusCode()})\n\n";
@@ -91,6 +143,9 @@ class Response
         return $ret;
     }
 
+    /**
+     * @internal
+     */
     protected function rawBody(): string
     {
         return $this->body();

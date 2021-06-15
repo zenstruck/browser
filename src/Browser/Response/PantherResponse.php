@@ -4,6 +4,8 @@ namespace Zenstruck\Browser\Response;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
 final class PantherResponse extends HtmlResponse
 {

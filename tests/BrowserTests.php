@@ -5,6 +5,8 @@ namespace Zenstruck\Browser\Tests;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
+use Zenstruck\Browser\Response;
+use Zenstruck\Browser\Response\HtmlResponse;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
@@ -123,6 +125,22 @@ trait BrowserTests
             ->use(function(TestComponent2 $component) {
                 $this->assertTrue($component->preActionsCalled);
                 $this->assertTrue($component->preAssertionsCalled);
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_response(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->use(function(Response $response) {
+                $this->assertStringContainsString('<h1>h1 title</h1>', $response->body());
+            })
+            ->use(function(HtmlResponse $response) {
+                $this->assertCount(2, $response->crawler()->filter('ul li'));
             })
         ;
     }
@@ -399,6 +417,22 @@ trait BrowserTests
         $this->assertCount(2, $output);
         $this->assertSame('list 1', $output[0]);
         $this->assertSame('list 2', $output[1]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_access_the_html_crawler(): void
+    {
+        $crawler = $this->browser()
+            ->visit('/page1')
+            ->response()
+            ->assertHtml()
+            ->crawler()
+            ->filter('ul li')
+        ;
+
+        $this->assertCount(2, $crawler);
     }
 
     protected static function catchFileContents(string $expectedFile, callable $callback): string

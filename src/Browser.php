@@ -111,7 +111,8 @@ class Browser
             Parameter::union(
                 Parameter::untyped($this),
                 Parameter::typed(self::class, $this),
-                Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this)))
+                Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
+                Parameter::typed(Response::class, Parameter::factory(fn() => $this->response()))
             )
         );
 
@@ -415,6 +416,11 @@ class Browser
         return ['Saved Source Files' => $this->savedSources];
     }
 
+    public function response(): Response
+    {
+        return Response::createFor($this->minkSession());
+    }
+
     /**
      * @internal
      */
@@ -437,11 +443,6 @@ class Browser
     final protected function documentElement(): DocumentElement
     {
         return $this->minkSession()->getPage();
-    }
-
-    protected function response(): Response
-    {
-        return Response::createFor($this->minkSession());
     }
 
     /**

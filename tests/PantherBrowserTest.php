@@ -187,22 +187,6 @@ final class PantherBrowserTest extends PantherTestCase
         ;
     }
 
-    /**
-     * @test
-     */
-    public function can_dump_html_element(): void
-    {
-        $this->markTestIncomplete('TODO: fix.');
-    }
-
-    /**
-     * @test
-     */
-    public function if_dump_selector_matches_multiple_elements_all_are_dumped(): void
-    {
-        $this->markTestIncomplete('TODO: fix.');
-    }
-
     protected function browser(): PantherBrowser
     {
         return $this->pantherBrowser();
