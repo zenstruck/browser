@@ -207,11 +207,9 @@ abstract class BrowserKitBrowser extends Browser
     /**
      * @return static
      */
-    final public function assertJson(): self
+    final public function assertJson(string $expectedContentType = 'json'): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseHeaderContains('Content-Type', 'application/json')
-        );
+        return $this->assertHeaderContains('Content-Type', $expectedContentType);
     }
 
     /**

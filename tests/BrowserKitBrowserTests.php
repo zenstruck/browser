@@ -259,6 +259,19 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function assert_json_alternate_content_types(): void
+    {
+        $this->browser()
+            ->get('/json?content-type=application/vnd.custom.json', ['json' => 'foo'])
+            ->assertSuccessful()
+            ->assertJson()
+            ->assertJson('application/vnd.custom.json')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_json_response_as_array(): void
     {
         $output = self::catchVarDumperOutput(function() {

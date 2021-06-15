@@ -75,7 +75,12 @@ final class Kernel extends BaseKernel
 
     public function json(Request $request): JsonResponse
     {
-        return new JsonResponse($request->getContent(), 200, [], true);
+        return new JsonResponse(
+            $request->getContent(),
+            200,
+            ['Content-Type' => $request->query->get('content-type', 'application/json')],
+            true
+        );
     }
 
     public function exception(): void
