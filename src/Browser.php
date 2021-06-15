@@ -19,7 +19,7 @@ use Zenstruck\Callback\Parameter;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class Browser
+class Browser
 {
     private const SESSION = 'app';
 
