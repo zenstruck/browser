@@ -13,6 +13,10 @@ final class JsonResponse extends Response
 {
     public function json()
     {
+        if (empty($this->body())) {
+            return null;
+        }
+
         return \json_decode($this->body(), true, 512, \JSON_THROW_ON_ERROR);
     }
 

@@ -272,6 +272,21 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function can_dump_empty_json_request(): void
+    {
+        $output = self::catchVarDumperOutput(function() {
+            $this->browser()
+                ->post('/json')
+                ->dump()
+            ;
+        });
+
+        $this->assertStringContainsString('content-type: application/json', $output[0]);
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_json_response_as_array(): void
     {
         $output = self::catchVarDumperOutput(function() {
