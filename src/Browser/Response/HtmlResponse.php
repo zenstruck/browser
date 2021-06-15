@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Browser\Response;
 
-use Behat\Mink\Element\NodeElement;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Response;
@@ -31,15 +30,14 @@ class HtmlResponse extends Response
             return;
         }
 
-        $elements = $this->session()->getPage()->findAll('css', $selector);
-        $elements = \array_map(static fn(NodeElement $node) => $node->getHtml(), $elements);
+        $elements = $this->crawler()->filter($selector);
 
-        if (empty($elements)) {
+        if (0 === $elements->count()) {
             throw new \RuntimeException("Element \"{$selector}\" not found.");
         }
 
-        foreach ($elements as $element) {
-            VarDumper::dump($element);
-        }
+        $elements->each(function(Crawler $node) {
+            VarDumper::dump($node->html());
+        });
     }
 }
