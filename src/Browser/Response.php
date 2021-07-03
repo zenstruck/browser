@@ -83,33 +83,21 @@ class Response
         return $this;
     }
 
-    /**
-     * @internal
-     */
     final public function raw(): string
     {
         return "{$this->rawMetadata()}\n{$this->rawBody()}";
     }
 
-    /**
-     * @internal
-     */
     final public function isSuccessful(): bool
     {
         return $this->statusCode() >= 200 && $this->statusCode() < 300;
     }
 
-    /**
-     * @internal
-     */
     final public function isRedirect(): bool
     {
         return $this->statusCode() >= 300 && $this->statusCode() < 400;
     }
 
-    /**
-     * @internal
-     */
     public function dump(?string $selector = null): void
     {
         if (null !== $selector) {

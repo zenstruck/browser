@@ -20,9 +20,6 @@ final class JsonResponse extends Response
         return \json_decode($this->body(), true, 512, \JSON_THROW_ON_ERROR);
     }
 
-    /**
-     * @internal
-     */
     public function dump(?string $selector = null): void
     {
         if (null === $selector) {
