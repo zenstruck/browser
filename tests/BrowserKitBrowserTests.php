@@ -409,8 +409,8 @@ trait BrowserKitBrowserTests
         });
 
         $this->assertCount(2, $output);
-        $this->assertSame('https://www.example.com/page1', $output[0]);
-        $this->assertSame('https://www.example.com/page2', $output[1]);
+        $this->assertSame('<loc>https://www.example.com/page1</loc>', $output[0]);
+        $this->assertSame('<loc attr="attribute">https://www.example.com/page2</loc>', $output[1]);
     }
 
     /**

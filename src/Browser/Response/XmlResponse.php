@@ -3,13 +3,11 @@
 namespace Zenstruck\Browser\Response;
 
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\VarDumper\VarDumper;
-use Zenstruck\Browser\Response;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class XmlResponse extends Response
+final class XmlResponse extends DomResponse
 {
     public function crawler(): Crawler
     {
@@ -17,27 +15,5 @@ final class XmlResponse extends Response
         $dom->loadXML($this->body());
 
         return new Crawler($dom);
-    }
-
-    /**
-     * @internal
-     */
-    public function dump(?string $selector = null): void
-    {
-        if (null === $selector) {
-            parent::dump();
-
-            return;
-        }
-
-        $elements = $this->crawler()->filter($selector);
-
-        if (!\count($elements)) {
-            throw new \RuntimeException("Element \"{$selector}\" not found.");
-        }
-
-        foreach ($elements as $element) {
-            VarDumper::dump($element->textContent);
-        }
     }
 }

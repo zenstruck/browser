@@ -399,7 +399,7 @@ trait BrowserTests
         });
 
         $this->assertCount(1, $output);
-        $this->assertSame('<a href="/page2">a link</a> not a link', $output[0]);
+        $this->assertSame('<p id="link"><a href="/page2">a link</a> not a link</p>', $output[0]);
     }
 
     /**
@@ -415,8 +415,8 @@ trait BrowserTests
         });
 
         $this->assertCount(2, $output);
-        $this->assertSame('list 1', $output[0]);
-        $this->assertSame('list 2', $output[1]);
+        $this->assertSame('<li>list 1</li>', $output[0]);
+        $this->assertSame('<li>list 2</li>', $output[1]);
     }
 
     /**
