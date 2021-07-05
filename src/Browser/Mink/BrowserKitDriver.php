@@ -419,7 +419,6 @@ final class BrowserKitDriver extends CoreDriver
 
     public function attachFile($xpath, $path)
     {
-
         $field = $this->getFormField($xpath);
 
         if (!$field instanceof FileFormField) {
