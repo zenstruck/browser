@@ -166,6 +166,10 @@ final class PantherDriver extends CoreDriver
 
     public function attachFile($xpath, $path): void
     {
+        if (!file_exists($path)) {
+            throw new \InvalidArgumentException(sprintf('File "%s" does not exist!', $path));
+        }
+
         $this->fileFormField($xpath)->upload($path);
     }
 

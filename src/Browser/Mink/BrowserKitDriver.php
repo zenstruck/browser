@@ -419,10 +419,15 @@ final class BrowserKitDriver extends CoreDriver
 
     public function attachFile($xpath, $path)
     {
+
         $field = $this->getFormField($xpath);
 
         if (!$field instanceof FileFormField) {
             throw new DriverException(\sprintf('Impossible to attach a file on the element with XPath "%s" as it is not a file input', $xpath));
+        }
+
+        if (!file_exists($path)) {
+            throw new \InvalidArgumentException(sprintf('File "%s" does not exist!', $path));
         }
 
         $field->upload($path);

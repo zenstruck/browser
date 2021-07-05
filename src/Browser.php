@@ -216,6 +216,10 @@ class Browser
      */
     final public function attachFile(string $selector, string $path): self
     {
+        if (!file_exists($path)) {
+            throw new \InvalidArgumentException(sprintf('File "%s" does not exist!', $path));
+        }
+
         $this->documentElement()->attachFileToField($selector, $path);
 
         return $this;
