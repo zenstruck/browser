@@ -389,6 +389,19 @@ trait BrowserTests
     /**
      * @test
      */
+    public function cannot_attach_file_that_does_not_exist(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->browser()
+            ->visit('/page1')
+            ->attachFile('Input 5', '/invalid/file')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_html_element(): void
     {
         $output = self::catchVarDumperOutput(function() {
