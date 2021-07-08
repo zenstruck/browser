@@ -650,7 +650,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
            ;
        }
 
-       protected function httpBrowser(): KernelBrowser
+       protected function browser(): KernelBrowser
        {
            return $this->baseKernelBrowser()
                ->setDefaultHttpOptions(['headers' => ['X-Token' => 'my-token']])
