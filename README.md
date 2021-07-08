@@ -636,7 +636,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
    class MyTest extends KernelTestCase
    {
        use HasBrowser {
-           httpBrowser as baseKernelBrowser;
+           browser as baseKernelBrowser;
        }
    
        public function testDemo(): void
