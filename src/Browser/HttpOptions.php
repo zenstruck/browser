@@ -21,7 +21,7 @@ class HttpOptions
         // server variables
         'server' => [],
 
-        // raw request body as string
+        // request body
         'body' => null,
 
         // if set, will json_encode and use as the body and
@@ -159,9 +159,11 @@ class HttpOptions
     }
 
     /**
+     * @param string|array|null $body
+     *
      * @return static
      */
-    final public function withBody(?string $body): self
+    final public function withBody($body): self
     {
         $this->options['body'] = $body;
 
@@ -190,12 +192,39 @@ class HttpOptions
         return $this;
     }
 
+    final public function addQueryToUrl(string $url): string
+    {
+        $parts = \parse_url($url);
+
+        if (isset($parts['query'])) {
+            \parse_str($parts['query'], $query);
+        } else {
+            $query = [];
+        }
+
+        // merge query on url with the query option
+        $parts['query'] = \http_build_query(\array_merge($query, $this->options['query']));
+
+        $scheme = isset($parts['scheme']) ? $parts['scheme'].'://' : '';
+        $host = $parts['host'] ?? '';
+        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+        $user = $parts['user'] ?? '';
+        $pass = isset($parts['pass']) ? ':'.$parts['pass'] : '';
+        $pass = ($user || $pass) ? "{$pass}@" : '';
+        $path = $parts['path'] ?? '';
+        $query = isset($parts['query']) && $parts['query'] ? '?'.$parts['query'] : '';
+        $fragment = isset($parts['fragment']) ? '#'.$parts['fragment'] : '';
+
+        return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;
+    }
+
     /**
      * @internal
      */
-    final public function query(): array
+    final public function parameters(): array
     {
-        return $this->options['query'];
+        // when body is array, use as request parameters
+        return \is_array($this->options['body']) ? $this->options['body'] : [];
     }
 
     /**
@@ -251,6 +280,11 @@ class HttpOptions
      */
     final public function body(): ?string
     {
+        if (\is_array($this->options['body'])) {
+            // when body is array, it's used as the request parameters
+            return null;
+        }
+
         if (null === $this->options['json']) {
             return $this->options['body'];
         }
