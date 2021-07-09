@@ -17,7 +17,7 @@ final class HttpOptionsTest extends TestCase
     {
         $options = new HttpOptions();
 
-        $this->assertEmpty($options->query());
+        $this->assertSame('/', $options->addQueryToUrl('/'));
         $this->assertEmpty($options->files());
         $this->assertEmpty($options->server());
         $this->assertNull($options->body());
@@ -30,7 +30,7 @@ final class HttpOptionsTest extends TestCase
     {
         $options = new HttpOptions([
             'headers' => ['header' => 'header value'],
-            'query' => $expectedQuery = ['param' => 'param value'],
+            'query' => ['param' => 'param value'],
             'files' => $expectedFiles = ['file' => 'file value'],
             'server' => ['server' => 'server value'],
             'body' => $expectedBody = 'body value',
@@ -38,7 +38,7 @@ final class HttpOptionsTest extends TestCase
             'ajax' => false,
         ]);
 
-        $this->assertSame($expectedQuery, $options->query());
+        $this->assertSame('/?param=param+value', $options->addQueryToUrl('/'));
         $this->assertSame($expectedFiles, $options->files());
         $this->assertSame(['server' => 'server value', 'HTTP_HEADER' => 'header value'], $options->server());
         $this->assertSame($expectedBody, $options->body());
@@ -55,10 +55,10 @@ final class HttpOptionsTest extends TestCase
             ->withHeader('header2', 'header2 value')
             ->withFiles($expectedFiles = ['file' => 'file value'])
             ->withServer(['server' => 'server value'])
-            ->withQuery($expectedQuery = ['param' => 'param value'])
+            ->withQuery(['param' => 'param value'])
         ;
 
-        $this->assertSame($expectedQuery, $options->query());
+        $this->assertSame('/?param=param+value', $options->addQueryToUrl('/'));
         $this->assertSame($expectedFiles, $options->files());
         $this->assertSame($expectedBody, $options->body());
         $this->assertSame(
@@ -199,7 +199,7 @@ final class HttpOptionsTest extends TestCase
     {
         $options = HttpOptions::create([
             'headers' => ['header1' => 'header1 value'],
-            'query' => $expectedQuery = ['param' => 'param value'],
+            'query' => ['param' => 'param value'],
             'files' => $expectedFiles = ['file' => 'file value'],
             'server' => ['server' => 'server value'],
             'body' => null,
@@ -211,7 +211,7 @@ final class HttpOptionsTest extends TestCase
             'json' => $json = ['json' => 'body'],
         ]);
 
-        $this->assertSame($expectedQuery, $options->query());
+        $this->assertSame('/?param=param+value', $options->addQueryToUrl('/'));
         $this->assertSame($expectedFiles, $options->files());
         $this->assertSame(\json_encode($json), $options->body());
         $this->assertSame(
@@ -234,7 +234,7 @@ final class HttpOptionsTest extends TestCase
     {
         $options = HttpOptions::create([
             'headers' => ['header1' => 'header1 value'],
-            'query' => $expectedQuery = ['param' => 'param value'],
+            'query' => ['param' => 'param value'],
             'files' => $expectedFiles = ['file' => 'file value'],
             'server' => ['server' => 'server value'],
             'body' => null,
@@ -243,7 +243,7 @@ final class HttpOptionsTest extends TestCase
         ]);
         $options = $options->merge(new class(['headers' => ['header2' => 'header2 value']]) extends HttpOptions {});
 
-        $this->assertSame($expectedQuery, $options->query());
+        $this->assertSame('/?param=param+value', $options->addQueryToUrl('/'));
         $this->assertSame($expectedFiles, $options->files());
         $this->assertNull($options->body());
         $this->assertSame(

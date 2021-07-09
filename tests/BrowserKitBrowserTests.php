@@ -206,6 +206,14 @@ trait BrowserKitBrowserTests
             ->assertContains('"x-token":["my-token"]')
             ->post('/http-method', HttpOptions::json()->withHeader('content-type', 'application/ld+json'))
             ->assertContains('"content-type":["application\/ld+json"]')
+            ->post('/http-method?q1=qv1')
+            ->assertContains('"query":{"q1":"qv1"}')
+            ->post('/http-method', ['query' => ['q1' => 'qv1']])
+            ->assertContains('"query":{"q1":"qv1"}')
+            ->post('/http-method?q1=qv1', ['query' => ['q2' => 'qv2']])
+            ->assertContains('"query":{"q1":"qv1","q2":"qv2"}')
+            ->post('/http-method', ['body' => ['b1' => 'bv1']])
+            ->assertContains('"request":{"b1":"bv1"}')
         ;
     }
 

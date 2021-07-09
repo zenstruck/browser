@@ -67,7 +67,7 @@ final class Kernel extends BaseKernel
             'attributes' => $request->attributes->all(),
             'files' => $request->files->all(),
             'server' => $request->server->all(),
-            'request' => $request->query->all(),
+            'request' => $request->request->all(),
             'content' => $request->getContent(),
             'ajax' => $request->isXmlHttpRequest(),
         ]);
