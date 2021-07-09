@@ -204,6 +204,8 @@ trait BrowserKitBrowserTests
             ->post('/http-method', CustomHttpOptions::api('my-token'))
             ->assertContains('"content-type":["application\/json"]')
             ->assertContains('"x-token":["my-token"]')
+            ->post('/http-method', HttpOptions::json()->withHeader('content-type', 'application/ld+json'))
+            ->assertContains('"content-type":["application\/ld+json"]')
         ;
     }
 

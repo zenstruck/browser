@@ -214,19 +214,27 @@ class HttpOptions
     final public function server(): array
     {
         $server = $this->options['server'];
-        $headers = $this->options['headers'];
+        $headers = \array_combine(
+            \array_map(
+                static fn($header) => \mb_strtoupper(\str_replace('-', '_', $header)),
+                \array_keys($this->options['headers'])
+            ),
+            $this->options['headers']
+        );
 
-        if (null !== $this->options['json']) {
-            $headers['Content-Type'] = $headers['Accept'] = 'application/json';
+        if (null !== $this->options['json'] && !\array_key_exists('ACCEPT', $headers)) {
+            $headers['ACCEPT'] = 'application/json';
         }
 
-        if (false !== $this->options['ajax']) {
-            $headers['X-Requested-With'] = 'XMLHttpRequest';
+        if (null !== $this->options['json'] && !\array_key_exists('CONTENT_TYPE', $headers)) {
+            $headers['CONTENT_TYPE'] = 'application/json';
+        }
+
+        if (false !== $this->options['ajax'] && !\array_key_exists('X_REQUESTED_WITH', $headers)) {
+            $headers['X_REQUESTED_WITH'] = 'XMLHttpRequest';
         }
 
         foreach ($headers as $header => $value) {
-            $header = \mb_strtoupper(\str_replace('-', '_', $header));
-
             // content type header cannot have HTTP_ prefix
             if ('CONTENT_TYPE' !== $header) {
                 $header = "HTTP_{$header}";

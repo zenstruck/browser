@@ -256,4 +256,26 @@ final class HttpOptionsTest extends TestCase
             $options->server()
         );
     }
+
+    /**
+     * @test
+     */
+    public function can_override_json_and_ajax_headers(): void
+    {
+        $options = HttpOptions::jsonAjax()
+            ->withHeader('Accept', 'application/ld+json')
+            ->withHeader('Content-Type', 'application/ld+json')
+            ->withHeader('X-Requested-With', 'something')
+        ;
+
+        $this->assertNull($options->body());
+        $this->assertSame(
+            [
+                'HTTP_ACCEPT' => 'application/ld+json',
+                'CONTENT_TYPE' => 'application/ld+json',
+                'HTTP_X_REQUESTED_WITH' => 'something',
+            ],
+            $options->server()
+        );
+    }
 }
