@@ -296,6 +296,14 @@ trait BrowserTests
             ->assertNotSelected('Input 7', 'option 2')
             ->assertNotSelected('input7', 'option 2')
             ->assertNotSelected('input_7[]', 'option 2')
+            ->assertNotSelected('input_8', 'option 1')
+            ->assertSelected('input_8', 'option 2')
+            ->assertNotChecked('Radio 1')
+            ->assertNotChecked('radio1')
+            ->assertNotChecked('Radio 3')
+            ->assertNotChecked('radio3')
+            ->assertChecked('Radio 2')
+            ->assertChecked('radio2')
         ;
     }
 
@@ -327,6 +335,7 @@ trait BrowserTests
             ->selectFieldOption('Input 4', 'option 2')
             ->attachFile('Input 5', __FILE__)
             ->selectFieldOptions('Input 6', ['option 1', 'option 3'])
+            ->checkField('Radio 3')
             ->click('Submit')
             ->assertOn('/submit-form')
             ->assertContains('"input_1":"Kevin"')
@@ -335,6 +344,7 @@ trait BrowserTests
             ->assertContains('"input_4":"option 2"')
             ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, \PATHINFO_BASENAME)))
             ->assertContains('"input_6":["option 1","option 3"]')
+            ->assertContains('"input_8":"option 3"')
         ;
     }
 
@@ -351,6 +361,7 @@ trait BrowserTests
             ->selectFieldOption('input4', 'option 2')
             ->attachFile('input5', __FILE__)
             ->selectFieldOptions('input6', ['option 1', 'option 3'])
+            ->checkField('radio3')
             ->click('Submit')
             ->assertOn('/submit-form')
             ->assertContains('"input_1":"Kevin"')
@@ -359,6 +370,7 @@ trait BrowserTests
             ->assertContains('"input_4":"option 2"')
             ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, \PATHINFO_BASENAME)))
             ->assertContains('"input_6":["option 1","option 3"]')
+            ->assertContains('"input_8":"option 3"')
         ;
     }
 
@@ -375,6 +387,7 @@ trait BrowserTests
             ->selectFieldOption('input_4', 'option 2')
             ->attachFile('input_5', __FILE__)
             ->selectFieldOptions('input_6[]', ['option 1', 'option 3'])
+            ->selectFieldOption('input_8', 'option 3')
             ->click('Submit')
             ->assertOn('/submit-form')
             ->assertContains('"input_1":"Kevin"')
@@ -383,6 +396,7 @@ trait BrowserTests
             ->assertContains('"input_4":"option 2"')
             ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, \PATHINFO_BASENAME)))
             ->assertContains('"input_6":["option 1","option 3"]')
+            ->assertContains('"input_8":"option 3"')
         ;
     }
 

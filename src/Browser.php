@@ -174,6 +174,14 @@ class Browser
      */
     final public function checkField(string $selector): self
     {
+        $field = $this->documentElement()->findField($selector);
+
+        if ($field && 'radio' === \mb_strtolower($field->getAttribute('type'))) {
+            $this->documentElement()->selectFieldOption($selector, $field->getAttribute('value'));
+
+            return $this;
+        }
+
         $this->documentElement()->checkField($selector);
 
         return $this;
