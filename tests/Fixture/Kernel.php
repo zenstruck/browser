@@ -54,7 +54,7 @@ final class Kernel extends BaseKernel
     {
         return new JsonResponse(\array_merge(
             $request->request->all(),
-            \array_map(fn(UploadedFile $file) => $file->getClientOriginalName(), $request->files->all())
+            \array_map(fn(UploadedFile $file) => $file->getClientOriginalName(), \array_filter($request->files->all()))
         ));
     }
 

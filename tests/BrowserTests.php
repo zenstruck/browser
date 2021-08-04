@@ -403,6 +403,26 @@ trait BrowserTests
     /**
      * @test
      */
+    public function select_field(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->selectField('Input 2')
+            ->selectField('Input 4', 'option 2')
+            ->selectField('Input 6', ['option 1', 'option 3'])
+            ->selectField('Radio 3')
+            ->click('Submit')
+            ->assertOn('/submit-form')
+            ->assertContains('"input_2":"on"')
+            ->assertContains('"input_4":"option 2"')
+            ->assertContains('"input_6":["option 1","option 3"]')
+            ->assertContains('"input_8":"option 3"')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function cannot_attach_file_that_does_not_exist(): void
     {
         $this->expectException(\InvalidArgumentException::class);

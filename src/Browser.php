@@ -198,6 +198,28 @@ class Browser
     }
 
     /**
+     * Select Radio, check checkbox, select single/multiple values.
+     *
+     * @param string|array|null $value null: check radio/checkbox
+     *                                 string: single value
+     *                                 array: multiple values
+     *
+     * @return static
+     */
+    final public function selectField(string $selector, $value = null): self
+    {
+        if (\is_array($value)) {
+            return $this->selectFieldOptions($selector, $value);
+        }
+
+        if (\is_string($value)) {
+            return $this->selectFieldOption($selector, $value);
+        }
+
+        return $this->checkField($selector);
+    }
+
+    /**
      * @return static
      */
     final public function selectFieldOption(string $selector, string $value): self

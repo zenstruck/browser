@@ -157,8 +157,9 @@ $browser
     ->fillField('Name', 'Kevin')
     ->checkField('Accept Terms')
     ->uncheckField('Accept Terms')
-    ->selectFieldOption('Type', 'Employee') // single option select
-    ->selectFieldOptions('Notification', ['Email', 'SMS']) // multi-option select
+    ->selectField('Canada') // "radio" select
+    ->selectField('Type', 'Employee') // "select" single option
+    ->selectField('Notification', ['Email', 'SMS']) // "select" multiple options
     ->attachFile('Photo', '/path/to/photo.jpg')
     ->click('Submit')
 
