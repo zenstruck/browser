@@ -171,6 +171,12 @@ final class PantherDriver extends CoreDriver
 
     public function isChecked($xpath): bool
     {
+        $element = $this->crawlerElement($this->filteredCrawler($xpath));
+
+        if ('radio' === \mb_strtolower($element->getAttribute('type'))) {
+            return null !== $element->getAttribute('checked');
+        }
+
         return $this->choiceFormField($xpath)->hasValue();
     }
 
