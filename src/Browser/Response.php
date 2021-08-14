@@ -3,8 +3,8 @@
 namespace Zenstruck\Browser;
 
 use Behat\Mink\Session;
-use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\VarDumper\VarDumper;
+use Zenstruck\Assert;
 use Zenstruck\Browser\Response\DomResponse;
 use Zenstruck\Browser\Response\HtmlResponse;
 use Zenstruck\Browser\Response\JsonResponse;
@@ -60,7 +60,7 @@ class Response
     final public function assertJson(): JsonResponse
     {
         if (!$this instanceof JsonResponse) {
-            PHPUnit::fail('Not a json response.');
+            Assert::fail('Not a json response.');
         }
 
         return $this;
@@ -69,7 +69,7 @@ class Response
     final public function assertXml(): XmlResponse
     {
         if (!$this instanceof XmlResponse) {
-            PHPUnit::fail('Not an xml response.');
+            Assert::fail('Not an xml response.');
         }
 
         return $this;
@@ -78,7 +78,7 @@ class Response
     final public function assertHtml(): HtmlResponse
     {
         if (!$this instanceof HtmlResponse) {
-            PHPUnit::fail('Not an html response.');
+            Assert::fail('Not an html response.');
         }
 
         return $this;
@@ -87,7 +87,7 @@ class Response
     final public function assertDom(): DomResponse
     {
         if (!$this instanceof DomResponse) {
-            PHPUnit::fail('Not an DOM response.');
+            Assert::fail('Not an DOM response.');
         }
 
         return $this;

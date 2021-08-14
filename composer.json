@@ -19,6 +19,7 @@
         "symfony/css-selector": "^4.4|^5.0",
         "symfony/framework-bundle": "^4.4|^5.0",
         "symfony/polyfill-php80": "^1.20",
+        "zenstruck/assert": "^1.0",
         "zenstruck/callback": "^1.1"
     },
     "require-dev": {

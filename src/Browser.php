@@ -9,12 +9,12 @@ use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
-use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
+use Zenstruck\Browser\Assertion\MinkAssertion;
+use Zenstruck\Browser\Assertion\SameUrlAssertion;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Response;
-use Zenstruck\Browser\Test\Constraint\UrlMatches;
 use Zenstruck\Callback\Parameter;
 
 /**
@@ -57,13 +57,13 @@ class Browser
     }
 
     /**
-     * @param array $parts The url parts to check (@see parse_url)
+     * @param array $parts The url parts to check {@see parse_url} (use empty array for "all")
      *
      * @return static
      */
     final public function assertOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        PHPUnit::assertThat($expected, new UrlMatches($this->minkSession()->getCurrentUrl(), $parts));
+        Assert::run(new SameUrlAssertion($this->minkSession()->getCurrentUrl(), $expected, $parts));
 
         return $this;
     }
@@ -75,10 +75,7 @@ class Browser
      */
     final public function assertNotOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        PHPUnit::assertThat(
-            $expected,
-            PHPUnit::logicalNot(new UrlMatches($this->minkSession()->getCurrentUrl(), $parts))
-        );
+        Assert::not(new SameUrlAssertion($this->minkSession()->getCurrentUrl(), $expected, $parts));
 
         return $this;
     }
@@ -374,12 +371,11 @@ class Browser
     {
         try {
             $field = $this->webAssert()->fieldExists($selector);
-            PHPUnit::assertTrue(true);
         } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
+            Assert::fail($e->getMessage());
         }
 
-        PHPUnit::assertContains($expected, (array) $field->getValue());
+        Assert::that((array) $field->getValue())->contains($expected);
 
         return $this;
     }
@@ -391,12 +387,11 @@ class Browser
     {
         try {
             $field = $this->webAssert()->fieldExists($selector);
-            PHPUnit::assertTrue(true);
         } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
+            Assert::fail($e->getMessage());
         }
 
-        PHPUnit::assertNotContains($expected, (array) $field->getValue());
+        Assert::that((array) $field->getValue())->doesNotContain($expected);
 
         return $this;
     }
@@ -493,12 +488,7 @@ class Browser
      */
     final protected function wrapMinkExpectation(callable $callback): self
     {
-        try {
-            $callback();
-            PHPUnit::assertTrue(true);
-        } catch (ExpectationException $e) {
-            PHPUnit::fail($e->getMessage());
-        }
+        Assert::run(new MinkAssertion($callback));
 
         return $this;
     }
