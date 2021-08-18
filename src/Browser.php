@@ -10,6 +10,7 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Response;
@@ -112,7 +113,8 @@ class Browser
                 Parameter::untyped($this),
                 Parameter::typed(self::class, $this),
                 Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
-                Parameter::typed(Response::class, Parameter::factory(fn() => $this->response()))
+                Parameter::typed(Response::class, Parameter::factory(fn() => $this->response())),
+                Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->response()->assertDom()->crawler()))
             )
         );
 

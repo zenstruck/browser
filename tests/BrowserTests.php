@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
@@ -148,12 +149,25 @@ trait BrowserTests
     /**
      * @test
      */
+    public function can_use_crawler(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->use(function(Crawler $crawler) {
+                $this->assertSame('h1 title', $crawler->filter('h1')->text());
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function with_can_accept_multiple_browsers_and_components(): void
     {
         $browser = $this->browser();
 
         $browser
-            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2) use ($browser) {
+            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2, Crawler $crawler) use ($browser) {
                 $this->assertInstanceOf(Browser::class, $browser1);
                 $this->assertInstanceOf(Browser::class, $browser2);
                 $this->assertInstanceOf(\get_class($browser), $browser1);

@@ -5,6 +5,7 @@ namespace Zenstruck\Browser;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\VarDumper\VarDumper;
+use Zenstruck\Browser\Response\DomResponse;
 use Zenstruck\Browser\Response\HtmlResponse;
 use Zenstruck\Browser\Response\JsonResponse;
 use Zenstruck\Browser\Response\XmlResponse;
@@ -78,6 +79,15 @@ class Response
     {
         if (!$this instanceof HtmlResponse) {
             PHPUnit::fail('Not an html response.');
+        }
+
+        return $this;
+    }
+
+    final public function assertDom(): DomResponse
+    {
+        if (!$this instanceof DomResponse) {
+            PHPUnit::fail('Not an DOM response.');
         }
 
         return $this;

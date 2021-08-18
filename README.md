@@ -208,6 +208,10 @@ $browser
         // access the current Browser instance
     })
 
+    ->use(function(\Zenstruck\Browser $browser, \Symfony\Component\DomCrawler\Crawler $crawler) {
+        // access the current Browser instance and the current crawler
+    })
+
     // save the raw source of the current page
     // by default, saves to "<project-root>/var/browser/source"
     // configure with "BROWSER_SOURCE_DIR" env variable
