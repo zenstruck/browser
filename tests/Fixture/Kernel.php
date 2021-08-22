@@ -52,9 +52,20 @@ final class Kernel extends BaseKernel
 
     public function submitForm(Request $request): JsonResponse
     {
+        $files = \array_map(
+            static function($value) {
+                if (\is_array($value)) {
+                    return \array_map(fn(UploadedFile $file) => $file->getClientOriginalName(), $value);
+                }
+
+                return $value instanceof UploadedFile ? $value->getClientOriginalName() : null;
+            },
+            $request->files->all()
+        );
+
         return new JsonResponse(\array_merge(
             $request->request->all(),
-            \array_map(fn(UploadedFile $file) => $file->getClientOriginalName(), \array_filter($request->files->all()))
+            \array_filter($files)
         ));
     }
 

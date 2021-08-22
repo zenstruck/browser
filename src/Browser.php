@@ -244,15 +244,20 @@ class Browser
     }
 
     /**
+     * @param string[]|string $filename string: single file
+     *                                  array: multiple files
+     *
      * @return static
      */
-    final public function attachFile(string $selector, string $path): self
+    final public function attachFile(string $selector, $filename): self
     {
-        if (!\file_exists($path)) {
-            throw new \InvalidArgumentException(\sprintf('File "%s" does not exist.', $path));
+        foreach ((array) $filename as $file) {
+            if (!\file_exists($file)) {
+                throw new \InvalidArgumentException(\sprintf('File "%s" does not exist.', $file));
+            }
         }
 
-        $this->documentElement()->attachFileToField($selector, $path);
+        $this->documentElement()->attachFileToField($selector, $filename);
 
         return $this;
     }

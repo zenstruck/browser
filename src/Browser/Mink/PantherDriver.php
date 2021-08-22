@@ -166,7 +166,13 @@ final class PantherDriver extends CoreDriver
 
     public function attachFile($xpath, $path): void
     {
-        $this->fileFormField($xpath)->upload($path);
+        if (\is_array($path) && empty($this->filteredCrawler($xpath)->attr('multiple'))) {
+            throw new \InvalidArgumentException('Cannot attach multiple files to a non-multiple file field.');
+        }
+
+        foreach ((array) $path as $file) {
+            $this->fileFormField($xpath)->upload($file);
+        }
     }
 
     public function isChecked($xpath): bool
