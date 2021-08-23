@@ -437,6 +437,33 @@ trait BrowserTests
     /**
      * @test
      */
+    public function can_submit_form_with_different_submit_buttons(): void
+    {
+        // Submit and Submit B, have the same field name but different values
+        // Submit C has a different field name (and value)
+
+        $this->browser()
+            ->visit('/page1')
+            ->click('Submit')
+            ->assertOn('/submit-form')
+            ->assertContains('"submit_1":"a"')
+            ->assertNotContains('submit_2')
+            ->visit('/page1')
+            ->click('Submit B')
+            ->assertOn('/submit-form')
+            ->assertContains('"submit_1":"b"')
+            ->assertNotContains('submit_2')
+            ->visit('/page1')
+            ->click('Submit C')
+            ->assertOn('/submit-form')
+            ->assertContains('"submit_2":"c"')
+            ->assertNotContains('submit_1')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function cannot_attach_file_that_does_not_exist(): void
     {
         $this->expectException(\InvalidArgumentException::class);
