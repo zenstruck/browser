@@ -477,6 +477,32 @@ trait BrowserTests
     /**
      * @test
      */
+    public function can_attach_multiple_files(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->attachFile('Input 9', [__DIR__.'/Fixture/files/attachment.txt', __DIR__.'/Fixture/files/xml.xml'])
+            ->click('Submit')
+            ->assertContains('"input_9":["attachment.txt","xml.xml"]')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_attach_multiple_files_to_a_non_multiple_input(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->browser()
+            ->visit('/page1')
+            ->attachFile('Input 5', [__DIR__.'/Fixture/files/attachment.txt', __DIR__.'/Fixture/files/xml.xml'])
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_html_element(): void
     {
         $output = self::catchVarDumperOutput(function() {

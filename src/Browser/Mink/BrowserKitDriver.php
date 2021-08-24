@@ -21,7 +21,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\DomCrawler\Field\FormField;
-use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
@@ -419,13 +418,35 @@ final class BrowserKitDriver extends CoreDriver
 
     public function attachFile($xpath, $path)
     {
+        $files = (array) $path;
         $field = $this->getFormField($xpath);
 
         if (!$field instanceof FileFormField) {
             throw new DriverException(\sprintf('Impossible to attach a file on the element with XPath "%s" as it is not a file input', $xpath));
         }
 
-        $field->upload($path);
+        $field->upload(\array_shift($files));
+
+        if (empty($files)) {
+            // not multiple files
+            return;
+        }
+
+        $node = $this->getFilteredCrawler($xpath);
+
+        if (null === $node->attr('multiple')) {
+            throw new \InvalidArgumentException('Cannot attach multiple files to a non-multiple file field.');
+        }
+
+        $fieldNode = $this->getCrawlerNode($this->getFilteredCrawler($xpath));
+        $form = $this->getFormForFieldNode($fieldNode);
+
+        foreach ($files as $file) {
+            $field = new FileFormField($fieldNode);
+            $field->upload($file);
+
+            $form->set($field);
+        }
     }
 
     public function submitForm($xpath)
@@ -489,6 +510,17 @@ final class BrowserKitDriver extends CoreDriver
         $fieldNode = $this->getCrawlerNode($this->getFilteredCrawler($xpath));
         $fieldName = \str_replace('[]', '', $fieldNode->getAttribute('name'));
 
+        $form = $this->getFormForFieldNode($fieldNode);
+
+        if (\is_array($form[$fieldName])) {
+            return $form[$fieldName][$this->getFieldPosition($fieldNode)];
+        }
+
+        return $form[$fieldName];
+    }
+
+    private function getFormForFieldNode(\DOMElement $fieldNode): Form
+    {
         $formNode = $this->getFormNode($fieldNode);
         $formId = $this->getFormNodeId($formNode);
 
@@ -496,11 +528,7 @@ final class BrowserKitDriver extends CoreDriver
             $this->forms[$formId] = new Form($formNode, $this->getCurrentUrl());
         }
 
-        if (\is_array($this->forms[$formId][$fieldName])) {
-            return $this->forms[$formId][$fieldName][$this->getFieldPosition($fieldNode)];
-        }
-
-        return $this->forms[$formId][$fieldName];
+        return $this->forms[$formId];
     }
 
     /**
@@ -620,7 +648,7 @@ final class BrowserKitDriver extends CoreDriver
         $formId = $this->getFormNodeId($form->getFormNode());
 
         if (isset($this->forms[$formId])) {
-            $this->mergeForms($form, $this->forms[$formId]);
+            $form = $this->forms[$formId];
         }
 
         // remove empty file fields from request
@@ -709,31 +737,6 @@ final class BrowserKitDriver extends CoreDriver
         }
 
         return '1'; // DomCrawler uses 1 by default if there is no text in the option
-    }
-
-    /**
-     * Merges second form values into first one.
-     *
-     * @param Form $to   merging target
-     * @param Form $from merging source
-     */
-    private function mergeForms(Form $to, Form $from)
-    {
-        foreach ($from->all() as $name => $field) {
-            $fieldReflection = new \ReflectionObject($field);
-            $nodeReflection = $fieldReflection->getProperty('node');
-            $valueReflection = $fieldReflection->getProperty('value');
-
-            $nodeReflection->setAccessible(true);
-            $valueReflection->setAccessible(true);
-
-            $isIgnoredField = $field instanceof InputFormField &&
-                \in_array($nodeReflection->getValue($field)->getAttribute('type'), ['submit', 'button', 'image'], true);
-
-            if (!$isIgnoredField) {
-                $valueReflection->setValue($to[$name], $valueReflection->getValue($field));
-            }
-        }
     }
 
     /**
