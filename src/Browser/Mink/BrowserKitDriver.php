@@ -817,11 +817,9 @@ final class BrowserKitDriver extends CoreDriver
 
             $node = $nodeReflection->getValue($field);
 
-            if (!\in_array($node->getAttribute('type'), ['submit', 'button', 'image'])) {
-                continue;
+            if ('button' === $node->nodeName || \in_array($node->getAttribute('type'), ['submit', 'button', 'image'])) {
+                $cached->set($field);
             }
-
-            $cached->set($field);
         }
 
         return $cached;

@@ -458,6 +458,11 @@ trait BrowserTests
             ->assertOn('/submit-form')
             ->assertContains('"submit_2":"c"')
             ->assertNotContains('submit_1')
+            ->visit('/page1')
+            ->click('Submit D')
+            ->assertOn('/submit-form')
+            ->assertContains('"submit_2":"d"')
+            ->assertNotContains('submit_1')
         ;
     }
 
@@ -492,6 +497,13 @@ trait BrowserTests
             ->assertOn('/submit-form')
             ->assertContains('"input_1":"Kevin"')
             ->assertContains('"submit_2":"c"')
+            ->assertNotContains('submit_1')
+            ->visit('/page1')
+            ->fillField('input_1', 'Kevin')
+            ->click('Submit D')
+            ->assertOn('/submit-form')
+            ->assertContains('"input_1":"Kevin"')
+            ->assertContains('"submit_2":"d"')
             ->assertNotContains('submit_1')
         ;
     }
