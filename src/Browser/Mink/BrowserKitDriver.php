@@ -21,6 +21,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
@@ -648,7 +649,7 @@ final class BrowserKitDriver extends CoreDriver
         $formId = $this->getFormNodeId($form->getFormNode());
 
         if (isset($this->forms[$formId])) {
-            $form = $this->forms[$formId];
+            $form = $this->addButtons($form, $this->forms[$formId]);
         }
 
         // remove empty file fields from request
@@ -799,5 +800,28 @@ final class BrowserKitDriver extends CoreDriver
         }
 
         return $crawler;
+    }
+
+    /**
+     * Adds button fields from submitted form to cached version.
+     */
+    private function addButtons(Form $submitted, Form $cached): Form
+    {
+        foreach ($submitted->all() as $field) {
+            if (!$field instanceof InputFormField) {
+                continue;
+            }
+
+            $nodeReflection = (new \ReflectionObject($field))->getProperty('node');
+            $nodeReflection->setAccessible(true);
+
+            $node = $nodeReflection->getValue($field);
+
+            if ('button' === $node->nodeName || \in_array($node->getAttribute('type'), ['submit', 'button', 'image'])) {
+                $cached->set($field);
+            }
+        }
+
+        return $cached;
     }
 }
