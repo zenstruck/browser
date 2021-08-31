@@ -462,6 +462,41 @@ trait BrowserTests
     }
 
     /**
+     * @see https://github.com/zenstruck/browser/issues/55
+     *
+     * @test
+     */
+    public function can_submit_filled_form_with_different_submit_buttons(): void
+    {
+        // Submit and Submit B, have the same field name but different values
+        // Submit C has a different field name (and value)
+
+        $this->browser()
+            ->visit('/page1')
+            ->fillField('input_1', 'Kevin')
+            ->click('Submit')
+            ->assertOn('/submit-form')
+            ->assertContains('"input_1":"Kevin"')
+            ->assertContains('"submit_1":"a"')
+            ->assertNotContains('submit_2')
+            ->visit('/page1')
+            ->fillField('input_1', 'Kevin')
+            ->click('Submit B')
+            ->assertOn('/submit-form')
+            ->assertContains('"input_1":"Kevin"')
+            ->assertContains('"submit_1":"b"')
+            ->assertNotContains('submit_2')
+            ->visit('/page1')
+            ->fillField('input_1', 'Kevin')
+            ->click('Submit C')
+            ->assertOn('/submit-form')
+            ->assertContains('"input_1":"Kevin"')
+            ->assertContains('"submit_2":"c"')
+            ->assertNotContains('submit_1')
+        ;
+    }
+
+    /**
      * @test
      */
     public function cannot_attach_file_that_does_not_exist(): void
