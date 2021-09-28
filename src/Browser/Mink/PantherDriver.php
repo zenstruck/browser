@@ -88,6 +88,9 @@ final class PantherDriver extends CoreDriver
         return \trim($text);
     }
 
+    /**
+     * @return mixed
+     */
     public function getValue($xpath)
     {
         try {
@@ -202,6 +205,9 @@ final class PantherDriver extends CoreDriver
         return $this->client->executeScript($script);
     }
 
+    /**
+     * @return mixed
+     */
     public function evaluateScript($script)
     {
         if (0 !== \mb_strpos(\trim($script), 'return ')) {

@@ -8,20 +8,20 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.versions }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         php: [7.4, 8.0]
-        stability: [hightest]
-        symfony: [4.4.*, 5.2.*, 5.3.*]
+        versions: [hightest]
+        symfony: [4.4.*, 5.3.*, 5.4.*]
         include:
           - php: 7.4
-            stability: lowest
+            versions: lowest
             symfony: '*'
 #          - php: 8.0
-#            stability: highest
-#            symfony: '5.4.*@dev'
+#            versions: highest
+#            symfony: '6.0.*'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.3.3
@@ -31,21 +31,12 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: none
-
-      - name: Setup chromedriver
-        uses: nanasess/setup-chromedriver@v1.0.1
-
-      - name: Install Symfony Flex
-        run: composer global require --no-progress --no-scripts --no-plugins symfony/flex dev-main
-
-      - name: Set minimum-stability to dev
-        run: composer config minimum-stability dev
-        if: ${{ contains(matrix.symfony, '@dev') }}
+          tools: flex
 
       - name: Install dependencies
         uses: ramsey/composer-install@v1
         with:
-          dependency-versions: ${{ matrix.stability }}
+          dependency-versions: ${{ matrix.versions }}
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
@@ -79,9 +70,6 @@ jobs:
           php-version: 7.4
           coverage: xdebug
           ini-values: xdebug.mode=coverage
-
-      - name: Setup chromedriver
-        uses: nanasess/setup-chromedriver@v1.0.1
 
       - name: Install dependencies
         uses: ramsey/composer-install@v1
