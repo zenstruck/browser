@@ -2,10 +2,10 @@
 
 namespace Zenstruck\Browser;
 
-use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\VarDumper\VarDumper;
+use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\PantherDriver;
 use Zenstruck\Browser\Response\PantherResponse;
@@ -53,11 +53,11 @@ class PantherBrowser extends Browser
     final public function follow(string $link): self
     {
         if (!$element = $this->documentElement()->findLink($link)) {
-            PHPUnit::fail(\sprintf('Link "%s" not found.', $link));
+            Assert::fail('Link "%s" not found.', [$link]);
         }
 
         if (!$element->isVisible()) {
-            PHPUnit::fail(\sprintf('Link "%s" is not visible.', $link));
+            Assert::fail('Link "%s" is not visible.', [$link]);
         }
 
         $this->documentElement()->clickLink($link);
@@ -73,7 +73,7 @@ class PantherBrowser extends Browser
         return $this->wrapMinkExpectation(function() use ($selector) {
             $element = $this->webAssert()->elementExists('css', $selector);
 
-            PHPUnit::assertTrue($element->isVisible());
+            Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
         });
     }
 
@@ -85,12 +85,12 @@ class PantherBrowser extends Browser
         $element = $this->documentElement()->find('css', $selector);
 
         if (!$element) {
-            PHPUnit::assertTrue(true);
+            Assert::pass();
 
             return $this;
         }
 
-        PHPUnit::assertFalse($element->isVisible());
+        Assert::false($element->isVisible(), 'Expected element "%s" to not be visible but it is.', [$selector]);
 
         return $this;
     }

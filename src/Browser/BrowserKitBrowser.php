@@ -2,9 +2,9 @@
 
 namespace Zenstruck\Browser;
 
-use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
 
@@ -171,7 +171,9 @@ abstract class BrowserKitBrowser extends Browser
      */
     final public function assertSuccessful(): self
     {
-        PHPUnit::assertTrue($this->response()->isSuccessful(), "Expected successful status code (2xx), [{$this->response()->statusCode()}] received.");
+        Assert::true($this->response()->isSuccessful(), 'Expected successful status code (2xx) but got {actual}.', [
+            'actual' => $this->response()->statusCode(),
+        ]);
 
         return $this;
     }
@@ -185,7 +187,9 @@ abstract class BrowserKitBrowser extends Browser
             throw new \RuntimeException('Cannot assert redirected if not intercepting redirects. Call ->interceptRedirects() before making the request.');
         }
 
-        PHPUnit::assertTrue($this->response()->isRedirect(), "Expected redirect status code (3xx), [{$this->response()->statusCode()}] received.");
+        Assert::true($this->response()->isRedirect(), 'Expected redirect status code (3xx) but got {actual}.', [
+            'actual' => $this->response()->statusCode(),
+        ]);
 
         return $this;
     }
@@ -226,7 +230,7 @@ abstract class BrowserKitBrowser extends Browser
      */
     final public function assertJsonMatches(string $expression, $expected): self
     {
-        PHPUnit::assertSame($expected, $this->response()->assertJson()->search($expression));
+        Assert::that($this->response()->assertJson()->search($expression))->is($expected);
 
         return $this;
     }
