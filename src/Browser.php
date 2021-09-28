@@ -34,6 +34,8 @@ class Browser
     public function __construct(DriverInterface $driver)
     {
         $this->mink = new Mink([self::SESSION => new Session($driver)]);
+
+        trigger_deprecation('?', '?', 'temporary');
     }
 
     /**
