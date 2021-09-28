@@ -38,5 +38,7 @@
     },
     "autoload-dev": {
         "psr-4": { "Zenstruck\\Browser\\Tests\\": "tests/" }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

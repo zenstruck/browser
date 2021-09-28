@@ -108,23 +108,23 @@ final class BrowserKitDriver extends CoreDriver
         $this->removeScriptFromUrl = (bool) $remove;
     }
 
-    public function start()
+    public function start(): void
     {
         $this->started = true;
     }
 
-    public function isStarted()
+    public function isStarted(): bool
     {
         return $this->started;
     }
 
-    public function stop()
+    public function stop(): void
     {
         $this->reset();
         $this->started = false;
     }
 
-    public function reset()
+    public function reset(): void
     {
         // Restarting the client resets the cookies and the history
         $this->client->restart();
@@ -132,13 +132,13 @@ final class BrowserKitDriver extends CoreDriver
         $this->serverParameters = [];
     }
 
-    public function visit($url)
+    public function visit($url): void
     {
         $this->client->request('GET', $this->prepareUrl($url), [], [], $this->serverParameters);
         $this->forms = [];
     }
 
-    public function getCurrentUrl()
+    public function getCurrentUrl(): string
     {
         // This should be encapsulated in `getRequest` method if any other method needs the request
         try {
@@ -155,25 +155,25 @@ final class BrowserKitDriver extends CoreDriver
         return $request->getUri();
     }
 
-    public function reload()
+    public function reload(): void
     {
         $this->client->reload();
         $this->forms = [];
     }
 
-    public function forward()
+    public function forward(): void
     {
         $this->client->forward();
         $this->forms = [];
     }
 
-    public function back()
+    public function back(): void
     {
         $this->client->back();
         $this->forms = [];
     }
 
-    public function setBasicAuth($user, $password)
+    public function setBasicAuth($user, $password): void
     {
         if (false === $user) {
             unset($this->serverParameters['PHP_AUTH_USER'], $this->serverParameters['PHP_AUTH_PW']);
@@ -185,7 +185,7 @@ final class BrowserKitDriver extends CoreDriver
         $this->serverParameters['PHP_AUTH_PW'] = $password;
     }
 
-    public function setRequestHeader($name, $value)
+    public function setRequestHeader($name, $value): void
     {
         $contentHeaders = ['CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true];
         $name = \str_replace('-', '_', \mb_strtoupper($name));
@@ -198,12 +198,12 @@ final class BrowserKitDriver extends CoreDriver
         $this->serverParameters[$name] = $value;
     }
 
-    public function getResponseHeaders()
+    public function getResponseHeaders(): array
     {
         return $this->getResponse()->getHeaders();
     }
 
-    public function setCookie($name, $value = null)
+    public function setCookie($name, $value = null): void
     {
         if (null === $value) {
             $this->deleteCookie($name);
@@ -215,7 +215,7 @@ final class BrowserKitDriver extends CoreDriver
         $jar->set(new Cookie($name, $value));
     }
 
-    public function getCookie($name)
+    public function getCookie($name): ?string
     {
         // Note that the following doesn't work well because
         // Symfony\Component\BrowserKit\CookieJar stores cookies by name,
@@ -237,7 +237,7 @@ final class BrowserKitDriver extends CoreDriver
         return null;
     }
 
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         $response = $this->getResponse();
 
@@ -249,12 +249,12 @@ final class BrowserKitDriver extends CoreDriver
         return $response->getStatusCode();
     }
 
-    public function getContent()
+    public function getContent(): string
     {
         return $this->getResponse()->getContent();
     }
 
-    public function findElementXpaths($xpath)
+    public function findElementXpaths($xpath): array
     {
         $nodes = $this->getCrawler()->filterXPath($xpath);
 
@@ -266,12 +266,12 @@ final class BrowserKitDriver extends CoreDriver
         return $elements;
     }
 
-    public function getTagName($xpath)
+    public function getTagName($xpath): string
     {
         return $this->getCrawlerNode($this->getFilteredCrawler($xpath))->nodeName;
     }
 
-    public function getText($xpath)
+    public function getText($xpath): string
     {
         $text = $this->getFilteredCrawler($xpath)->text(null, true);
         // TODO drop our own normalization once supporting only dom-crawler 4.4+ as it already does it.
@@ -281,12 +281,12 @@ final class BrowserKitDriver extends CoreDriver
         return \trim($text);
     }
 
-    public function getHtml($xpath)
+    public function getHtml($xpath): string
     {
         return $this->getFilteredCrawler($xpath)->html();
     }
 
-    public function getOuterHtml($xpath)
+    public function getOuterHtml($xpath): string
     {
         $crawler = $this->getFilteredCrawler($xpath);
 
@@ -299,7 +299,7 @@ final class BrowserKitDriver extends CoreDriver
         return $node->ownerDocument->saveHTML($node);
     }
 
-    public function getAttribute($xpath, $name)
+    public function getAttribute($xpath, $name): ?string
     {
         $node = $this->getFilteredCrawler($xpath);
 
@@ -310,6 +310,9 @@ final class BrowserKitDriver extends CoreDriver
         return null;
     }
 
+    /**
+     * @return mixed
+     */
     public function getValue($xpath)
     {
         if (\in_array($this->getAttribute($xpath, 'type'), ['submit', 'image', 'button'], true)) {
@@ -339,22 +342,22 @@ final class BrowserKitDriver extends CoreDriver
         return $value;
     }
 
-    public function setValue($xpath, $value)
+    public function setValue($xpath, $value): void
     {
         $this->getFormField($xpath)->setValue($value);
     }
 
-    public function check($xpath)
+    public function check($xpath): void
     {
         $this->getCheckboxField($xpath)->tick();
     }
 
-    public function uncheck($xpath)
+    public function uncheck($xpath): void
     {
         $this->getCheckboxField($xpath)->untick();
     }
 
-    public function selectOption($xpath, $value, $multiple = false)
+    public function selectOption($xpath, $value, $multiple = false): void
     {
         $field = $this->getFormField($xpath);
 
@@ -371,7 +374,7 @@ final class BrowserKitDriver extends CoreDriver
         $field->select($value);
     }
 
-    public function isSelected($xpath)
+    public function isSelected($xpath): bool
     {
         $optionValue = $this->getOptionValue($this->getCrawlerNode($this->getFilteredCrawler($xpath)));
         $selectField = $this->getFormField('('.$xpath.')/ancestor-or-self::*[local-name()="select"]');
@@ -380,7 +383,7 @@ final class BrowserKitDriver extends CoreDriver
         return \is_array($selectValue) ? \in_array($optionValue, $selectValue, true) : $optionValue === $selectValue;
     }
 
-    public function click($xpath)
+    public function click($xpath): void
     {
         $crawler = $this->getFilteredCrawler($xpath);
         $node = $this->getCrawlerNode($crawler);
@@ -400,7 +403,7 @@ final class BrowserKitDriver extends CoreDriver
         }
     }
 
-    public function isChecked($xpath)
+    public function isChecked($xpath): bool
     {
         $field = $this->getFormField($xpath);
 
@@ -417,7 +420,7 @@ final class BrowserKitDriver extends CoreDriver
         return $radio->getAttribute('value') === $field->getValue();
     }
 
-    public function attachFile($xpath, $path)
+    public function attachFile($xpath, $path): void
     {
         $files = (array) $path;
         $field = $this->getFormField($xpath);
@@ -450,7 +453,7 @@ final class BrowserKitDriver extends CoreDriver
         }
     }
 
-    public function submitForm($xpath)
+    public function submitForm($xpath): void
     {
         $crawler = $this->getFilteredCrawler($xpath);
 
