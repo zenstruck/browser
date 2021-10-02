@@ -343,7 +343,7 @@ trait BrowserTests
     {
         $this->browser()
             ->visit('/page1')
-            ->clickOnElement('#link a')
+            ->click('#link a')
             ->assertOn('/page2')
         ;
     }

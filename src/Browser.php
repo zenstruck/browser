@@ -260,6 +260,8 @@ class Browser
     }
 
     /**
+     * Click on a button, link or any DOM element.
+     *
      * @return static
      */
     final public function click(string $selector): self
@@ -268,18 +270,12 @@ class Browser
             $this->documentElement()->pressButton($selector);
         } catch (ElementNotFoundException $e) {
             // try link
-            $this->documentElement()->clickLink($selector);
+            try {
+                $this->documentElement()->clickLink($selector);
+            } catch (ElementNotFoundException $e) {
+                $this->documentElement()->find('css', $selector)->click();
+            }
         }
-
-        return $this;
-    }
-
-    /**
-     * @param string $selector Any CSS selector is valid
-     */
-    public function clickOnElement(string $selector): self
-    {
-        $this->documentElement()->find('css', $selector)->click();
 
         return $this;
     }
