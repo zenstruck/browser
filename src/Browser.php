@@ -277,6 +277,16 @@ class Browser
     /**
      * @return static
      */
+    public function clickOnElement(string $selector): self
+    {
+        $this->documentElement()->findById($selector)->click();
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
     final public function assertSee(string $expected): self
     {
         return $this->wrapMinkExpectation(
