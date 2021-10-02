@@ -339,6 +339,18 @@ trait BrowserTests
     /**
      * @test
      */
+    public function click_on_element(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->clickOnElement('#link a')
+            ->assertOn('/page2')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function form_actions_by_field_label(): void
     {
         $this->browser()
