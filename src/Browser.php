@@ -275,11 +275,11 @@ class Browser
     }
 
     /**
-     * @return static
+     * @param string $selector Any CSS selector is valid
      */
     public function clickOnElement(string $selector): self
     {
-        $this->documentElement()->findById($selector)->click();
+        $this->documentElement()->find('css', $selector)->click();
 
         return $this;
     }
