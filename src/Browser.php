@@ -5,13 +5,10 @@ namespace Zenstruck;
 use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
-use Behat\Mink\WebAssert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
-use Zenstruck\Browser\Assertion\MinkAssertion;
 use Zenstruck\Browser\Assertion\SameUrlAssertion;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Dom;
@@ -359,9 +356,9 @@ class Browser
      */
     final public function assertFieldEquals(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->fieldValueEquals($selector, $expected)
-        );
+        $this->response()->ensureDom()->dom()->assertFieldEquals($selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -369,9 +366,9 @@ class Browser
      */
     final public function assertFieldNotEquals(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->fieldValueNotEquals($selector, $expected)
-        );
+        $this->response()->ensureDom()->dom()->assertFieldNotEquals($selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -379,13 +376,7 @@ class Browser
      */
     final public function assertSelected(string $selector, string $expected): self
     {
-        try {
-            $field = $this->webAssert()->fieldExists($selector);
-        } catch (ExpectationException $e) {
-            Assert::fail($e->getMessage());
-        }
-
-        Assert::that((array) $field->getValue())->contains($expected);
+        $this->response()->ensureDom()->dom()->assertSelected($selector, $expected);
 
         return $this;
     }
@@ -395,13 +386,7 @@ class Browser
      */
     final public function assertNotSelected(string $selector, string $expected): self
     {
-        try {
-            $field = $this->webAssert()->fieldExists($selector);
-        } catch (ExpectationException $e) {
-            Assert::fail($e->getMessage());
-        }
-
-        Assert::that((array) $field->getValue())->doesNotContain($expected);
+        $this->response()->ensureDom()->dom()->assertNotSelected($selector, $expected);
 
         return $this;
     }
@@ -411,9 +396,9 @@ class Browser
      */
     final public function assertChecked(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->checkboxChecked($selector)
-        );
+        $this->response()->ensureDom()->dom()->assertChecked($selector);
+
+        return $this;
     }
 
     /**
@@ -421,9 +406,9 @@ class Browser
      */
     final public function assertNotChecked(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->checkboxNotChecked($selector)
-        );
+        $this->response()->ensureDom()->dom()->assertNotChecked($selector);
+
+        return $this;
     }
 
     /**
@@ -478,29 +463,9 @@ class Browser
     /**
      * @internal
      */
-    final protected function webAssert(): WebAssert
-    {
-        return $this->mink->assertSession(self::SESSION);
-    }
-
-    /**
-     * @internal
-     */
     final protected function documentElement(): DocumentElement
     {
         return $this->minkSession()->getPage();
-    }
-
-    /**
-     * @internal
-     *
-     * @return static
-     */
-    final protected function wrapMinkExpectation(callable $callback): self
-    {
-        Assert::run(new MinkAssertion($callback));
-
-        return $this;
     }
 
     /**

@@ -70,11 +70,11 @@ class PantherBrowser extends Browser
      */
     final public function assertVisible(string $selector): self
     {
-        return $this->wrapMinkExpectation(function() use ($selector) {
-            $element = $this->webAssert()->elementExists('css', $selector);
+        $this->response()->ensureDom()->dom()->assertSeeElement($selector);
 
-            Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
-        });
+        $element = $this->documentElement()->find('css', $selector);
+
+        Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
     }
 
     /**
@@ -82,9 +82,7 @@ class PantherBrowser extends Browser
      */
     final public function assertNotVisible(string $selector): self
     {
-        $element = $this->documentElement()->find('css', $selector);
-
-        if (!$element) {
+        if (!$element = $this->documentElement()->find('css', $selector)) {
             Assert::pass();
 
             return $this;

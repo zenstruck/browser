@@ -30,6 +30,11 @@ class Response
         return $this->session->getStatusCode();
     }
 
+    final public function headers(): array
+    {
+        return $this->session->getResponseHeaders();
+    }
+
     /**
      * @internal
      */

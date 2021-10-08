@@ -161,9 +161,11 @@ abstract class BrowserKitBrowser extends Browser
      */
     final public function assertStatus(int $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->statusCodeEquals($expected)
-        );
+        Assert::that($this->response()->statusCode())
+            ->is($expected, 'Expected status code {expected} but got {actual}.')
+        ;
+
+        return $this;
     }
 
     /**
@@ -199,19 +201,39 @@ abstract class BrowserKitBrowser extends Browser
      */
     final public function assertHeaderEquals(string $header, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseHeaderEquals($header, $expected)
-        );
+        // todo refactor - could have multiple headers
+        $header = \mb_strtolower($header);
+
+        Assert::that(\array_keys($this->response()->headers()))
+            ->contains($header, 'Expected response to have header "{header}".')
+        ;
+
+        Assert::that($this->response()->headers()[$header][0])
+            ->is($expected, 'Expected header "{header}" to be "{expected}".', ['header' => $header])
+        ;
+
+        return $this;
     }
 
     /**
      * @return static
      */
-    final public function assertHeaderContains(string $header, string $expected): self
+    final public function assertHeaderContains(string $header, string $needle): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseHeaderContains($header, $expected)
-        );
+        // todo refactor - could have multiple headers
+        $header = \mb_strtolower($header);
+
+        Assert::that(\array_keys($this->response()->headers()))
+            ->contains($header, 'Expected response to have header "{header}".')
+        ;
+
+        Assert::that($this->response()->headers()[$header][0])
+            ->contains($needle, 'Expected header "{header}" with value "{haystack}" to contain "{needle}".', [
+                'header' => $header,
+            ])
+        ;
+
+        return $this;
     }
 
     /**

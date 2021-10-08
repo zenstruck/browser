@@ -11,9 +11,6 @@ final class XmlResponse extends DomResponse
 {
     public function crawler(): Crawler
     {
-        $dom = new \DOMDocument();
-        $dom->loadXML($this->body());
-
-        return new Crawler($dom);
+        return new Crawler($this->body());
     }
 }
