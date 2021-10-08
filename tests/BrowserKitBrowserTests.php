@@ -386,7 +386,7 @@ trait BrowserKitBrowserTests
             ->post('/json', ['json' => $expected = ['foo' => 'bar']])
             ->assertSuccessful()
             ->response()
-            ->assertJson()
+            ->ensureJson()
         ;
 
         $this->assertSame($expected, $response->json());
@@ -431,7 +431,7 @@ trait BrowserKitBrowserTests
         $crawler = $this->browser()
             ->visit('/xml')
             ->response()
-            ->assertXml()
+            ->ensureXml()
             ->crawler()
             ->filter('url loc')
         ;

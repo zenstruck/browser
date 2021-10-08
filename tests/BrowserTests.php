@@ -600,7 +600,7 @@ trait BrowserTests
         $crawler = $this->browser()
             ->visit('/page1')
             ->response()
-            ->assertHtml()
+            ->ensureHtml()
             ->crawler()
             ->filter('ul li')
         ;

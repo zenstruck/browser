@@ -57,7 +57,7 @@ class Response
         return $this->session->getPage()->getContent();
     }
 
-    final public function assertJson(): JsonResponse
+    final public function ensureJson(): JsonResponse
     {
         if (!$this instanceof JsonResponse) {
             Assert::fail('Not a json response.');
@@ -66,7 +66,7 @@ class Response
         return $this;
     }
 
-    final public function assertXml(): XmlResponse
+    final public function ensureXml(): XmlResponse
     {
         if (!$this instanceof XmlResponse) {
             Assert::fail('Not an xml response.');
@@ -75,7 +75,7 @@ class Response
         return $this;
     }
 
-    final public function assertHtml(): HtmlResponse
+    final public function ensureHtml(): HtmlResponse
     {
         if (!$this instanceof HtmlResponse) {
             Assert::fail('Not an html response.');
@@ -84,7 +84,7 @@ class Response
         return $this;
     }
 
-    final public function assertDom(): DomResponse
+    final public function ensureDom(): DomResponse
     {
         if (!$this instanceof DomResponse) {
             Assert::fail('Not an DOM response.');

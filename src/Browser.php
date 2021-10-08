@@ -111,7 +111,7 @@ class Browser
                 Parameter::typed(self::class, $this),
                 Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
                 Parameter::typed(Response::class, Parameter::factory(fn() => $this->response())),
-                Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->response()->assertDom()->crawler()))
+                Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->response()->ensureDom()->crawler()))
             )
         );
 

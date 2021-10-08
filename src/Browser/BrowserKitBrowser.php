@@ -230,7 +230,7 @@ abstract class BrowserKitBrowser extends Browser
      */
     final public function assertJsonMatches(string $expression, $expected): self
     {
-        Assert::that($this->response()->assertJson()->search($expression))->is($expected);
+        Assert::that($this->response()->ensureJson()->search($expression))->is($expected);
 
         return $this;
     }

@@ -237,21 +237,21 @@ $response->statusCode(); // ie 200
 $response->body(); // the raw body
 
 // html response
-$response->assertHtml()->crawler(); // Symfony\Component\DomCrawler\Crawler
+$response->ensureHtml()->crawler(); // Symfony\Component\DomCrawler\Crawler
 
 // xml response (not available with PantherBrowser)
-$response->assertXml()->crawler(); // Symfony\Component\DomCrawler\Crawler
+$response->ensureXml()->crawler(); // Symfony\Component\DomCrawler\Crawler
 
 // json response (not available with PantherBrowser)
-$response->assertJson()->json(); // response content json decoded
-$response->assertJson()->search('some.selector'); // search the json using JMESPath expression
+$response->ensureJson()->json(); // response content json decoded
+$response->ensureJson()->search('some.selector'); // search the json using JMESPath expression
 
 // use the response without breaking the fluid browser session
 $browser
     ->visit('/some/page')
     ->use(function(\Zenstruck\Browser\Response $response) {
         $response->statusCode(); // ie 200
-        $response->assertJson()->json(); // response content json decoded
+        $response->ensureJson()->json(); // response content json decoded
     })
     ->use(function(\Zenstruck\Browser\Response\JsonResponse $response) {
         // inject the expected response type
