@@ -16,6 +16,12 @@
         <server name="PANTHER_WEB_SERVER_DIR" value="./tests/Fixture/public"/>
     </php>
 
+    <groups>
+        <exclude>
+            <group>panther</group>
+        </exclude>
+    </groups>
+
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>./tests/</directory>
