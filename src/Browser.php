@@ -14,6 +14,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Browser\Assertion\MinkAssertion;
 use Zenstruck\Browser\Assertion\SameUrlAssertion;
 use Zenstruck\Browser\Component;
+use Zenstruck\Browser\Dom;
 use Zenstruck\Browser\Response;
 use Zenstruck\Callback\Parameter;
 
@@ -85,9 +86,9 @@ class Browser
      */
     final public function assertContains(string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseContains($expected)
-        );
+        Assert::that($this->response()->body())->contains($expected, 'Expected response body to contain "{needle}".');
+
+        return $this;
     }
 
     /**
@@ -95,9 +96,11 @@ class Browser
      */
     final public function assertNotContains(string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseNotContains($expected)
-        );
+        Assert::that($this->response()->body())
+            ->doesNotContain($expected, 'Expected response body to not contain "{needle}".')
+        ;
+
+        return $this;
     }
 
     /**
@@ -111,7 +114,8 @@ class Browser
                 Parameter::typed(self::class, $this),
                 Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
                 Parameter::typed(Response::class, Parameter::factory(fn() => $this->response())),
-                Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->response()->ensureDom()->crawler()))
+                Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->response()->ensureDom()->crawler())),
+                Parameter::typed(Dom::class, Parameter::factory(fn() => $this->response()->ensureDom()->dom()))
             )
         );
 
@@ -285,9 +289,9 @@ class Browser
      */
     final public function assertSee(string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->pageTextContains($expected)
-        );
+        $this->response()->ensureDom()->dom()->assertSee($expected);
+
+        return $this;
     }
 
     /**
@@ -295,9 +299,9 @@ class Browser
      */
     final public function assertNotSee(string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->pageTextNotContains($expected)
-        );
+        $this->response()->ensureDom()->dom()->assertNotSee($expected);
+
+        return $this;
     }
 
     /**
@@ -305,9 +309,9 @@ class Browser
      */
     final public function assertSeeIn(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementTextContains('css', $selector, $expected)
-        );
+        $this->response()->ensureDom()->dom()->assertSeeIn($selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -315,9 +319,9 @@ class Browser
      */
     final public function assertNotSeeIn(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementTextNotContains('css', $selector, $expected)
-        );
+        $this->response()->ensureDom()->dom()->assertNotSeeIn($selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -325,9 +329,9 @@ class Browser
      */
     final public function assertSeeElement(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementExists('css', $selector)
-        );
+        $this->response()->ensureDom()->dom()->assertSeeElement($selector);
+
+        return $this;
     }
 
     /**
@@ -335,9 +339,9 @@ class Browser
      */
     final public function assertNotSeeElement(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementNotExists('css', $selector)
-        );
+        $this->response()->ensureDom()->dom()->assertNotSeeElement($selector);
+
+        return $this;
     }
 
     /**
@@ -345,9 +349,9 @@ class Browser
      */
     final public function assertElementCount(string $selector, int $count): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementsCount('css', $selector, $count)
-        );
+        $this->response()->ensureDom()->dom()->assertElementCount($selector, $count);
+
+        return $this;
     }
 
     /**
@@ -427,9 +431,9 @@ class Browser
      */
     final public function assertElementAttributeContains(string $selector, string $attribute, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementAttributeContains('css', $selector, $attribute, $expected)
-        );
+        $this->response()->ensureDom()->dom()->assertElementAttributeContains($selector, $attribute, $expected);
+
+        return $this;
     }
 
     /**
@@ -437,9 +441,9 @@ class Browser
      */
     final public function assertElementAttributeNotContains(string $selector, string $attribute, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementAttributeNotContains('css', $selector, $attribute, $expected)
-        );
+        $this->response()->ensureDom()->dom()->assertElementAttributeNotContains($selector, $attribute, $expected);
+
+        return $this;
     }
 
     /**

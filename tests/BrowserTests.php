@@ -6,6 +6,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
+use Zenstruck\Browser\Dom;
 use Zenstruck\Browser\Response;
 use Zenstruck\Browser\Response\HtmlResponse;
 use Zenstruck\Browser\Test\HasBrowser;
@@ -167,7 +168,7 @@ trait BrowserTests
         $browser = $this->browser();
 
         $browser
-            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2, Crawler $crawler) use ($browser) {
+            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2, Crawler $crawler, Dom $dom) use ($browser) {
                 $this->assertInstanceOf(Browser::class, $browser1);
                 $this->assertInstanceOf(Browser::class, $browser2);
                 $this->assertInstanceOf(\get_class($browser), $browser1);

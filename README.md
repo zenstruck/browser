@@ -54,7 +54,7 @@ public function testViewPostAndAddComment()
 $ composer require zenstruck/browser --dev
 ```
 
-Optionally, enable the provided extension in your `phpunit.xml`: 
+Optionally, enable the provided extension in your `phpunit.xml`:
 
 ```xml
 <!-- phpunit.xml -->
@@ -119,7 +119,7 @@ class MyTest extends TestCase
             ->assertSuccessful()
         ;
     }
-    
+
     /**
      * Requires this test extend Symfony\Component\Panther\PantherTestCase.
      */
@@ -130,7 +130,7 @@ class MyTest extends TestCase
             ->assertSuccessful()
         ;
     }
-    
+
     /**
      * Requires this test extend Symfony\Component\Panther\PantherTestCase or
      * have the "HTTP_BROWSER_URI" env var set to the root uri to test against.
@@ -186,15 +186,15 @@ $browser
     // form field assertions
     ->assertFieldEquals('Username', 'kevin')
     ->assertFieldNotEquals('Username', 'john')
-    
+
     // form checkbox assertions
     ->assertChecked('Accept Terms')
     ->assertNotChecked('Accept Terms')
-    
+
     // form select assertions
     ->assertSelected('Type', 'Employee')
     ->assertNotSelected('Type', 'Admin')
-    
+
     // form multi-select assertions
     ->assertSelected('Roles', 'Content Editor')
     ->assertSelected('Roles', 'Human Resources')
@@ -211,6 +211,11 @@ $browser
 
     ->use(function(\Zenstruck\Browser $browser, \Symfony\Component\DomCrawler\Crawler $crawler) {
         // access the current Browser instance and the current crawler
+    })
+
+    ->use(function(\Zenstruck\Browser\Dom $dom) {
+        // access current "DOM" which is a wrapper around \Symfony\Component\DomCrawler\Crawler
+        // with convenience methods
     })
 
     // save the raw source of the current page
@@ -399,7 +404,7 @@ $browser
 
 ### HttpBrowser
 
-This browser has no extra methods. 
+This browser has no extra methods.
 
 ### PantherBrowser
 
@@ -440,10 +445,10 @@ $browser
 
     // dump() the browser's console error log
     ->dumpConsoleLog()
-    
+
     // dd() the browser's console error log
     ->ddConsoleLog()
-    
+
     // take screenshot (default filename is "screenshot.png")
     ->ddScreenshot()
 ;
@@ -471,7 +476,7 @@ class MyTest extends PantherTestCase
             ->visit('/my/page')
             // ...
         ;
-        
+
         $browser2 = $this->pantherBrowser()
             ->visit('/my/page')
             // ...
@@ -555,7 +560,7 @@ class CommentComponent extends Component
             ->assertSeeIn('#comments li span.author', $author)
         ;
 
-        return $this; 
+        return $this;
     }
 
     public function addComment(string $body, string $author): self
@@ -619,13 +624,13 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
 1. Use `->setDefaultHttpOptions()` for the current browser:
    ```php
    /** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
-   
+
    $browser
        ->setDefaultHttpOptions(['headers' => ['X-Token' => 'my-token']])
-   
+
        // now all http requests will have the X-Token header
        ->get('/endpoint')
-   
+
        // "per-request" options will be merged with the default
        ->get('/endpoint', ['headers' => ['Another' => 'Header']])
    ;
@@ -634,23 +639,23 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
 2. Use `->setDefaultHttpOptions()` in your test case's [`configureBrowser()`](#test-browser-configuration) method:
    ```php
    namespace App\Tests;
-   
+
    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
    use Zenstruck\Browser\KernelBrowser;
    use Zenstruck\Browser\Test\HasBrowser;
-   
+
    class MyTest extends KernelTestCase
    {
        use HasBrowser {
            browser as baseKernelBrowser;
        }
-   
+
        public function testDemo(): void
        {
            $this->browser()
                // all http requests in this test class will have the X-Token header
                ->get('/endpoint')
-   
+
                // "per-request" options will be merged with the default
                ->get('/endpoint', ['headers' => ['Another' => 'Header']])
            ;

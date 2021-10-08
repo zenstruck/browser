@@ -4,6 +4,7 @@ namespace Zenstruck\Browser\Response;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\VarDumper\VarDumper;
+use Zenstruck\Browser\Dom;
 use Zenstruck\Browser\Response;
 
 /**
@@ -11,7 +12,14 @@ use Zenstruck\Browser\Response;
  */
 abstract class DomResponse extends Response
 {
+    private Dom $dom;
+
     abstract public function crawler(): Crawler;
+
+    final public function dom(): Dom
+    {
+        return $this->dom ??= Dom::wrap($this->crawler());
+    }
 
     final public function dump(?string $selector = null): void
     {
