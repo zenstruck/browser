@@ -26,12 +26,12 @@ class Response
         $this->session = $session;
     }
 
-    final public function statusCode(): int
+    public function statusCode(): int
     {
         return $this->session->getStatusCode();
     }
 
-    final public function headers(): HeaderBag
+    public function headers(): HeaderBag
     {
         return new HeaderBag($this->session->getResponseHeaders());
     }
