@@ -36,6 +36,11 @@ class Response
         return new HeaderBag($this->session->getResponseHeaders());
     }
 
+    public function currentUrl(): string
+    {
+        return $this->session->getCurrentUrl();
+    }
+
     /**
      * @internal
      */
@@ -136,7 +141,7 @@ class Response
      */
     protected function rawMetadata(): string
     {
-        return "URL: {$this->session->getCurrentUrl()} ({$this->statusCode()})\n\n{$this->headers()}";
+        return "URL: {$this->currentUrl()} ({$this->statusCode()})\n\n{$this->headers()}";
     }
 
     /**

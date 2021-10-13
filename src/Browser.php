@@ -61,7 +61,7 @@ class Browser
      */
     final public function assertOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        Assert::run(new SameUrlAssertion($this->minkSession()->getCurrentUrl(), $expected, $parts));
+        Assert::run(new SameUrlAssertion($this->response()->currentUrl(), $expected, $parts));
 
         return $this;
     }
@@ -73,7 +73,7 @@ class Browser
      */
     final public function assertNotOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        Assert::not(new SameUrlAssertion($this->minkSession()->getCurrentUrl(), $expected, $parts));
+        Assert::not(new SameUrlAssertion($this->response()->currentUrl(), $expected, $parts));
 
         return $this;
     }
