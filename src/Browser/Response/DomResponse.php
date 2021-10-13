@@ -14,11 +14,14 @@ abstract class DomResponse extends Response
 {
     private Dom $dom;
 
-    abstract public function crawler(): Crawler;
+    final public function crawler(): Crawler
+    {
+        return $this->dom()->crawler();
+    }
 
     final public function dom(): Dom
     {
-        return $this->dom ??= Dom::wrap($this->crawler());
+        return $this->dom ??= Dom::wrap(new Crawler($this->body(), 'http://localhost'));
     }
 
     final public function dump(?string $selector = null): void

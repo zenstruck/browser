@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Browser;
 
-use Behat\Mink\Session;
+use Symfony\Component\BrowserKit\AbstractBrowser as Client;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Assert;
@@ -16,56 +16,56 @@ use Zenstruck\Browser\Response\XmlResponse;
  */
 class Response
 {
-    private Session $session;
+    private Client $client;
 
     /**
      * @internal
      */
-    final public function __construct(Session $session)
+    final public function __construct(Client $client)
     {
-        $this->session = $session;
+        $this->client = $client;
     }
 
     public function statusCode(): int
     {
-        return $this->session->getStatusCode();
+        return $this->client->getInternalResponse()->getStatusCode();
     }
 
     public function headers(): HeaderBag
     {
-        return new HeaderBag($this->session->getResponseHeaders());
+        return new HeaderBag($this->client->getInternalResponse()->getHeaders());
     }
 
     public function currentUrl(): string
     {
-        return $this->session->getCurrentUrl();
+        return $this->client->getInternalRequest()->getUri();
     }
 
     /**
      * @internal
      */
-    final public static function createFor(Session $session): self
+    final public static function createFor(Client $client): self
     {
-        $contentType = (string) $session->getResponseHeader('content-type');
+        $contentType = $client->getInternalResponse()->getHeader('content-type');
 
         if (str_contains($contentType, 'json')) {
-            return new JsonResponse($session);
+            return new JsonResponse($client);
         }
 
         if (str_contains($contentType, 'html')) {
-            return new HtmlResponse($session);
+            return new HtmlResponse($client);
         }
 
         if (str_contains($contentType, 'xml')) {
-            return new XmlResponse($session);
+            return new XmlResponse($client);
         }
 
-        return new self($session);
+        return new self($client);
     }
 
     final public function body(): string
     {
-        return $this->session->getPage()->getContent();
+        return $this->client->getInternalResponse()->getContent();
     }
 
     final public function ensureJson(): JsonResponse
@@ -126,14 +126,6 @@ class Response
         }
 
         VarDumper::dump($this->raw());
-    }
-
-    /**
-     * @internal
-     */
-    final protected function session(): Session
-    {
-        return $this->session;
     }
 
     /**

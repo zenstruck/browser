@@ -449,7 +449,8 @@ class Browser
 
     public function response(): Response
     {
-        return Response::createFor($this->minkSession());
+        // todo cache and reset when request is made
+        return Response::createFor($this->minkSession()->getDriver()->getClient());
     }
 
     /**
