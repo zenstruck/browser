@@ -201,15 +201,12 @@ abstract class BrowserKitBrowser extends Browser
      */
     final public function assertHeaderEquals(string $header, string $expected): self
     {
-        // todo refactor - could have multiple headers
-        $header = \mb_strtolower($header);
+        $headers = $this->response()->headers();
+        $context = ['header' => $header];
 
-        Assert::that(\array_keys($this->response()->headers()))
-            ->contains($header, 'Expected response to have header "{header}".')
-        ;
-
-        Assert::that($this->response()->headers()[$header][0])
-            ->is($expected, 'Expected header "{header}" to be "{expected}".', ['header' => $header])
+        Assert::true($headers->has($header), 'Expected response to have header "{header}".', $context);
+        Assert::that($headers->all($header))
+            ->contains($expected, 'Expected header "{header}" to be "{needle}".', $context)
         ;
 
         return $this;
@@ -220,17 +217,12 @@ abstract class BrowserKitBrowser extends Browser
      */
     final public function assertHeaderContains(string $header, string $needle): self
     {
-        // todo refactor - could have multiple headers
-        $header = \mb_strtolower($header);
+        $headers = $this->response()->headers();
+        $context = ['header' => $header];
 
-        Assert::that(\array_keys($this->response()->headers()))
-            ->contains($header, 'Expected response to have header "{header}".')
-        ;
-
-        Assert::that($this->response()->headers()[$header][0])
-            ->contains($needle, 'Expected header "{header}" with value "{haystack}" to contain "{needle}".', [
-                'header' => $header,
-            ])
+        Assert::true($headers->has($header), 'Expected response to have header "{header}".', $context);
+        Assert::that(\implode('|', $headers->all($header)))
+            ->contains($needle, 'Expected header "{header}" with value(s) "{haystack}" to contain "{needle}".', $context)
         ;
 
         return $this;

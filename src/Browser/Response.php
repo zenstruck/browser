@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser;
 
 use Behat\Mink\Session;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Assert;
 use Zenstruck\Browser\Response\DomResponse;
@@ -30,9 +31,9 @@ class Response
         return $this->session->getStatusCode();
     }
 
-    final public function headers(): array
+    final public function headers(): HeaderBag
     {
-        return $this->session->getResponseHeaders();
+        return new HeaderBag($this->session->getResponseHeaders());
     }
 
     /**
@@ -135,15 +136,7 @@ class Response
      */
     protected function rawMetadata(): string
     {
-        $ret = "URL: {$this->session->getCurrentUrl()} ({$this->statusCode()})\n\n";
-
-        foreach ($this->session->getResponseHeaders() as $header => $values) {
-            foreach ($values as $value) {
-                $ret .= "{$header}: {$value}\n";
-            }
-        }
-
-        return $ret;
+        return "URL: {$this->session->getCurrentUrl()} ({$this->statusCode()})\n\n{$this->headers()}";
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Tests;
 
 use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Response;
 use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
 
 /**
@@ -171,6 +172,26 @@ trait BrowserKitBrowserTests
     /**
      * @test
      */
+    public function response_multi_header_assertions(): void
+    {
+        $this->browser()
+            ->visit('/multi-headers')
+            ->assertSuccessful()
+            ->assertHeaderEquals('X-FOO', 'bar 1')
+            ->assertHeaderEquals('x-foo', 'bar 1')
+            ->assertHeaderEquals('x-foo', 'bar 2')
+            ->assertHeaderContains('x-foo', '1')
+            ->assertHeaderContains('x-foo', '2')
+            ->use(function(Response $response) {
+                $this->assertStringContainsString('X-Foo:         bar 1', $response->raw());
+                $this->assertStringContainsString('X-Foo:         bar 1', $response->raw());
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function http_method_actions(): void
     {
         $this->browser()
@@ -291,7 +312,7 @@ trait BrowserKitBrowserTests
             ;
         });
 
-        $this->assertStringContainsString('content-type: application/json', $output[0]);
+        $this->assertStringContainsString('Content-Type:  application/json', $output[0]);
     }
 
     /**
@@ -322,7 +343,7 @@ trait BrowserKitBrowserTests
         });
 
         $this->assertStringContainsString('(200)', $output[0]);
-        $this->assertStringContainsString('content-type: text/html;', $output[0]);
+        $this->assertStringContainsString('Content-Type:  text/html;', $output[0]);
     }
 
     /**

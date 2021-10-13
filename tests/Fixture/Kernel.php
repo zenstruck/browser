@@ -50,6 +50,13 @@ final class Kernel extends BaseKernel
         return new Response(\file_get_contents(__DIR__.'/files/xml.xml'), 200, ['Content-Type' => 'text/xml']);
     }
 
+    public function multiHeaders(): Response
+    {
+        return new Response('', 200, [
+            'X-Foo' => ['bar 1', 'bar 2'],
+        ]);
+    }
+
     public function submitForm(Request $request): JsonResponse
     {
         $files = \array_map(
@@ -161,5 +168,6 @@ final class Kernel extends BaseKernel
         $routes->add('/xml', 'kernel::xml');
         $routes->add('/javascript', 'kernel::javascript');
         $routes->add('/user', 'kernel::user');
+        $routes->add('/multi-headers', 'kernel::multiHeaders');
     }
 }
