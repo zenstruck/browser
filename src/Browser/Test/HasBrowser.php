@@ -113,7 +113,7 @@ trait HasBrowser
         ;
     }
 
-    protected function browser(array $options = []): KernelBrowser
+    protected function browser(array $kernelOptions = [], array $server = []): KernelBrowser
     {
         if (!$this instanceof KernelTestCase) {
             throw new \RuntimeException(\sprintf('The "%s" method can only be used on TestCases that extend "%s".', __METHOD__, KernelTestCase::class));
@@ -128,16 +128,19 @@ trait HasBrowser
         if ($this instanceof WebTestCase) {
             static::ensureKernelShutdown();
 
-            $browser = new $class(static::createClient($options));
+            $browser = new $class(static::createClient($kernelOptions, $server));
         } else {
             // reboot kernel before starting browser
-            static::bootKernel($options);
+            static::bootKernel($kernelOptions);
 
             if (!static::$container->has('test.client')) {
                 throw new \RuntimeException('The Symfony test client is not enabled.');
             }
 
-            $browser = new $class(static::$container->get('test.client'));
+            $client = static::$container->get('test.client');
+            $client->setServerParameters($server);
+
+            $browser = new $class($client);
         }
 
         BrowserExtension::registerBrowser($browser);
