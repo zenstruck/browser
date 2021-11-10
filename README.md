@@ -109,37 +109,37 @@ class MyTest extends TestCase
     use HasBrowser;
 
     /**
-     * Requires this test extend either Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
+     * Requires this test extends Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
      * or Symfony\Bundle\FrameworkBundle\Test\WebTestCase.
      */
     public function test_using_kernel_browser(): void
     {
         $this->browser()
             ->visit('/my/page')
-            ->assertSuccessful()
+            ->assertSeeIn('h1', 'Page Title')
         ;
     }
     
     /**
-     * Requires this test extend Symfony\Component\Panther\PantherTestCase.
+     * Requires this test extends Symfony\Component\Panther\PantherTestCase.
      */
     public function test_using_panther_browser(): void
     {
         $this->pantherBrowser()
             ->visit('/my/page')
-            ->assertSuccessful()
+            ->assertSeeIn('h1', 'Page Title')
         ;
     }
     
     /**
-     * Requires this test extend Symfony\Component\Panther\PantherTestCase or
+     * Requires this test extends Symfony\Component\Panther\PantherTestCase or
      * have the "HTTP_BROWSER_URI" env var set to the root uri to test against.
      */
     public function test_using_http_browser(): void
     {
         $this->httpBrowser()
             ->visit('/my/page')
-            ->assertSuccessful()
+            ->assertSeeIn('h1', 'Page Title')
         ;
     }
 }
