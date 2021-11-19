@@ -2,10 +2,9 @@
 
 namespace Zenstruck\Browser\Tests;
 
-use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\User;
 use Zenstruck\Browser\KernelBrowser;
+use Zenstruck\Browser\Tests\Fixture\Kernel;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -32,15 +31,13 @@ trait KernelBrowserTests
      */
     public function can_act_as_user(): void
     {
-        if (!\method_exists(SymfonyKernelBrowser::class, 'loginUser')) {
-            $this->markTestSkipped(SymfonyKernelBrowser::class.'::loginUser() is only available in Symfony 5.1+.');
+        if (!Kernel::securityEnabled()) {
+            $this->markTestSkipped('Only enable security-related tests in 5.3+');
         }
-
-        $userClass = \class_exists(InMemoryUser::class) ? InMemoryUser::class : User::class;
 
         $this->browser()
             ->throwExceptions()
-            ->actingAs(new $userClass('kevin', 'pass'))
+            ->actingAs(new InMemoryUser('kevin', 'pass'))
             ->visit('/user')
             ->assertSee('user: kevin/pass')
         ;

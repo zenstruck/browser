@@ -8,24 +8,9 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: [7.4, 8.0]
-        deps: [hightest]
-        symfony: [4.4.*, 5.3.*, 5.4.*]
-        include:
-          - php: 7.4
-            deps: lowest
-            symfony: '*'
-    steps:
-      - uses: zenstruck/.github@php-test-symfony
-        with:
-          php: ${{ matrix.php }}
-          symfony: ${{ matrix.symfony }}
-          deps: ${{ matrix.deps }}
-          phpunit: simple-phpunit
+    uses: zenstruck/.github/.github/workflows/php-test-symfony.yml@main
+    with:
+      phpunit: simple-phpunit
 
   code-coverage:
     uses: zenstruck/.github/.github/workflows/php-coverage-codecov.yml@main

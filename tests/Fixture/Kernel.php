@@ -14,8 +14,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -126,7 +127,15 @@ final class Kernel extends BaseKernel
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
-        yield new SecurityBundle();
+
+        if (self::securityEnabled()) {
+            yield new SecurityBundle();
+        }
+    }
+
+    public static function securityEnabled(): bool
+    {
+        return self::VERSION_ID >= 50300;
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
@@ -136,30 +145,58 @@ final class Kernel extends BaseKernel
             'router' => ['utf8' => true],
             'test' => true,
             'profiler' => ['enabled' => true, 'collect' => true],
-            'session' => ['storage_id' => 'session.storage.mock_file'],
-        ]);
-        $c->loadFromExtension('security', [
-            'encoders' => [User::class => 'plaintext'],
-            'providers' => ['users' => ['memory' => ['users' => ['kevin' => ['password' => 'pass']]]]],
-            'firewalls' => ['main' => ['anonymous' => true]],
         ]);
         $c->register('logger', NullLogger::class); // disable logging
+
+        if (self::securityEnabled()) {
+            $c->loadFromExtension('security', [
+                'enable_authenticator_manager' => true,
+                'password_hashers' => [InMemoryUser::class => 'plaintext'],
+                'providers' => ['users' => ['memory' => ['users' => ['kevin' => ['password' => 'pass']]]]],
+                'firewalls' => ['main' => []],
+            ]);
+
+            $c->loadFromExtension('framework', [
+                'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
+            ]);
+        }
     }
 
-    protected function configureRoutes(RouteCollectionBuilder $routes): void
+    /**
+     * @param RouteCollectionBuilder|RoutingConfigurator $routes
+     */
+    protected function configureRoutes($routes): void
     {
-        $routes->add('/page1', 'kernel::page1');
-        $routes->add('/page2', 'kernel::page2');
-        $routes->add('/text', 'kernel::text');
-        $routes->add('/submit-form', 'kernel::submitForm');
-        $routes->add('/http-method', 'kernel::httpMethod');
-        $routes->add('/exception', 'kernel::exception');
-        $routes->add('/redirect1', 'kernel::redirect1');
-        $routes->add('/redirect2', 'kernel::redirect2');
-        $routes->add('/redirect3', 'kernel::redirect3');
-        $routes->add('/json', 'kernel::json');
-        $routes->add('/xml', 'kernel::xml');
-        $routes->add('/javascript', 'kernel::javascript');
-        $routes->add('/user', 'kernel::user');
+        if ($routes instanceof RouteCollectionBuilder) {
+            $routes->add('/page1', 'kernel::page1');
+            $routes->add('/page2', 'kernel::page2');
+            $routes->add('/text', 'kernel::text');
+            $routes->add('/submit-form', 'kernel::submitForm');
+            $routes->add('/http-method', 'kernel::httpMethod');
+            $routes->add('/exception', 'kernel::exception');
+            $routes->add('/redirect1', 'kernel::redirect1');
+            $routes->add('/redirect2', 'kernel::redirect2');
+            $routes->add('/redirect3', 'kernel::redirect3');
+            $routes->add('/json', 'kernel::json');
+            $routes->add('/xml', 'kernel::xml');
+            $routes->add('/javascript', 'kernel::javascript');
+            $routes->add('/user', 'kernel::user');
+
+            return;
+        }
+
+        $routes->add('page1', '/page1')->controller('kernel::page1');
+        $routes->add('page2', '/page2')->controller('kernel::page2');
+        $routes->add('text', '/text')->controller('kernel::text');
+        $routes->add('submit-form', '/submit-form')->controller('kernel::submitForm');
+        $routes->add('http-method', '/http-method')->controller('kernel::httpMethod');
+        $routes->add('exception', '/exception')->controller('kernel::exception');
+        $routes->add('redirect1', '/redirect1')->controller('kernel::redirect1');
+        $routes->add('redirect2', '/redirect2')->controller('kernel::redirect2');
+        $routes->add('redirect3', '/redirect3')->controller('kernel::redirect3');
+        $routes->add('json', '/json')->controller('kernel::json');
+        $routes->add('xml', '/xml')->controller('kernel::xml');
+        $routes->add('javascript', '/javascript')->controller('kernel::javascript');
+        $routes->add('user', '/user')->controller('kernel::user');
     }
 }

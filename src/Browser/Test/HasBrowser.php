@@ -101,8 +101,10 @@ trait HasBrowser
                 static::bootKernel($kernelOptions);
             }
 
-            if (static::$container->has('profiler')) {
-                $browser->setProfiler(static::$container->get('profiler'));
+            $container = \method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container;
+
+            if ($container->has('profiler')) {
+                $browser->setProfiler($container->get('profiler'));
             }
         }
 
@@ -133,11 +135,13 @@ trait HasBrowser
             // reboot kernel before starting browser
             static::bootKernel($kernelOptions);
 
-            if (!static::$container->has('test.client')) {
+            $container = \method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container;
+
+            if (!$container->has('test.client')) {
                 throw new \RuntimeException('The Symfony test client is not enabled.');
             }
 
-            $client = static::$container->get('test.client');
+            $client = $container->get('test.client');
             $client->setServerParameters($server);
 
             $browser = new $class($client);
