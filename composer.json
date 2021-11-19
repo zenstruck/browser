@@ -25,7 +25,7 @@
     "require-dev": {
         "dbrekelmans/bdi": "^0.3.0",
         "symfony/mime": ">=4.4.1",
-        "symfony/panther": "^1.0",
+        "symfony/panther": "^1.0|^2.0",
         "symfony/phpunit-bridge": "^5.3",
         "symfony/security-bundle": "^4.4|^5.0|^6.0"
     },
