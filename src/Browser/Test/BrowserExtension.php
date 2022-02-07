@@ -108,12 +108,15 @@ final class BrowserExtension implements BeforeFirstTestHook, BeforeTestHook, Aft
 
     private static function normalizeTestName(string $name): string
     {
-        \preg_match('#^([\w:\\\]+)(.+\#(\d+).+)?$#', $name, $matches);
+        // Try to match for a numeric data set index. If it didn't, match for a string one.
+        if (!\preg_match('#^([\w:\\\]+)(.+\#(\d+).+)?$#', $name, $matches)) {
+            \preg_match('#^([\w:\\\]+)(.+"([\w ]+)".+)?$#', $name, $matches);
+        }
 
         $normalized = \strtr($matches[1], '\\:', '-_');
 
         if (isset($matches[3])) {
-            $normalized .= '__data-set-'.$matches[3];
+            $normalized .= '__data-set-'.strtr($matches[3], '\\: ', '-_-');
         }
 
         return $normalized;
