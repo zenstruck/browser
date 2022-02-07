@@ -116,7 +116,7 @@ final class BrowserExtension implements BeforeFirstTestHook, BeforeTestHook, Aft
         $normalized = \strtr($matches[1], '\\:', '-_');
 
         if (isset($matches[3])) {
-            $normalized .= '__data-set-'.strtr($matches[3], '\\: ', '-_-');
+            $normalized .= '__data-set-'.\strtr($matches[3], '\\: ', '-_-');
         }
 
         return $normalized;
