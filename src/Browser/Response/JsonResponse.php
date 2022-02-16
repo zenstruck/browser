@@ -11,6 +11,9 @@ use function JmesPath\search;
  */
 final class JsonResponse extends Response
 {
+    /**
+     * @return mixed
+     */
     public function json()
     {
         if (empty($this->body())) {
@@ -29,6 +32,9 @@ final class JsonResponse extends Response
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function search(string $selector)
     {
         return search($selector, $this->json());
