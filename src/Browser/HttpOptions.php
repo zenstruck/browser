@@ -54,6 +54,8 @@ class HttpOptions
     }
 
     /**
+     * @param mixed $body
+     *
      * @return static
      */
     final public static function json($body = null): self
@@ -70,6 +72,8 @@ class HttpOptions
     }
 
     /**
+     * @param mixed $body
+     *
      * @return static
      */
     final public static function jsonAjax($body = null): self

@@ -18,6 +18,8 @@ final class BrowserExtension implements BeforeFirstTestHook, BeforeTestHook, Aft
     /** @var Browser[] */
     private static array $registeredBrowsers = [];
     private static bool $enabled = false;
+
+    /** @var array<string,array<string,string[]>> */
     private array $savedArtifacts = [];
 
     /**

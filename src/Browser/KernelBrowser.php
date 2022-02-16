@@ -8,6 +8,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @extends BrowserKitBrowser<SymfonyKernelBrowser>
  */
 class KernelBrowser extends BrowserKitBrowser
 {

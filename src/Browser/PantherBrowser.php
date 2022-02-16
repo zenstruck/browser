@@ -20,7 +20,11 @@ class PantherBrowser extends Browser
     private Client $client;
     private ?string $screenshotDir = null;
     private ?string $consoleLogDir = null;
+
+    /** @var string[] */
     private array $savedScreenshots = [];
+
+    /** @var string[] */
     private array $savedConsoleLogs = [];
 
     final public function __construct(Client $client)

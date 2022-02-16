@@ -9,6 +9,7 @@ use Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates;
 use Facebook\WebDriver\Internal\WebDriverLocatable;
 use Facebook\WebDriver\WebDriverElement;
 use Facebook\WebDriver\WebDriverSelect;
+use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\DomCrawler\Crawler;
@@ -81,16 +82,9 @@ final class PantherDriver extends CoreDriver
             return $this->client->getTitle();
         }
 
-        $text = $crawler->text();
-        $text = \str_replace("\n", ' ', $text);
-        $text = \preg_replace('/ {2,}/', ' ', $text);
-
-        return \trim($text);
+        return \trim($crawler->text(null, true));
     }
 
-    /**
-     * @return mixed
-     */
     public function getValue($xpath)
     {
         try {
@@ -109,7 +103,7 @@ final class PantherDriver extends CoreDriver
         return $value;
     }
 
-    public function setValue($xpath, $value)
+    public function setValue($xpath, $value): void
     {
         $element = $this->crawlerElement($this->filteredCrawler($xpath));
         $jsNode = $this->jsNode($xpath);
@@ -167,6 +161,9 @@ final class PantherDriver extends CoreDriver
         $select->selectByVisibleText($value);
     }
 
+    /**
+     * @param string|string[] $path
+     */
     public function attachFile($xpath, $path): void
     {
         if (\is_array($path) && empty($this->filteredCrawler($xpath)->attr('multiple'))) {
@@ -182,7 +179,7 @@ final class PantherDriver extends CoreDriver
     {
         $element = $this->crawlerElement($this->filteredCrawler($xpath));
 
-        if ('radio' === \mb_strtolower($element->getAttribute('type'))) {
+        if ('radio' === \mb_strtolower((string) $element->getAttribute('type'))) {
             return null !== $element->getAttribute('checked');
         }
 
@@ -195,19 +192,16 @@ final class PantherDriver extends CoreDriver
         $this->client->refreshCrawler();
     }
 
-    public function executeScript($script)
+    public function executeScript($script): void
     {
         if (\preg_match('/^function[\s(]/', $script)) {
             $script = \preg_replace('/;$/', '', $script);
             $script = '('.$script.')';
         }
 
-        return $this->client->executeScript($script);
+        $this->client->executeScript($script);
     }
 
-    /**
-     * @return mixed
-     */
     public function evaluateScript($script)
     {
         if (0 !== \mb_strpos(\trim($script), 'return ')) {
@@ -220,7 +214,7 @@ final class PantherDriver extends CoreDriver
     public function getHtml($xpath): string
     {
         // cut the tag itself (making innerHTML out of outerHTML)
-        return \preg_replace('/^<[^>]+>|<[^>]+>$/', '', $this->getOuterHtml($xpath));
+        return (string) \preg_replace('/^<[^>]+>|<[^>]+>$/', '', $this->getOuterHtml($xpath));
     }
 
     public function isVisible($xpath): bool
@@ -230,9 +224,7 @@ final class PantherDriver extends CoreDriver
 
     public function getOuterHtml($xpath): string
     {
-        $crawler = $this->filteredCrawler($xpath);
-
-        return $crawler->html();
+        return $this->filteredCrawler($xpath)->html();
     }
 
     public function getAttribute($xpath, $name): ?string
@@ -264,10 +256,10 @@ final class PantherDriver extends CoreDriver
 
     private function prepareUrl(string $url): string
     {
-        return \preg_replace('#(https?://[^/]+)(/[^/.]+\.php)?#', '$1$2', $url);
+        return (string) \preg_replace('#(https?://[^/]+)(/[^/.]+\.php)?#', '$1$2', $url);
     }
 
-    private function filteredCrawler($xpath): Crawler
+    private function filteredCrawler(string $xpath): Crawler
     {
         if (!\count($crawler = $this->crawler()->filterXPath($xpath))) {
             throw new DriverException(\sprintf('There is no element matching XPath "%s"', $xpath));
@@ -278,11 +270,11 @@ final class PantherDriver extends CoreDriver
 
     private function crawler(): Crawler
     {
-        if (null === $crawler = $this->client->getCrawler()) {
-            throw new DriverException('Unable to access the response content before visiting a page');
+        try {
+            return $this->client->getCrawler();
+        } catch (BadMethodCallException $e) {
+            throw new DriverException('Unable to access the response content before visiting a page', 0, $e);
         }
-
-        return $crawler;
     }
 
     private function formField(string $xpath): FormField

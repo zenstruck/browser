@@ -24,9 +24,11 @@
     },
     "require-dev": {
         "dbrekelmans/bdi": "^0.3.0",
+        "phpstan/phpstan": "^1.4",
+        "phpunit/phpunit": "^9.5",
         "symfony/mime": ">=4.4.1",
         "symfony/panther": "^1.0|^2.0",
-        "symfony/phpunit-bridge": "^5.3",
+        "symfony/phpunit-bridge": "^6.0",
         "symfony/security-bundle": "^4.4|^5.0|^6.0"
     },
     "config": {

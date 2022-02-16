@@ -10,12 +10,18 @@ use Zenstruck\Browser\Mink\BrowserKitDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @template B of AbstractBrowser
  */
 abstract class BrowserKitBrowser extends Browser
 {
+    /** @var B */
     private AbstractBrowser $inner;
     private ?HttpOptions $defaultHttpOptions = null;
 
+    /**
+     * @param B $inner
+     */
     public function __construct(AbstractBrowser $inner)
     {
         $this->inner = $inner;
@@ -119,6 +125,8 @@ abstract class BrowserKitBrowser extends Browser
     /**
      * @see request()
      *
+     * @param HttpOptions|array $options
+     *
      * @return static
      */
     final public function get(string $url, $options = []): self
@@ -128,6 +136,8 @@ abstract class BrowserKitBrowser extends Browser
 
     /**
      * @see request()
+     *
+     * @param HttpOptions|array $options
      *
      * @return static
      */
@@ -139,6 +149,8 @@ abstract class BrowserKitBrowser extends Browser
     /**
      * @see request()
      *
+     * @param HttpOptions|array $options
+     *
      * @return static
      */
     final public function put(string $url, $options = []): self
@@ -148,6 +160,8 @@ abstract class BrowserKitBrowser extends Browser
 
     /**
      * @see request()
+     *
+     * @param HttpOptions|array $options
      *
      * @return static
      */
@@ -237,6 +251,9 @@ abstract class BrowserKitBrowser extends Browser
 
     abstract public function profile(): Profile;
 
+    /**
+     * @return B
+     */
     final protected function inner(): AbstractBrowser
     {
         return $this->inner;

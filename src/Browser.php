@@ -26,6 +26,8 @@ class Browser
 
     private Mink $mink;
     private ?string $sourceDir = null;
+
+    /** @var string[] */
     private array $savedSources = [];
 
     /**
@@ -175,8 +177,8 @@ class Browser
     {
         $field = $this->documentElement()->findField($selector);
 
-        if ($field && 'radio' === \mb_strtolower($field->getAttribute('type'))) {
-            $this->documentElement()->selectFieldOption($selector, $field->getAttribute('value'));
+        if ($field && 'radio' === \mb_strtolower((string) $field->getAttribute('type'))) {
+            $this->documentElement()->selectFieldOption($selector, (string) $field->getAttribute('value'));
 
             return $this;
         }
@@ -273,7 +275,11 @@ class Browser
             try {
                 $this->documentElement()->clickLink($selector);
             } catch (ElementNotFoundException $e) {
-                $this->documentElement()->find('css', $selector)->click();
+                if (!$element = $this->documentElement()->find('css', $selector)) {
+                    throw $e;
+                }
+
+                $element->click();
             }
         }
 
@@ -452,6 +458,8 @@ class Browser
 
     /**
      * @internal
+     *
+     * @return array<string,string[]>
      */
     public function savedArtifacts(): array
     {
