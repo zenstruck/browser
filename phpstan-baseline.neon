@@ -66,6 +66,11 @@ parameters:
 			path: src/Browser/BrowserKitBrowser.php
 
 		-
+			message: "#^Method Zenstruck\\\\Browser\\\\BrowserKitBrowser\\:\\:patch\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/BrowserKitBrowser.php
+
+		-
 			message: "#^Method Zenstruck\\\\Browser\\\\BrowserKitBrowser\\:\\:post\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Browser/BrowserKitBrowser.php
