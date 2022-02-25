@@ -171,6 +171,18 @@ abstract class BrowserKitBrowser extends Browser
     }
 
     /**
+     * @see request()
+     *
+     * @param HttpOptions|array $options
+     *
+     * @return static
+     */
+    final public function patch(string $url, $options = []): self
+    {
+        return $this->request('PATCH', $url, $options);
+    }
+
+    /**
      * @return static
      */
     final public function assertStatus(int $expected): self
