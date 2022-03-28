@@ -3,10 +3,12 @@
 namespace Zenstruck\Browser;
 
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
+use Zenstruck\Callback\Parameter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -269,5 +271,13 @@ abstract class BrowserKitBrowser extends Browser
     final protected function inner(): AbstractBrowser
     {
         return $this->inner;
+    }
+
+    protected function useParameters(): array
+    {
+        return [
+            ...parent::useParameters(),
+            Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->inner->getCookieJar())),
+        ];
     }
 }

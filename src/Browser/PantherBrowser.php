@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser;
 
+use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\VarDumper\VarDumper;
@@ -9,6 +10,7 @@ use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\PantherDriver;
 use Zenstruck\Browser\Response\PantherResponse;
+use Zenstruck\Callback\Parameter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -248,5 +250,13 @@ class PantherBrowser extends Browser
     {
         $this->client->quit();
         parent::die();
+    }
+
+    protected function useParameters(): array
+    {
+        return [
+            ...parent::useParameters(),
+            Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->client->getCookieJar())),
+        ];
     }
 }

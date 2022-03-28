@@ -26,8 +26,12 @@ final class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    public function page1(): Response
+    public function page1(Request $request): Response
     {
+        if ($request->query->has('start-session')) {
+            $request->getSession()->set('key', 'value');
+        }
+
         return new Response(\file_get_contents(__DIR__.'/files/page1.html'));
     }
 
