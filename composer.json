@@ -15,9 +15,9 @@
         "php": ">=7.4",
         "behat/mink": "^1.8",
         "mtdowling/jmespath.php": "^2.6",
-        "symfony/browser-kit": "^4.4.9|^5.0.9|^6.0",
-        "symfony/css-selector": "^4.4|^5.0|^6.0",
-        "symfony/framework-bundle": "^4.4|^5.0|^6.0",
+        "symfony/browser-kit": "^5.4|^6.0",
+        "symfony/css-selector": "^5.4|^6.0",
+        "symfony/framework-bundle": "^5.4|^6.0",
         "symfony/polyfill-php80": "^1.20",
         "zenstruck/assert": "^1.0",
         "zenstruck/callback": "^1.1"
@@ -26,10 +26,10 @@
         "dbrekelmans/bdi": "^0.3.0",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5",
-        "symfony/mime": ">=4.4.1",
+        "symfony/mime": "^5.4|^6.0",
         "symfony/panther": "^1.0|^2.0",
         "symfony/phpunit-bridge": "^6.0",
-        "symfony/security-bundle": "^4.4|^5.0|^6.0"
+        "symfony/security-bundle": "^5.4|^6.0"
     },
     "config": {
         "preferred-install": "dist",
