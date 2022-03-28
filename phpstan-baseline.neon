@@ -176,11 +176,6 @@ parameters:
 			path: src/Browser/Mink/BrowserKitDriver.php
 
 		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\BrowserKitDriver\\:\\:getResponseHeaders\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
-
-		-
 			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\BrowserKitDriver\\:\\:getValue\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Browser/Mink/BrowserKitDriver.php

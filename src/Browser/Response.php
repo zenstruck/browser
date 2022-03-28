@@ -133,7 +133,7 @@ class Response
         $ret = "URL: {$this->session->getCurrentUrl()} ({$this->statusCode()})\n\n";
 
         foreach ($this->session->getResponseHeaders() as $header => $values) {
-            foreach ($values as $value) {
+            foreach ((array) $values as $value) {
                 $ret .= "{$header}: {$value}\n";
             }
         }
