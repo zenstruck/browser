@@ -303,6 +303,11 @@ $queryCount = $browser
     // must be called before the request.
     ->profile()->getCollector('db')->getQueryCount()
 ;
+
+// "use" a specific data collector
+$browser->use(function(\Symfony\Component\HttpKernel\DataCollector\RequestDataCollector $collector) {
+    // ...
+})
 ```
 
 #### HTTP Requests

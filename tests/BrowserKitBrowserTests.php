@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
 
@@ -440,5 +441,18 @@ trait BrowserKitBrowserTests
         ;
 
         $this->assertCount(2, $crawler);
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_data_collector(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->use(function(RequestDataCollector $collector) {
+                $this->assertSame('/page1', $collector->getPathInfo());
+            })
+        ;
     }
 }
