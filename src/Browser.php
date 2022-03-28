@@ -108,13 +108,7 @@ class Browser
     final public function use(callable $callback): self
     {
         Callback::createFor($callback)->invokeAll(
-            Parameter::union(
-                Parameter::untyped($this),
-                Parameter::typed(self::class, $this),
-                Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
-                Parameter::typed(Response::class, Parameter::factory(fn() => $this->response())),
-                Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->response()->assertDom()->crawler()))
-            )
+            Parameter::union(...$this->useParameters())
         );
 
         return $this;
@@ -513,5 +507,21 @@ class Browser
     protected function die(): void
     {
         exit(1);
+    }
+
+    /**
+     * @internal
+     *
+     * @return Parameter[]
+     */
+    protected function useParameters(): array
+    {
+        return [
+            Parameter::untyped($this),
+            Parameter::typed(self::class, $this),
+            Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
+            Parameter::typed(Response::class, Parameter::factory(fn() => $this->response())),
+            Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->response()->assertDom()->crawler())),
+        ];
     }
 }

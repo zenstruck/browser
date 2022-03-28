@@ -26,8 +26,12 @@ final class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    public function page1(): Response
+    public function page1(Request $request): Response
     {
+        if ($request->query->has('start-session')) {
+            $request->getSession()->set('key', 'value');
+        }
+
         return new Response(\file_get_contents(__DIR__.'/files/page1.html'));
     }
 
@@ -127,15 +131,7 @@ final class Kernel extends BaseKernel
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
-
-        if (self::securityEnabled()) {
-            yield new SecurityBundle();
-        }
-    }
-
-    public static function securityEnabled(): bool
-    {
-        return self::VERSION_ID >= 50300;
+        yield new SecurityBundle();
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
@@ -145,21 +141,15 @@ final class Kernel extends BaseKernel
             'router' => ['utf8' => true],
             'test' => true,
             'profiler' => ['enabled' => true, 'collect' => true],
+            'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
+        ]);
+        $c->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'password_hashers' => [InMemoryUser::class => 'plaintext'],
+            'providers' => ['users' => ['memory' => ['users' => ['kevin' => ['password' => 'pass']]]]],
+            'firewalls' => ['main' => []],
         ]);
         $c->register('logger', NullLogger::class); // disable logging
-
-        if (self::securityEnabled()) {
-            $c->loadFromExtension('security', [
-                'enable_authenticator_manager' => true,
-                'password_hashers' => [InMemoryUser::class => 'plaintext'],
-                'providers' => ['users' => ['memory' => ['users' => ['kevin' => ['password' => 'pass']]]]],
-                'firewalls' => ['main' => []],
-            ]);
-
-            $c->loadFromExtension('framework', [
-                'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
-            ]);
-        }
     }
 
     /**

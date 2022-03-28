@@ -4,7 +4,6 @@ namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Zenstruck\Browser\KernelBrowser;
-use Zenstruck\Browser\Tests\Fixture\Kernel;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -31,10 +30,6 @@ trait KernelBrowserTests
      */
     public function can_act_as_user(): void
     {
-        if (!Kernel::securityEnabled()) {
-            $this->markTestSkipped('Only enable security-related tests in 5.3+');
-        }
-
         $this->browser()
             ->throwExceptions()
             ->actingAs(new InMemoryUser('kevin', 'pass'))

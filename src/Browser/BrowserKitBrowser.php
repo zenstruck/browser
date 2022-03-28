@@ -3,10 +3,13 @@
 namespace Zenstruck\Browser;
 
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Mink\BrowserKitDriver;
+use Zenstruck\Callback\Parameter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -269,5 +272,22 @@ abstract class BrowserKitBrowser extends Browser
     final protected function inner(): AbstractBrowser
     {
         return $this->inner;
+    }
+
+    protected function useParameters(): array
+    {
+        return [
+            ...parent::useParameters(),
+            Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->inner->getCookieJar())),
+            Parameter::typed(DataCollectorInterface::class, Parameter::factory(function(string $class) {
+                foreach ($this->profile()->getCollectors() as $collector) {
+                    if ($class === \get_class($collector)) {
+                        return $collector;
+                    }
+                }
+
+                Assert::fail('DataCollector %s is not available for this request.', [$class]);
+            })),
+        ];
     }
 }

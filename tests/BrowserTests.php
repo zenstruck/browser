@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
@@ -155,6 +157,19 @@ trait BrowserTests
             ->visit('/page1')
             ->use(function(Crawler $crawler) {
                 $this->assertSame('h1 title', $crawler->filter('h1')->text());
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_cookie_jar(): void
+    {
+        $this->browser()
+            ->visit('/page1?start-session=1')
+            ->use(function(CookieJar $jar) {
+                $this->assertInstanceOf(Cookie::class, $jar->get('MOCKSESSID'));
             })
         ;
     }
