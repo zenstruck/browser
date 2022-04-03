@@ -80,9 +80,7 @@ There are several environment variables available to configure:
 | `BROWSER_SCREENSHOT_DIR`  | Directory to save screenshots to.                                     | `<project-root>/var/browser/screenshots`  |
 | `BROWSER_CONSOLE_LOG_DIR` | Directory to save javascript console logs to.                         | `<project-root>/var/browser/console-logs` |
 | `KERNEL_BROWSER_CLASS`    | `KernelBrowser` class to use.                                         | `Zenstruck\Browser\KernelBrowser`         |
-| `HTTP_BROWSER_CLASS`      | `HttpBrowser` class to use.                                           | `Zenstruck\Browser\HttpBrowser`           |
 | `PANTHER_BROWSER_CLASS`   | `PantherBrowser` class to use.                                        | `Zenstruck\Browser\PantherBrowser`        |
-| `HTTP_BROWSER_URI`        | The URI to use for `HttpBrowser` (if not using `PantherTestCase`).    | `null`                                    |
 | `PANTHER_NO_HEADLESS`     | Disable headless-mode and allow usage of `PantherBrowser::inspect()`. | `0`                                       |
 
 
@@ -91,7 +89,6 @@ There are several environment variables available to configure:
 This library provides 3 different "browsers":
 
 1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel *(this is the fastest browser)*.
-2. [HttpBrowser](#httpbrowser): makes requests to a webserver using `symfony/http-client`.
 3. [PantherBrowser](#pantherbrowser): makes requests to a webserver with a real browser using `symfony/panther` which
    allows testing javascript *(this is the slowest browser)*.
 
@@ -129,25 +126,13 @@ class MyTest extends TestCase
             ->assertSeeIn('h1', 'Page Title')
         ;
     }
-
-    /**
-     * Requires this test extends Symfony\Component\Panther\PantherTestCase or
-     * have the "HTTP_BROWSER_URI" env var set to the root uri to test against.
-     */
-    public function test_using_http_browser(): void
-    {
-        $this->httpBrowser()
-            ->visit('/my/page')
-            ->assertSeeIn('h1', 'Page Title')
-        ;
-    }
 }
 ```
 
 All browsers have the following methods:
 
 ```php
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser|\Zenstruck\Browser\PantherBrowser $browser **/
+/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\PantherBrowser $browser **/
 
 $browser
     // ACTIONS
@@ -264,12 +249,12 @@ $browser
 ;
 ```
 
-### KernelBrowser/HttpBrowser
+### KernelBrowser
 
 These browsers have the following methods:
 
 ```php
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
 $browser
     // response assertions
@@ -297,8 +282,7 @@ $browser
 
 // Access the Symfony Profiler for the last request
 $queryCount = $browser
-    // HttpBrowser requires profiling have collect globally enabled.
-    // If not globally enabled and using KernelBrowser, ->withProfiling()
+    // If profiling not not globally enabled for tests, ->withProfiling()
     // must be called before the request.
     ->profile()->getCollector('db')->getQueryCount()
 ;
@@ -314,7 +298,7 @@ $browser->use(function(\Symfony\Component\HttpKernel\DataCollector\RequestDataCo
 ```php
 use Zenstruck\Browser\HttpOptions;
 
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
 $browser
     // http methods
@@ -364,7 +348,7 @@ Make assertions about json responses using [JMESPath expressions](https://jmespa
 See the [JMESPath Tutorials](https://jmespath.org/tutorial.html) to learn more.
 
 ```php
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
 $browser
     ->get('/api/endpoint')
     ->assertJson() // ensures the content-type is application/json
@@ -405,10 +389,6 @@ $browser
     ->withProfiling()
 ;
 ```
-
-### HttpBrowser
-
-This browser has no extra methods.
 
 ### PantherBrowser
 
@@ -627,7 +607,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
 
 1. Use `->setDefaultHttpOptions()` for the current browser:
    ```php
-   /** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+   /** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
    $browser
        ->setDefaultHttpOptions(['headers' => ['X-Token' => 'my-token']])
@@ -696,7 +676,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
    ```php
    use Zenstruck\Browser\HttpOptions;
 
-   /** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+   /** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
    $browser
        // instead of
@@ -732,7 +712,6 @@ class AppBrowser extends KernelBrowser
 Then, depending on the implementation you extended from, set the appropriate env variable:
 
 * `KernelBrowser`: `KERNEL_BROWSER_CLASS`
-* `HttpBrowser`: `HTTP_BROWSER_CLASS`
 * `PantherBrowser`: `PANTHER_BROWSER_CLASS`
 
 For the example above, you would set `KERNEL_BROWSER_CLASS=App\Tests\AppBrowser`.

@@ -91,11 +91,6 @@ parameters:
 			path: src/Browser/BrowserKitBrowser.php
 
 		-
-			message: "#^Parameter \\#1 \\$token of method Symfony\\\\Component\\\\HttpKernel\\\\Profiler\\\\Profiler\\:\\:loadProfile\\(\\) expects string, array\\|string given\\.$#"
-			count: 1
-			path: src/Browser/HttpBrowser.php
-
-		-
 			message: "#^Cannot access offset 'query' on array\\{scheme\\?\\: string, host\\?\\: string, port\\?\\: int, user\\?\\: string, pass\\?\\: string, path\\?\\: string, query\\?\\: string, fragment\\?\\: string\\}\\|false\\.$#"
 			count: 2
 			path: src/Browser/HttpOptions.php
