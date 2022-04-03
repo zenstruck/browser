@@ -20,7 +20,7 @@ class Response
     /**
      * @internal
      */
-    final public function __construct(Session $session)
+    public function __construct(Session $session)
     {
         $this->session = $session;
     }

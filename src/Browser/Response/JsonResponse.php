@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Response;
 
+use Behat\Mink\Session;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser\Response;
 use function JmesPath\search;
@@ -11,6 +12,15 @@ use function JmesPath\search;
  */
 final class JsonResponse extends Response
 {
+    public function __construct(Session $session)
+    {
+        if (!\function_exists('JmesPath\search')) {
+            throw new \RuntimeException('"mtdowling/jmespath.php" is required to use Json assertions (composer require mtdowling/jmespath.php).');
+        }
+
+        parent::__construct($session);
+    }
+
     /**
      * @return mixed
      */
