@@ -9,7 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Extension\InteractiveExtension;
-use Zenstruck\Browser\Mink\BrowserKitDriver;
+use Zenstruck\Browser\Session\Driver\BrowserKitDriver;
 use Zenstruck\Callback\Parameter;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Proxy;
@@ -25,9 +25,12 @@ class KernelBrowser extends Browser
 
     private ?HttpOptions $defaultHttpOptions = null;
 
+    /**
+     * @internal
+     */
     final public function __construct(SymfonyKernelBrowser $client)
     {
-        parent::__construct($client, new BrowserKitDriver($client));
+        parent::__construct(new BrowserKitDriver($client));
     }
 
     /**
@@ -141,7 +144,7 @@ class KernelBrowser extends Browser
     {
         $this->client()->followRedirects(true);
 
-        if ($this->minkSession()->isStarted() && $this->response()->isRedirect()) {
+        if ($this->session()->isStarted() && $this->session()->isRedirect()) {
             $this->followRedirect();
         }
 
@@ -156,7 +159,7 @@ class KernelBrowser extends Browser
     final public function followRedirect(int $max = \PHP_INT_MAX): self
     {
         for ($i = 0; $i < $max; ++$i) {
-            if (!$this->response()->isRedirect()) {
+            if (!$this->session()->isRedirect()) {
                 break;
             }
 
@@ -282,9 +285,9 @@ class KernelBrowser extends Browser
      */
     final public function assertStatus(int $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->statusCodeEquals($expected)
-        );
+        $this->session()->assert()->statusCodeEquals($expected);
+
+        return $this;
     }
 
     /**
@@ -292,9 +295,11 @@ class KernelBrowser extends Browser
      */
     final public function assertSuccessful(): self
     {
-        Assert::true($this->response()->isSuccessful(), 'Expected successful status code (2xx) but got {actual}.', [
-            'actual' => $this->response()->statusCode(),
-        ]);
+        Assert::true(
+            $this->session()->getStatusCode() >= 200 && $this->session()->getStatusCode() < 300,
+            'Expected successful status code (2xx) but got {actual}.',
+            ['actual' => $this->session()->getStatusCode()]
+        );
 
         return $this;
     }
@@ -308,8 +313,8 @@ class KernelBrowser extends Browser
             throw new \RuntimeException('Cannot assert redirected if not intercepting redirects. Call ->interceptRedirects() before making the request.');
         }
 
-        Assert::true($this->response()->isRedirect(), 'Expected redirect status code (3xx) but got {actual}.', [
-            'actual' => $this->response()->statusCode(),
+        Assert::true($this->session()->isRedirect(), 'Expected redirect status code (3xx) but got {actual}.', [
+            'actual' => $this->session()->getStatusCode(),
         ]);
 
         return $this;
@@ -320,9 +325,9 @@ class KernelBrowser extends Browser
      */
     final public function assertHeaderEquals(string $header, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseHeaderEquals($header, $expected)
-        );
+        $this->session()->assert()->responseHeaderEquals($header, $expected);
+
+        return $this;
     }
 
     /**
@@ -330,9 +335,9 @@ class KernelBrowser extends Browser
      */
     final public function assertHeaderContains(string $header, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseHeaderContains($header, $expected)
-        );
+        $this->session()->assert()->responseHeaderContains($header, $expected);
+
+        return $this;
     }
 
     /**
@@ -351,7 +356,7 @@ class KernelBrowser extends Browser
      */
     final public function assertJsonMatches(string $expression, $expected): self
     {
-        Assert::that($this->response()->assertJson()->search($expression))->is($expected);
+        Assert::that($this->session()->json()->search($expression))->is($expected);
 
         return $this;
     }

@@ -5,12 +5,10 @@ namespace Zenstruck\Browser;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\DomCrawler\Crawler;
-use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Extension\InteractiveExtension;
-use Zenstruck\Browser\Mink\PantherDriver;
-use Zenstruck\Browser\Response\PantherResponse;
+use Zenstruck\Browser\Session\Driver\PantherDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -33,9 +31,12 @@ class PantherBrowser extends Browser
     /** @var string[] */
     private array $savedConsoleLogs = [];
 
+    /**
+     * @internal
+     */
     final public function __construct(Client $client)
     {
-        parent::__construct($client, new PantherDriver($client));
+        parent::__construct(new PantherDriver($client));
     }
 
     final public function setScreenshotDir(string $dir): self
@@ -57,11 +58,11 @@ class PantherBrowser extends Browser
      */
     final public function assertVisible(string $selector): self
     {
-        return $this->wrapMinkExpectation(function() use ($selector) {
-            $element = $this->webAssert()->elementExists('css', $selector);
+        $element = $this->session()->assert()->elementExists('css', $selector);
 
-            Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
-        });
+        Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
+
+        return $this;
     }
 
     /**
@@ -69,7 +70,7 @@ class PantherBrowser extends Browser
      */
     final public function assertNotVisible(string $selector): self
     {
-        $element = $this->documentElement()->find('css', $selector);
+        $element = $this->session()->page()->find('css', $selector);
 
         if (!$element) {
             Assert::pass();
@@ -177,7 +178,7 @@ class PantherBrowser extends Browser
 
     final public function dumpConsoleLog(): self
     {
-        VarDumper::dump($this->client()->manage()->getLog('browser'));
+        Session::varDump($this->client()->manage()->getLog('browser'));
 
         return $this;
     }
@@ -185,7 +186,7 @@ class PantherBrowser extends Browser
     final public function ddConsoleLog(): void
     {
         $this->dumpConsoleLog();
-        $this->die();
+        $this->session()->exit();
     }
 
     final public function ddScreenshot(string $filename = 'screenshot.png'): void
@@ -194,7 +195,7 @@ class PantherBrowser extends Browser
 
         echo \sprintf("\n\nScreenshot saved as \"%s\".\n\n", \end($this->savedScreenshots));
 
-        $this->die();
+        $this->session()->exit();
     }
 
     /**
@@ -217,19 +218,5 @@ class PantherBrowser extends Browser
             parent::savedArtifacts(),
             ['Saved Console Logs' => $this->savedConsoleLogs, 'Saved Screenshots' => $this->savedScreenshots]
         );
-    }
-
-    final public function response(): PantherResponse
-    {
-        return new PantherResponse($this->minkSession());
-    }
-
-    /**
-     * @internal
-     */
-    final protected function die(): void
-    {
-        $this->client()->quit();
-        parent::die();
     }
 }

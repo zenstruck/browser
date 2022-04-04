@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Browser\Extension;
 
-use Behat\Mink\Exception\ExpectationException;
 use Zenstruck\Assert;
 
 /**
@@ -17,7 +16,7 @@ trait InteractiveExtension
      */
     final public function visit(string $uri): self
     {
-        $this->minkSession()->visit($uri);
+        $this->session()->visit($uri);
 
         return $this;
     }
@@ -27,7 +26,7 @@ trait InteractiveExtension
      */
     final public function fillField(string $selector, string $value): self
     {
-        $this->documentElement()->fillField($selector, $value);
+        $this->session()->page()->fillField($selector, $value);
 
         return $this;
     }
@@ -37,15 +36,15 @@ trait InteractiveExtension
      */
     final public function checkField(string $selector): self
     {
-        $field = $this->documentElement()->findField($selector);
+        $field = $this->session()->page()->findField($selector);
 
         if ($field && 'radio' === \mb_strtolower((string) $field->getAttribute('type'))) {
-            $this->documentElement()->selectFieldOption($selector, (string) $field->getAttribute('value'));
+            $this->session()->page()->selectFieldOption($selector, (string) $field->getAttribute('value'));
 
             return $this;
         }
 
-        $this->documentElement()->checkField($selector);
+        $this->session()->page()->checkField($selector);
 
         return $this;
     }
@@ -55,7 +54,7 @@ trait InteractiveExtension
      */
     final public function uncheckField(string $selector): self
     {
-        $this->documentElement()->uncheckField($selector);
+        $this->session()->page()->uncheckField($selector);
 
         return $this;
     }
@@ -87,7 +86,7 @@ trait InteractiveExtension
      */
     final public function selectFieldOption(string $selector, string $value): self
     {
-        $this->documentElement()->selectFieldOption($selector, $value);
+        $this->session()->page()->selectFieldOption($selector, $value);
 
         return $this;
     }
@@ -98,7 +97,7 @@ trait InteractiveExtension
     final public function selectFieldOptions(string $selector, array $values): self
     {
         foreach ($values as $value) {
-            $this->documentElement()->selectFieldOption($selector, $value, true);
+            $this->session()->page()->selectFieldOption($selector, $value, true);
         }
 
         return $this;
@@ -118,7 +117,7 @@ trait InteractiveExtension
             }
         }
 
-        $this->documentElement()->attachFileToField($selector, $filename);
+        $this->session()->page()->attachFileToField($selector, $filename);
 
         return $this;
     }
@@ -131,16 +130,16 @@ trait InteractiveExtension
     final public function click(string $selector): self
     {
         // try button
-        $element = $this->documentElement()->findButton($selector);
+        $element = $this->session()->page()->findButton($selector);
 
         if (!$element) {
             // try link
-            $element = $this->documentElement()->findLink($selector);
+            $element = $this->session()->page()->findLink($selector);
         }
 
         if (!$element) {
             // try by css
-            $element = $this->documentElement()->find('css', $selector);
+            $element = $this->session()->page()->find('css', $selector);
         }
 
         if (!$element) {
@@ -151,7 +150,7 @@ trait InteractiveExtension
             Assert::fail('Clickable element "%s" is not visible.', [$selector]);
         }
 
-        if ($button = $this->documentElement()->findButton($selector)) {
+        if ($button = $this->session()->page()->findButton($selector)) {
             if (!$button->isVisible()) {
                 Assert::fail('Button "%s" is not visible.', [$selector]);
             }
@@ -167,9 +166,9 @@ trait InteractiveExtension
      */
     final public function assertFieldEquals(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->fieldValueEquals($selector, $expected)
-        );
+        $this->session()->assert()->fieldValueEquals($selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -177,9 +176,9 @@ trait InteractiveExtension
      */
     final public function assertFieldNotEquals(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->fieldValueNotEquals($selector, $expected)
-        );
+        $this->session()->assert()->fieldValueNotEquals($selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -187,11 +186,7 @@ trait InteractiveExtension
      */
     final public function assertSelected(string $selector, string $expected): self
     {
-        try {
-            $field = $this->webAssert()->fieldExists($selector);
-        } catch (ExpectationException $e) {
-            Assert::fail($e->getMessage());
-        }
+        $field = $this->session()->assert()->fieldExists($selector);
 
         Assert::that((array) $field->getValue())->contains($expected);
 
@@ -203,11 +198,7 @@ trait InteractiveExtension
      */
     final public function assertNotSelected(string $selector, string $expected): self
     {
-        try {
-            $field = $this->webAssert()->fieldExists($selector);
-        } catch (ExpectationException $e) {
-            Assert::fail($e->getMessage());
-        }
+        $field = $this->session()->assert()->fieldExists($selector);
 
         Assert::that((array) $field->getValue())->doesNotContain($expected);
 
@@ -219,9 +210,9 @@ trait InteractiveExtension
      */
     final public function assertChecked(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->checkboxChecked($selector)
-        );
+        $this->session()->assert()->checkboxChecked($selector);
+
+        return $this;
     }
 
     /**
@@ -229,8 +220,8 @@ trait InteractiveExtension
      */
     final public function assertNotChecked(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->checkboxNotChecked($selector)
-        );
+        $this->session()->assert()->checkboxNotChecked($selector);
+
+        return $this;
     }
 }

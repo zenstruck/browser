@@ -19,9 +19,9 @@ trait DomExtension
      */
     final public function assertSee(string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->pageTextContains($expected)
-        );
+        $this->session()->assert()->pageTextContains($expected);
+
+        return $this;
     }
 
     /**
@@ -29,9 +29,9 @@ trait DomExtension
      */
     final public function assertNotSee(string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->pageTextNotContains($expected)
-        );
+        $this->session()->assert()->pageTextNotContains($expected);
+
+        return $this;
     }
 
     /**
@@ -39,9 +39,9 @@ trait DomExtension
      */
     final public function assertSeeIn(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementTextContains('css', $selector, $expected)
-        );
+        $this->session()->assert()->elementTextContains('css', $selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -49,9 +49,9 @@ trait DomExtension
      */
     final public function assertNotSeeIn(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementTextNotContains('css', $selector, $expected)
-        );
+        $this->session()->assert()->elementTextNotContains('css', $selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -59,9 +59,9 @@ trait DomExtension
      */
     final public function assertSeeElement(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementExists('css', $selector)
-        );
+        $this->session()->assert()->elementExists('css', $selector);
+
+        return $this;
     }
 
     /**
@@ -69,9 +69,9 @@ trait DomExtension
      */
     final public function assertNotSeeElement(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementNotExists('css', $selector)
-        );
+        $this->session()->assert()->elementNotExists('css', $selector);
+
+        return $this;
     }
 
     /**
@@ -79,9 +79,9 @@ trait DomExtension
      */
     final public function assertElementCount(string $selector, int $count): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementsCount('css', $selector, $count)
-        );
+        $this->session()->assert()->elementsCount('css', $selector, $count);
+
+        return $this;
     }
 
     /**
@@ -89,9 +89,9 @@ trait DomExtension
      */
     final public function assertElementAttributeContains(string $selector, string $attribute, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementAttributeContains('css', $selector, $attribute, $expected)
-        );
+        $this->session()->assert()->elementAttributeContains('css', $selector, $attribute, $expected);
+
+        return $this;
     }
 
     /**
@@ -99,8 +99,8 @@ trait DomExtension
      */
     final public function assertElementAttributeNotContains(string $selector, string $attribute, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementAttributeNotContains('css', $selector, $attribute, $expected)
-        );
+        $this->session()->assert()->elementAttributeNotContains('css', $selector, $attribute, $expected);
+
+        return $this;
     }
 }

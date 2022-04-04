@@ -166,56 +166,6 @@ parameters:
 			path: src/Browser/KernelBrowser.php
 
 		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\BrowserKitDriver\\:\\:getFormField\\(\\) should return Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField but returns array\\<Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\>\\|Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\.$#"
-			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\BrowserKitDriver\\:\\:getFormNode\\(\\) should return DOMElement but returns DOMNode\\.$#"
-			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\BrowserKitDriver\\:\\:getValue\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\BrowserKitDriver\\:\\:setValue\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
-
-		-
-			message: "#^Parameter \\#1 \\$path of function dirname expects string, string\\|false\\|null given\\.$#"
-			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
-
-		-
-			message: "#^Parameter \\#1 \\$value of method Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\:\\:setValue\\(\\) expects string\\|null, array\\|bool\\|string given\\.$#"
-			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\PantherDriver\\:\\:getValue\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/Mink/PantherDriver.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\PantherDriver\\:\\:setValue\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/Mink/PantherDriver.php
-
-		-
-			message: "#^Parameter \\#1 \\$value of method Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\:\\:setValue\\(\\) expects string\\|null, array\\|bool\\|string given\\.$#"
-			count: 1
-			path: src/Browser/Mink/PantherDriver.php
-
-		-
-			message: "#^Parameter \\#3 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, array\\|bool\\|string given\\.$#"
-			count: 1
-			path: src/Browser/Mink/PantherDriver.php
-
-		-
 			message: "#^Method Zenstruck\\\\Browser\\\\PantherBrowser\\:\\:selectField\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Browser/PantherBrowser.php
@@ -229,4 +179,54 @@ parameters:
 			message: "#^Parameter \\#2 \\$path of method Behat\\\\Mink\\\\Element\\\\TraversableElement\\:\\:attachFileToField\\(\\) expects string, array\\<string\\>\\|string given\\.$#"
 			count: 1
 			path: src/Browser/PantherBrowser.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:getFormField\\(\\) should return Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField but returns array\\<Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\>\\|Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:getFormNode\\(\\) should return DOMElement but returns DOMNode\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:getValue\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:setValue\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
+
+		-
+			message: "#^Parameter \\#1 \\$path of function dirname expects string, string\\|false\\|null given\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of method Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\:\\:setValue\\(\\) expects string\\|null, array\\|bool\\|string given\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\PantherDriver\\:\\:getValue\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/PantherDriver.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\PantherDriver\\:\\:setValue\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/PantherDriver.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of method Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\:\\:setValue\\(\\) expects string\\|null, array\\|bool\\|string given\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/PantherDriver.php
+
+		-
+			message: "#^Parameter \\#3 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, array\\|bool\\|string given\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/PantherDriver.php
 

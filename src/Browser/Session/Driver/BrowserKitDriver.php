@@ -8,9 +8,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Browser\Mink;
+namespace Zenstruck\Browser\Session\Driver;
 
-use Behat\Mink\Driver\CoreDriver;
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Symfony\Component\BrowserKit\AbstractBrowser;
@@ -24,6 +23,7 @@ use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
+use Zenstruck\Browser\Session\Driver;
 
 /**
  * Copied from https://github.com/minkphp/MinkBrowserKitDriver for use
@@ -36,50 +36,39 @@ use Symfony\Component\DomCrawler\Form;
  *
  * @internal
  */
-final class BrowserKitDriver extends CoreDriver
+final class BrowserKitDriver extends Driver
 {
-    private AbstractBrowser $client;
-
     /** @var Form[] */
     private array $forms = [];
 
     /** @var array<string,string> */
     private array $serverParameters = [];
-    private bool $started = false;
 
     public function __construct(AbstractBrowser $client)
     {
-        $this->client = $client;
-        $this->client->followRedirects(true);
-    }
+        $client->followRedirects(true);
 
-    public function start(): void
-    {
-        $this->started = true;
-    }
-
-    public function isStarted(): bool
-    {
-        return $this->started;
+        parent::__construct($client);
     }
 
     public function stop(): void
     {
         $this->reset();
-        $this->started = false;
+
+        parent::stop();
     }
 
     public function reset(): void
     {
-        // Restarting the client resets the cookies and the history
-        $this->client->restart();
+        parent::reset();
+
         $this->forms = [];
         $this->serverParameters = [];
     }
 
     public function visit($url): void
     {
-        $this->client->request('GET', $url, [], [], $this->serverParameters);
+        $this->client()->request('GET', $url, [], [], $this->serverParameters);
         $this->forms = [];
     }
 
@@ -87,7 +76,7 @@ final class BrowserKitDriver extends CoreDriver
     {
         // This should be encapsulated in `getRequest` method if any other method needs the request
         try {
-            $request = $this->client->getInternalRequest();
+            $request = $this->client()->getInternalRequest();
         } catch (BadMethodCallException $e) {
             // Handling Symfony 5+ behaviour
             $request = null;
@@ -102,19 +91,19 @@ final class BrowserKitDriver extends CoreDriver
 
     public function reload(): void
     {
-        $this->client->reload();
+        $this->client()->reload();
         $this->forms = [];
     }
 
     public function forward(): void
     {
-        $this->client->forward();
+        $this->client()->forward();
         $this->forms = [];
     }
 
     public function back(): void
     {
-        $this->client->back();
+        $this->client()->back();
         $this->forms = [];
     }
 
@@ -159,7 +148,7 @@ final class BrowserKitDriver extends CoreDriver
             return;
         }
 
-        $jar = $this->client->getCookieJar();
+        $jar = $this->client()->getCookieJar();
         $jar->set(new Cookie($name, $value));
     }
 
@@ -176,7 +165,7 @@ final class BrowserKitDriver extends CoreDriver
         //     return $cookie->getValue();
         // }
 
-        $allValues = $this->client->getCookieJar()->allValues($this->getCurrentUrl());
+        $allValues = $this->client()->getCookieJar()->allValues($this->getCurrentUrl());
 
         if (isset($allValues[$name])) {
             return $allValues[$name];
@@ -310,7 +299,7 @@ final class BrowserKitDriver extends CoreDriver
         $tagName = $node->nodeName;
 
         if ('a' === $tagName) {
-            $this->client->click($crawler->link());
+            $this->client()->click($crawler->link());
             $this->forms = [];
         } elseif ($this->canSubmitForm($node)) {
             $this->submit($crawler->form());
@@ -398,7 +387,7 @@ final class BrowserKitDriver extends CoreDriver
     private function getResponse(): Response
     {
         try {
-            $response = $this->client->getInternalResponse();
+            $response = $this->client()->getInternalResponse();
         } catch (BadMethodCallException $e) {
             // Handling Symfony 5+ behaviour
             $response = null;
@@ -443,7 +432,7 @@ final class BrowserKitDriver extends CoreDriver
     private function deleteCookie(string $name): void
     {
         $path = $this->getCookiePath();
-        $jar = $this->client->getCookieJar();
+        $jar = $this->client()->getCookieJar();
 
         do {
             if (null !== $jar->get($name, $path)) {
@@ -564,7 +553,7 @@ final class BrowserKitDriver extends CoreDriver
             }
         }
 
-        $this->client->submit($form, [], $this->serverParameters);
+        $this->client()->submit($form, [], $this->serverParameters);
 
         $this->forms = [];
     }
@@ -668,7 +657,7 @@ final class BrowserKitDriver extends CoreDriver
     private function getCrawler(): Crawler
     {
         try {
-            return $this->client->getCrawler();
+            return $this->client()->getCrawler();
         } catch (BadMethodCallException $e) {
             throw new DriverException('Unable to access the response content before visiting a page', 0, $e);
         }
