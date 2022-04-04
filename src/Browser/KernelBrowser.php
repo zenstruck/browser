@@ -5,6 +5,7 @@ namespace Zenstruck\Browser;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Zenstruck\Browser\Extension\InteractiveExtension;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Proxy;
 
@@ -15,6 +16,8 @@ use Zenstruck\Foundry\Proxy;
  */
 class KernelBrowser extends BrowserKitBrowser
 {
+    use InteractiveExtension;
+
     final public function __construct(SymfonyKernelBrowser $inner)
     {
         parent::__construct($inner);
