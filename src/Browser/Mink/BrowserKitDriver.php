@@ -296,6 +296,13 @@ final class BrowserKitDriver extends CoreDriver
         return \is_array($selectValue) ? \in_array($optionValue, $selectValue, true) : $optionValue === $selectValue;
     }
 
+    public function isVisible($xpath): bool
+    {
+        $this->getFilteredCrawler($xpath); // just check that the element exists
+
+        return true;
+    }
+
     public function click($xpath): void
     {
         $crawler = $this->getFilteredCrawler($xpath);

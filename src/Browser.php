@@ -4,7 +4,6 @@ namespace Zenstruck;
 
 use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Element\DocumentElement;
-use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
@@ -147,16 +146,6 @@ class Browser
     /**
      * @return static
      */
-    public function follow(string $link): self
-    {
-        $this->documentElement()->clickLink($link);
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
     final public function fillField(string $selector, string $value): self
     {
         $this->documentElement()->fillField($selector, $value);
@@ -262,20 +251,34 @@ class Browser
      */
     final public function click(string $selector): self
     {
-        try {
-            $this->documentElement()->pressButton($selector);
-        } catch (ElementNotFoundException $e) {
-            // try link
-            try {
-                $this->documentElement()->clickLink($selector);
-            } catch (ElementNotFoundException $e) {
-                if (!$element = $this->documentElement()->find('css', $selector)) {
-                    throw $e;
-                }
+        // try button
+        $element = $this->documentElement()->findButton($selector);
 
-                $element->click();
+        if (!$element) {
+            // try link
+            $element = $this->documentElement()->findLink($selector);
+        }
+
+        if (!$element) {
+            // try by css
+            $element = $this->documentElement()->find('css', $selector);
+        }
+
+        if (!$element) {
+            Assert::fail('Clickable element "%s" not found.', [$selector]);
+        }
+
+        if (!$element->isVisible()) {
+            Assert::fail('Clickable element "%s" is not visible.', [$selector]);
+        }
+
+        if ($button = $this->documentElement()->findButton($selector)) {
+            if (!$button->isVisible()) {
+                Assert::fail('Button "%s" is not visible.', [$selector]);
             }
         }
+
+        $element->click();
 
         return $this;
     }

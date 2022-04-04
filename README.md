@@ -137,7 +137,7 @@ All browsers have the following methods:
 $browser
     // ACTIONS
     ->visit('/my/page')
-    ->follow('A link')
+    ->click('A link')
     ->fillField('Name', 'Kevin')
     ->checkField('Accept Terms')
     ->uncheckField('Accept Terms')

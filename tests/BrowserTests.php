@@ -343,9 +343,6 @@ trait BrowserTests
     {
         $this->browser()
             ->visit('/page1')
-            ->follow('a link')
-            ->assertOn('/page2')
-            ->visit('/page1')
             ->click('a link')
             ->assertOn('/page2')
         ;
