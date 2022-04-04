@@ -4,6 +4,9 @@ namespace Zenstruck\Browser\Tests;
 
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Zenstruck\Browser\KernelBrowser;
+use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\Factory;
+use function Zenstruck\Foundry\factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -33,6 +36,42 @@ trait KernelBrowserTests
         $this->browser()
             ->throwExceptions()
             ->actingAs(new InMemoryUser('kevin', 'pass'))
+            ->visit('/user')
+            ->assertSee('user: kevin/pass')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_act_as_user_with_foundry_factory(): void
+    {
+        // todo remove this requirement in foundry
+        Factory::boot(new Configuration());
+
+        $user = factory(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
+
+        $this->browser()
+            ->throwExceptions()
+            ->actingAs($user)
+            ->visit('/user')
+            ->assertSee('user: kevin/pass')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_act_as_user_with_foundry_proxy(): void
+    {
+        // todo remove this requirement in foundry
+        Factory::boot(new Configuration());
+
+        $user = factory(InMemoryUser::class)->create(['username' => 'kevin', 'password' => 'pass']);
+
+        $this->browser()
+            ->throwExceptions()
+            ->actingAs($user)
             ->visit('/user')
             ->assertSee('user: kevin/pass')
         ;

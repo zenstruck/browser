@@ -5,6 +5,8 @@ namespace Zenstruck\Browser;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Proxy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -81,8 +83,23 @@ class KernelBrowser extends BrowserKitBrowser
         return $this;
     }
 
-    public function actingAs(UserInterface $user, ?string $firewall = null): self
+    /**
+     * @param object|UserInterface|Proxy|Factory $user
+     */
+    public function actingAs(object $user, ?string $firewall = null): self
     {
+        if ($user instanceof Factory) {
+            $user = $user->create();
+        }
+
+        if ($user instanceof Proxy) {
+            $user = $user->object();
+        }
+
+        if (!$user instanceof UserInterface) {
+            throw new \LogicException(\sprintf('%s() requires the user be an instance of %s.', __METHOD__, UserInterface::class));
+        }
+
         $this->inner()->loginUser(...\array_filter([$user, $firewall]));
 
         return $this;

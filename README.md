@@ -372,6 +372,9 @@ $browser
     // authenticate a user for subsequent actions
     ->actingAs($user)
 
+    // If using zenstruck/foundry, you can pass a factory/proxy
+    ->actingAs(UserFactory::new())
+
     // by default, exceptions are caught and converted to a response
     // this disables that behaviour allowing you to use TestCase::expectException()
     ->throwExceptions()
