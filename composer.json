@@ -22,7 +22,7 @@
         "zenstruck/callback": "^1.1"
     },
     "require-dev": {
-        "dbrekelmans/bdi": "^0.3.0",
+        "dbrekelmans/bdi": "^1.0",
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5",
