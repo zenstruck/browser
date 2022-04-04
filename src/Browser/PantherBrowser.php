@@ -2,27 +2,28 @@
 
 namespace Zenstruck\Browser;
 
-use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
+use Symfony\Component\Panther\DomCrawler\Crawler;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Extension\InteractiveExtension;
 use Zenstruck\Browser\Mink\PantherDriver;
 use Zenstruck\Browser\Response\PantherResponse;
-use Zenstruck\Callback\Parameter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @experimental in 1.0
+ *
+ * @method Client  client()
+ * @method Crawler crawler()
  */
 class PantherBrowser extends Browser
 {
     use InteractiveExtension;
 
-    private Client $client;
     private ?string $screenshotDir = null;
     private ?string $consoleLogDir = null;
 
@@ -34,12 +35,7 @@ class PantherBrowser extends Browser
 
     final public function __construct(Client $client)
     {
-        parent::__construct(new PantherDriver($this->client = $client));
-    }
-
-    final public function client(): Client
-    {
-        return $this->client;
+        parent::__construct($client, new PantherDriver($client));
     }
 
     final public function setScreenshotDir(string $dir): self
@@ -101,7 +97,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilVisible(string $selector): self
     {
-        $this->client->waitForVisibility($selector);
+        $this->client()->waitForVisibility($selector);
 
         return $this;
     }
@@ -111,7 +107,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilNotVisible(string $selector): self
     {
-        $this->client->waitForInvisibility($selector);
+        $this->client()->waitForInvisibility($selector);
 
         return $this;
     }
@@ -121,7 +117,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilSeeIn(string $selector, string $expected): self
     {
-        $this->client->waitForElementToContain($selector, $expected);
+        $this->client()->waitForElementToContain($selector, $expected);
 
         return $this;
     }
@@ -131,7 +127,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilNotSeeIn(string $selector, string $expected): self
     {
-        $this->client->waitForElementToNotContain($selector, $expected);
+        $this->client()->waitForElementToNotContain($selector, $expected);
 
         return $this;
     }
@@ -160,7 +156,7 @@ class PantherBrowser extends Browser
             $filename = \sprintf('%s/%s', \rtrim($this->screenshotDir, '/'), \ltrim($filename, '/'));
         }
 
-        $this->client->takeScreenshot($this->savedScreenshots[] = $filename);
+        $this->client()->takeScreenshot($this->savedScreenshots[] = $filename);
 
         return $this;
     }
@@ -171,7 +167,7 @@ class PantherBrowser extends Browser
             $filename = \sprintf('%s/%s', \rtrim($this->consoleLogDir, '/'), \ltrim($filename, '/'));
         }
 
-        $log = $this->client->manage()->getLog('browser');
+        $log = $this->client()->manage()->getLog('browser');
         $log = \json_encode($log, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);
 
         (new Filesystem())->dumpFile($this->savedConsoleLogs[] = $filename, $log);
@@ -181,7 +177,7 @@ class PantherBrowser extends Browser
 
     final public function dumpConsoleLog(): self
     {
-        VarDumper::dump($this->client->manage()->getLog('browser'));
+        VarDumper::dump($this->client()->manage()->getLog('browser'));
 
         return $this;
     }
@@ -233,15 +229,7 @@ class PantherBrowser extends Browser
      */
     final protected function die(): void
     {
-        $this->client->quit();
+        $this->client()->quit();
         parent::die();
-    }
-
-    protected function useParameters(): array
-    {
-        return [
-            ...parent::useParameters(),
-            Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->client->getCookieJar())),
-        ];
     }
 }

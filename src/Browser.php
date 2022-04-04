@@ -7,6 +7,8 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
+use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Browser\Assertion\MinkAssertion;
@@ -18,10 +20,11 @@ use Zenstruck\Callback\Parameter;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class Browser
+abstract class Browser
 {
     private const SESSION = 'app';
 
+    private AbstractBrowser $client;
     private Mink $mink;
     private ?string $sourceDir = null;
 
@@ -31,9 +34,15 @@ class Browser
     /**
      * @internal
      */
-    public function __construct(DriverInterface $driver)
+    public function __construct(AbstractBrowser $client, DriverInterface $driver)
     {
+        $this->client = $client;
         $this->mink = new Mink([self::SESSION => new Session($driver)]);
+    }
+
+    final public function client(): AbstractBrowser
+    {
+        return $this->client;
     }
 
     /**
@@ -211,7 +220,8 @@ class Browser
             Parameter::typed(self::class, $this),
             Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
             Parameter::typed(Response::class, Parameter::factory(fn() => $this->response())),
-            Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->response()->assertDom()->crawler())),
+            Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->client->getCrawler())),
+            Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->client->getCookieJar())),
         ];
     }
 }

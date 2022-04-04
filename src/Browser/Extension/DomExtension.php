@@ -2,11 +2,18 @@
 
 namespace Zenstruck\Browser\Extension;
 
+use Symfony\Component\DomCrawler\Crawler;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 trait DomExtension
 {
+    final public function crawler(): Crawler
+    {
+        return $this->client()->getCrawler();
+    }
+
     /**
      * @return static
      */
