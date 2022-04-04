@@ -370,7 +370,6 @@ This browser has the following extra methods:
 
 $browser
     // authenticate a user for subsequent actions
-    // NOTE: only available in Symfony 5.1+
     ->actingAs($user)
 
     // by default, exceptions are caught and converted to a response
@@ -747,19 +746,62 @@ There are several packaged extensions. These are traits that can be added to a
 
 See https://github.com/zenstruck/mailer-test#zenstruckbrowser-integration.
 
-#### Authentication Extension
+#### Custom Extension
 
-This extension is more of an example. Each Symfony application handles authentication
-differently but this is a good starting point. You can either override the methods
-provided by the extension or write your own.
+You can create your own extensions for repetitive tasks. The example below is for
+an `AuthenticationExtension` to login/logout users and make assertions about
+a users authenticated status:
+
+```php
+namespace App\Tests\Browser;
+
+trait AuthenticationExtension
+{
+    public function loginAs(string $username, string $password): self
+    {
+        return $this
+            ->visit('/login')
+            ->fillField('email', $username)
+            ->fillField('password', $password)
+            ->click('Login')
+        ;
+    }
+
+    public function logout(): self
+    {
+        return $this->visit('/logout');
+    }
+
+    public function assertLoggedIn(): self
+    {
+        $this->assertSee('Logout');
+
+        return $this;
+    }
+
+    public function assertLoggedInAs(string $user): self
+    {
+        $this->assertSee($user);
+
+        return $this;
+    }
+
+    public function assertNotLoggedIn(): self
+    {
+        $this->assertSee('Login');
+
+        return $this;
+    }
+}
+```
 
 Add to your [Custom Browser](#custom-browser):
 
 ```php
 namespace App\Tests;
 
+use App\Tests\Browser\AuthenticationExtension;
 use Zenstruck\Browser\KernelBrowser;
-use Zenstruck\Browser\Extension\Authentication;
 
 class AppBrowser extends KernelBrowser
 {
