@@ -5,6 +5,8 @@ namespace Zenstruck\Browser\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Panther\Client as PantherClient;
+use Symfony\Component\Panther\PantherTestCase;
+use Symfony\Component\Panther\PantherTestCaseTrait;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\PantherBrowser;
 
@@ -24,19 +26,30 @@ trait HasBrowser
         self::$primaryPantherClient = null;
     }
 
+    /**
+     * @see PantherTestCase::createPantherClient()
+     */
     protected function pantherBrowser(array $options = [], array $kernelOptions = [], array $managerOptions = []): PantherBrowser
     {
+        if (!\class_exists(PantherClient::class)) {
+            throw new \LogicException('symfony/panther must be installed to use the PantherBrowser (composer require symfony/panther).');
+        }
+
+        if (!\method_exists(static::class, 'createPantherClient')) {
+            throw new \LogicException(\sprintf('A PantherBrowser can only be created in TestCases that extend "%s" or use "%s".', PantherTestCase::class, PantherTestCaseTrait::class));
+        }
+
         $class = $_SERVER['PANTHER_BROWSER_CLASS'] ?? PantherBrowser::class;
 
         if (!\is_a($class, PantherBrowser::class, true)) {
-            throw new \RuntimeException(\sprintf('"PANTHER_BROWSER_CLASS" env variable must reference a class that extends %s.', PantherBrowser::class));
+            throw new \LogicException(\sprintf('"PANTHER_BROWSER_CLASS" env variable must reference a class that extends %s.', PantherBrowser::class));
         }
 
         if (self::$primaryPantherClient) {
             $browser = new $class(static::createAdditionalPantherClient());
         } else {
             self::$primaryPantherClient = static::createPantherClient(
-                \array_merge(['browser' => $_SERVER['PANTHER_BROWSER'] ?? static::CHROME], $options),
+                \array_merge(['browser' => $_SERVER['PANTHER_BROWSER'] ?? PantherTestCase::CHROME], $options),
                 $kernelOptions,
                 $managerOptions
             );
@@ -53,25 +66,28 @@ trait HasBrowser
         ;
     }
 
-    protected function browser(array $kernelOptions = [], array $server = []): KernelBrowser
+    /**
+     * @see WebTestCase::createClient()
+     */
+    protected function browser(array $options = [], array $server = []): KernelBrowser
     {
         if (!$this instanceof KernelTestCase) {
-            throw new \RuntimeException(\sprintf('The "%s" method can only be used on TestCases that extend "%s".', __METHOD__, KernelTestCase::class));
+            throw new \LogicException(\sprintf('A KernelBrowser can only be created in TestCases that extend "%s".', KernelTestCase::class));
         }
 
         $class = $_SERVER['KERNEL_BROWSER_CLASS'] ?? KernelBrowser::class;
 
         if (!\is_a($class, KernelBrowser::class, true)) {
-            throw new \RuntimeException(\sprintf('"KERNEL_BROWSER_CLASS" env variable must reference a class that extends %s.', KernelBrowser::class));
+            throw new \LogicException(\sprintf('"KERNEL_BROWSER_CLASS" env variable must reference a class that extends %s.', KernelBrowser::class));
         }
 
         if ($this instanceof WebTestCase) {
             static::ensureKernelShutdown();
 
-            $browser = new $class(static::createClient($kernelOptions, $server));
+            $browser = new $class(static::createClient($options, $server));
         } else {
             // reboot kernel before starting browser
-            static::bootKernel($kernelOptions);
+            static::bootKernel($options);
 
             if (!static::getContainer()->has('test.client')) {
                 throw new \RuntimeException('The Symfony test client is not enabled.');
