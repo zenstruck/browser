@@ -74,14 +74,14 @@ This extension provides the following features:
 
 There are several environment variables available to configure:
 
-| Variable                  | Description                                                           | Default                                   |
-|---------------------------|-----------------------------------------------------------------------|-------------------------------------------|
-| `BROWSER_SOURCE_DIR`      | Directory to save source files to.                                    | `<project-root>/var/browser/source`       |
-| `BROWSER_SCREENSHOT_DIR`  | Directory to save screenshots to.                                     | `<project-root>/var/browser/screenshots`  |
-| `BROWSER_CONSOLE_LOG_DIR` | Directory to save javascript console logs to.                         | `<project-root>/var/browser/console-logs` |
-| `KERNEL_BROWSER_CLASS`    | `KernelBrowser` class to use.                                         | `Zenstruck\Browser\KernelBrowser`         |
-| `PANTHER_BROWSER_CLASS`   | `PantherBrowser` class to use.                                        | `Zenstruck\Browser\PantherBrowser`        |
-| `PANTHER_NO_HEADLESS`     | Disable headless-mode and allow usage of `PantherBrowser::inspect()`. | `0`                                       |
+| Variable                  | Description                                                         | Default                                   |
+|---------------------------|---------------------------------------------------------------------|-------------------------------------------|
+| `BROWSER_SOURCE_DIR`      | Directory to save source files to.                                  | `<project-root>/var/browser/source`       |
+| `BROWSER_SCREENSHOT_DIR`  | Directory to save screenshots to.                                   | `<project-root>/var/browser/screenshots`  |
+| `BROWSER_CONSOLE_LOG_DIR` | Directory to save javascript console logs to.                       | `<project-root>/var/browser/console-logs` |
+| `KERNEL_BROWSER_CLASS`    | `KernelBrowser` class to use.                                       | `Zenstruck\Browser\KernelBrowser`         |
+| `PANTHER_BROWSER_CLASS`   | `PantherBrowser` class to use.                                      | `Zenstruck\Browser\PantherBrowser`        |
+| `PANTHER_NO_HEADLESS`     | Disable headless-mode and allow usage of `PantherBrowser::pause()`. | `0`                                       |
 
 
 ## Usage
