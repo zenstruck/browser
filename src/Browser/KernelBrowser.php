@@ -296,7 +296,9 @@ class KernelBrowser extends Browser
      */
     final public function assertStatus(int $expected): self
     {
-        $this->session()->assert()->statusCodeEquals($expected);
+        Assert::that($this->session()->getStatusCode())
+            ->is($expected, 'Current response status code is {actual}, but {expected} expected.')
+        ;
 
         return $this;
     }

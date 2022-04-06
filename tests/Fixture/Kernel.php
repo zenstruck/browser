@@ -104,7 +104,7 @@ final class Kernel extends BaseKernel
 
     public function exception(): void
     {
-        throw new \Exception('exception thrown');
+        throw new CustomException('exception thrown');
     }
 
     public function redirect1(): RedirectResponse
