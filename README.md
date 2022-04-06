@@ -74,14 +74,16 @@ This extension provides the following features:
 
 There are several environment variables available to configure:
 
-| Variable                  | Description                                                         | Default                                   |
-|---------------------------|---------------------------------------------------------------------|-------------------------------------------|
-| `BROWSER_SOURCE_DIR`      | Directory to save source files to.                                  | `<project-root>/var/browser/source`       |
-| `BROWSER_SCREENSHOT_DIR`  | Directory to save screenshots to.                                   | `<project-root>/var/browser/screenshots`  |
-| `BROWSER_CONSOLE_LOG_DIR` | Directory to save javascript console logs to.                       | `<project-root>/var/browser/console-logs` |
-| `KERNEL_BROWSER_CLASS`    | `KernelBrowser` class to use.                                       | `Zenstruck\Browser\KernelBrowser`         |
-| `PANTHER_BROWSER_CLASS`   | `PantherBrowser` class to use.                                      | `Zenstruck\Browser\PantherBrowser`        |
-| `PANTHER_NO_HEADLESS`     | Disable headless-mode and allow usage of `PantherBrowser::pause()`. | `0`                                       |
+| Variable                   | Description                                                                      | Default                            |
+|----------------------------|----------------------------------------------------------------------------------|------------------------------------|
+| `BROWSER_SOURCE_DIR`       | Directory to save source files to.                                               | `./var/browser/source`             |
+| `BROWSER_SCREENSHOT_DIR`   | Directory to save screenshots to (only applies to `PantherBrowser`).             | `./var/browser/screenshots`        |
+| `BROWSER_CONSOLE_LOG_DIR`  | Directory to save javascript console logs to (only applies to `PantherBrowser`). | `./var/browser/console-logs`       |
+| `BROWSER_FOLLOW_REDIRECTS` | Whether to follow redirects by default (only applies to `KernelBrowser`).        | `1` _(true)_                       |
+| `BROWSER_CATCH_EXCEPTIONS` | Whether to catch exceptions by default (only applies to `KernelBrowser`).        | `1` _(true)_                       |
+| `KERNEL_BROWSER_CLASS`     | `KernelBrowser` class to use.                                                    | `Zenstruck\Browser\KernelBrowser`  |
+| `PANTHER_BROWSER_CLASS`    | `PantherBrowser` class to use.                                                   | `Zenstruck\Browser\PantherBrowser` |
+| `PANTHER_NO_HEADLESS`      | Disable headless-mode and allow usage of `PantherBrowser::pause()`.              | `0` _(false)_                      |
 
 
 ## Usage
@@ -245,10 +247,35 @@ $browser
     ->assertXml()
     ->assertHtml()
 
+    // authenticate a user for subsequent actions
+    ->actingAs($user) // \Symfony\Component\Security\Core\User\UserInterface
+
+    // If using zenstruck/foundry, you can pass a factory/proxy
+    ->actingAs(UserFactory::new())
+
+    // by default, exceptions are caught and converted to a response
+    // use the BROWSER_CATCH_EXCEPTIONS environment variable to change default
+    // this disables that behaviour allowing you to use TestCase::expectException()
+    ->throwExceptions()
+
+    // enable catching exceptions
+    ->catchExceptions()
+
+    // by default, the kernel is rebooted between requests
+    // this disables this behaviour
+    ->disableReboot()
+
+    // re-enable rebooting between requests if previously disabled
+    ->enableReboot()
+
+    // enable the profiler for the next request (if not globally enabled)
+    ->withProfiling()
+
     // by default, redirects are followed, this disables that behaviour
+    // use the BROWSER_FOLLOW_REDIRECTS environment variable to change default
     ->interceptRedirects()
 
-    // re-enable following redirects by default
+    // enable following redirects
     // if currently on a redirect response, follows
     ->followRedirects()
 
@@ -364,40 +391,6 @@ $json = $browser
     ->use(function(\Zenstruck\Browser\Json $json) {
         $json->assertMatches('foo.bar.baz', 1);
     })
-;
-```
-
-### KernelBrowser
-
-This browser has the following extra methods:
-
-```php
-/** @var \Zenstruck\Browser\KernelBrowser $browser **/
-/** @var \Symfony\Component\Security\Core\User\UserInterface $user **/
-
-$browser
-    // authenticate a user for subsequent actions
-    ->actingAs($user)
-
-    // If using zenstruck/foundry, you can pass a factory/proxy
-    ->actingAs(UserFactory::new())
-
-    // by default, exceptions are caught and converted to a response
-    // this disables that behaviour allowing you to use TestCase::expectException()
-    ->throwExceptions()
-
-    // re-enable catching exceptions
-    ->catchExceptions()
-
-    // by default, the kernel is rebooted between requests
-    // this disables this behaviour
-    ->disableReboot()
-
-    // re-enable rebooting between requests if previously disabled
-    ->enableReboot()
-
-    // enable the profiler for the next request (if not globally enabled)
-    ->withProfiling()
 ;
 ```
 

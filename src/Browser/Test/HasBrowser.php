@@ -85,6 +85,8 @@ trait HasBrowser
 
         $browserOptions = [
             'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
+            'follow_redirects' => (bool) ($_SERVER['BROWSER_FOLLOW_REDIRECTS'] ?? true),
+            'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
         ];
 
         if ($this instanceof WebTestCase) {

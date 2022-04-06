@@ -13,7 +13,6 @@ namespace Zenstruck\Browser\Session\Driver;
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\BrowserKit\Response;
@@ -50,13 +49,6 @@ final class BrowserKitDriver extends Driver
     /** @var mixed */
     private $expectedException;
     private ?string $expectedExceptionMessage = null;
-
-    public function __construct(AbstractBrowser $client)
-    {
-        $client->followRedirects(true);
-
-        parent::__construct($client);
-    }
 
     public function expectException($expectedException, ?string $expectedMessage = null): void
     {
