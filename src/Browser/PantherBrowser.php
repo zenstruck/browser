@@ -136,7 +136,7 @@ class PantherBrowser extends Browser
     /**
      * @return static
      */
-    final public function inspect(): self
+    final public function pause(): self
     {
         if (!($_SERVER['PANTHER_NO_HEADLESS'] ?? false)) {
             throw new \RuntimeException('The "PANTHER_NO_HEADLESS" env variable must be set to inspect.');
