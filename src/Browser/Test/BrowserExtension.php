@@ -82,15 +82,15 @@ final class BrowserExtension implements BeforeFirstTestHook, BeforeTestHook, Aft
 
     public function executeAfterTestError(string $test, string $message, float $time): void
     {
-        self::dumpBrowsers($test, 'error');
+        self::saveBrowserStates($test, 'error');
     }
 
     public function executeAfterTestFailure(string $test, string $message, float $time): void
     {
-        self::dumpBrowsers($test, 'failure');
+        self::saveBrowserStates($test, 'failure');
     }
 
-    private static function dumpBrowsers(string $test, string $type): void
+    private static function saveBrowserStates(string $test, string $type): void
     {
         if (empty(self::$registeredBrowsers)) {
             return;
@@ -100,7 +100,7 @@ final class BrowserExtension implements BeforeFirstTestHook, BeforeTestHook, Aft
 
         foreach (self::$registeredBrowsers as $i => $browser) {
             try {
-                $browser->dumpCurrentState("{$filename}__{$i}");
+                $browser->saveCurrentState("{$filename}__{$i}");
             } catch (\Throwable $e) {
                 // noop - swallow exceptions related to dumping the current state so as to not
                 // lose the actual error/failure.

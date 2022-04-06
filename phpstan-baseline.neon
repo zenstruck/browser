@@ -56,46 +56,6 @@ parameters:
 			path: src/Browser/Assertion/SameUrlAssertion.php
 
 		-
-			message: "#^Method Zenstruck\\\\Browser\\\\BrowserKitBrowser\\:\\:delete\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/BrowserKitBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\BrowserKitBrowser\\:\\:get\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/BrowserKitBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\BrowserKitBrowser\\:\\:patch\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/BrowserKitBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\BrowserKitBrowser\\:\\:post\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/BrowserKitBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\BrowserKitBrowser\\:\\:put\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/BrowserKitBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\BrowserKitBrowser\\:\\:request\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/BrowserKitBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\BrowserKitBrowser\\:\\:setDefaultHttpOptions\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/BrowserKitBrowser.php
-
-		-
-			message: "#^Parameter \\#1 \\$token of method Symfony\\\\Component\\\\HttpKernel\\\\Profiler\\\\Profiler\\:\\:loadProfile\\(\\) expects string, array\\|string given\\.$#"
-			count: 1
-			path: src/Browser/HttpBrowser.php
-
-		-
 			message: "#^Cannot access offset 'query' on array\\{scheme\\?\\: string, host\\?\\: string, port\\?\\: int, user\\?\\: string, pass\\?\\: string, path\\?\\: string, query\\?\\: string, fragment\\?\\: string\\}\\|false\\.$#"
 			count: 2
 			path: src/Browser/HttpOptions.php
@@ -171,47 +131,87 @@ parameters:
 			path: src/Browser/HttpOptions.php
 
 		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\BrowserKitDriver\\:\\:getFormField\\(\\) should return Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField but returns array\\<Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\>\\|Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\.$#"
+			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:delete\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
 			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
+			path: src/Browser/KernelBrowser.php
 
 		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\BrowserKitDriver\\:\\:getValue\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:get\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
 			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
+			path: src/Browser/KernelBrowser.php
 
 		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\BrowserKitDriver\\:\\:setValue\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:patch\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
 			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
+			path: src/Browser/KernelBrowser.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:post\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/KernelBrowser.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:put\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/KernelBrowser.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:request\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/KernelBrowser.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:setDefaultHttpOptions\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/KernelBrowser.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:getFormField\\(\\) should return Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField but returns array\\<Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\>\\|Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:getFormNode\\(\\) should return DOMElement but returns DOMNode\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:getValue\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:setValue\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
 
 		-
 			message: "#^Parameter \\#1 \\$path of function dirname expects string, string\\|false\\|null given\\.$#"
 			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
 
 		-
 			message: "#^Parameter \\#1 \\$value of method Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\:\\:setValue\\(\\) expects string\\|null, array\\|bool\\|string given\\.$#"
 			count: 1
-			path: src/Browser/Mink/BrowserKitDriver.php
+			path: src/Browser/Session/Driver/BrowserKitDriver.php
 
 		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\PantherDriver\\:\\:getValue\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\PantherDriver\\:\\:getValue\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
-			path: src/Browser/Mink/PantherDriver.php
+			path: src/Browser/Session/Driver/PantherDriver.php
 
 		-
-			message: "#^Method Zenstruck\\\\Browser\\\\Mink\\\\PantherDriver\\:\\:setValue\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\PantherDriver\\:\\:setValue\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
 			count: 1
-			path: src/Browser/Mink/PantherDriver.php
+			path: src/Browser/Session/Driver/PantherDriver.php
 
 		-
 			message: "#^Parameter \\#1 \\$value of method Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\:\\:setValue\\(\\) expects string\\|null, array\\|bool\\|string given\\.$#"
 			count: 1
-			path: src/Browser/Mink/PantherDriver.php
+			path: src/Browser/Session/Driver/PantherDriver.php
 
 		-
 			message: "#^Parameter \\#3 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, array\\|bool\\|string given\\.$#"
 			count: 1
-			path: src/Browser/Mink/PantherDriver.php
+			path: src/Browser/Session/Driver/PantherDriver.php
 

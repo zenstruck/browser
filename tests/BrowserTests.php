@@ -2,14 +2,13 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Response;
-use Zenstruck\Browser\Response\HtmlResponse;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
@@ -135,22 +134,6 @@ trait BrowserTests
     /**
      * @test
      */
-    public function can_use_response(): void
-    {
-        $this->browser()
-            ->visit('/page1')
-            ->use(function(Response $response) {
-                $this->assertStringContainsString('<h1>h1 title</h1>', $response->body());
-            })
-            ->use(function(HtmlResponse $response) {
-                $this->assertCount(2, $response->crawler()->filter('ul li'));
-            })
-        ;
-    }
-
-    /**
-     * @test
-     */
     public function can_use_crawler(): void
     {
         $this->browser()
@@ -182,7 +165,7 @@ trait BrowserTests
         $browser = $this->browser();
 
         $browser
-            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2, Crawler $crawler) use ($browser) {
+            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2, Crawler $crawler, AbstractBrowser $inner) use ($browser) {
                 $this->assertInstanceOf(Browser::class, $browser1);
                 $this->assertInstanceOf(Browser::class, $browser2);
                 $this->assertInstanceOf(\get_class($browser), $browser1);
@@ -342,9 +325,6 @@ trait BrowserTests
     public function link_action(): void
     {
         $this->browser()
-            ->visit('/page1')
-            ->follow('a link')
-            ->assertOn('/page2')
             ->visit('/page1')
             ->click('a link')
             ->assertOn('/page2')
@@ -614,8 +594,6 @@ trait BrowserTests
     {
         $crawler = $this->browser()
             ->visit('/page1')
-            ->response()
-            ->assertHtml()
             ->crawler()
             ->filter('ul li')
         ;

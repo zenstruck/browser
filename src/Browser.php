@@ -2,50 +2,41 @@
 
 namespace Zenstruck;
 
-use Behat\Mink\Driver\DriverInterface;
-use Behat\Mink\Element\DocumentElement;
-use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\ExpectationException;
-use Behat\Mink\Mink;
-use Behat\Mink\Session;
-use Behat\Mink\WebAssert;
+use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
-use Zenstruck\Browser\Assertion\MinkAssertion;
 use Zenstruck\Browser\Assertion\SameUrlAssertion;
 use Zenstruck\Browser\Component;
-use Zenstruck\Browser\Response;
+use Zenstruck\Browser\Session;
+use Zenstruck\Browser\Session\Driver;
 use Zenstruck\Callback\Parameter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class Browser
+abstract class Browser
 {
-    private const SESSION = 'app';
-
-    private Mink $mink;
-    private ?string $sourceDir = null;
+    private Session $session;
+    private ?string $sourceDir;
 
     /** @var string[] */
     private array $savedSources = [];
 
     /**
      * @internal
+     *
+     * @param array<string,mixed> $options
      */
-    public function __construct(DriverInterface $driver)
+    public function __construct(Driver $driver, array $options = [])
     {
-        $this->mink = new Mink([self::SESSION => new Session($driver)]);
+        $this->session = new Session($driver);
+        $this->sourceDir = $options['source_dir'] ?? null;
     }
 
-    /**
-     * @return static
-     */
-    final public function setSourceDir(string $dir): self
+    final public function client(): AbstractBrowser
     {
-        $this->sourceDir = $dir;
-
-        return $this;
+        return $this->session->client();
     }
 
     /**
@@ -53,7 +44,7 @@ class Browser
      */
     final public function visit(string $uri): self
     {
-        $this->minkSession()->visit($uri);
+        $this->session()->visit($uri);
 
         return $this;
     }
@@ -65,7 +56,7 @@ class Browser
      */
     final public function assertOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        Assert::run(new SameUrlAssertion($this->minkSession()->getCurrentUrl(), $expected, $parts));
+        Assert::run(new SameUrlAssertion($this->session()->getCurrentUrl(), $expected, $parts));
 
         return $this;
     }
@@ -77,7 +68,7 @@ class Browser
      */
     final public function assertNotOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        Assert::not(new SameUrlAssertion($this->minkSession()->getCurrentUrl(), $expected, $parts));
+        Assert::not(new SameUrlAssertion($this->session()->getCurrentUrl(), $expected, $parts));
 
         return $this;
     }
@@ -87,9 +78,9 @@ class Browser
      */
     final public function assertContains(string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseContains($expected)
-        );
+        $this->session()->assert()->responseContains($expected);
+
+        return $this;
     }
 
     /**
@@ -97,19 +88,22 @@ class Browser
      */
     final public function assertNotContains(string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->responseNotContains($expected)
-        );
+        $this->session()->assert()->responseNotContains($expected);
+
+        return $this;
+    }
+
+    final public function crawler(): Crawler
+    {
+        return $this->client()->getCrawler();
     }
 
     /**
      * @return static
      */
-    final public function use(callable $callback): self
+    final public function assertSee(string $expected): self
     {
-        Callback::createFor($callback)->invokeAll(
-            Parameter::union(...$this->useParameters())
-        );
+        $this->session()->assert()->pageTextContains($expected);
 
         return $this;
     }
@@ -117,13 +111,9 @@ class Browser
     /**
      * @return static
      */
-    final public function saveSource(string $filename): self
+    final public function assertNotSee(string $expected): self
     {
-        if ($this->sourceDir) {
-            $filename = \sprintf('%s/%s', \rtrim($this->sourceDir, '/'), \ltrim($filename, '/'));
-        }
-
-        (new Filesystem())->dumpFile($this->savedSources[] = $filename, $this->response()->raw());
+        $this->session()->assert()->pageTextNotContains($expected);
 
         return $this;
     }
@@ -131,25 +121,69 @@ class Browser
     /**
      * @return static
      */
-    final public function dump(?string $selector = null): self
+    final public function assertSeeIn(string $selector, string $expected): self
     {
-        $this->response()->dump($selector);
+        $this->session()->assert()->elementTextContains('css', $selector, $expected);
 
         return $this;
-    }
-
-    final public function dd(?string $selector = null): void
-    {
-        $this->dump($selector);
-        $this->die();
     }
 
     /**
      * @return static
      */
-    public function follow(string $link): self
+    final public function assertNotSeeIn(string $selector, string $expected): self
     {
-        $this->documentElement()->clickLink($link);
+        $this->session()->assert()->elementTextNotContains('css', $selector, $expected);
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertSeeElement(string $selector): self
+    {
+        $this->session()->assert()->elementExists('css', $selector);
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertNotSeeElement(string $selector): self
+    {
+        $this->session()->assert()->elementNotExists('css', $selector);
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertElementCount(string $selector, int $count): self
+    {
+        $this->session()->assert()->elementsCount('css', $selector, $count);
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertElementAttributeContains(string $selector, string $attribute, string $expected): self
+    {
+        $this->session()->assert()->elementAttributeContains('css', $selector, $attribute, $expected);
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertElementAttributeNotContains(string $selector, string $attribute, string $expected): self
+    {
+        $this->session()->assert()->elementAttributeNotContains('css', $selector, $attribute, $expected);
 
         return $this;
     }
@@ -159,7 +193,7 @@ class Browser
      */
     final public function fillField(string $selector, string $value): self
     {
-        $this->documentElement()->fillField($selector, $value);
+        $this->session()->page()->fillField($selector, $value);
 
         return $this;
     }
@@ -169,15 +203,15 @@ class Browser
      */
     final public function checkField(string $selector): self
     {
-        $field = $this->documentElement()->findField($selector);
+        $field = $this->session()->page()->findField($selector);
 
         if ($field && 'radio' === \mb_strtolower((string) $field->getAttribute('type'))) {
-            $this->documentElement()->selectFieldOption($selector, (string) $field->getAttribute('value'));
+            $this->session()->page()->selectFieldOption($selector, (string) $field->getAttribute('value'));
 
             return $this;
         }
 
-        $this->documentElement()->checkField($selector);
+        $this->session()->page()->checkField($selector);
 
         return $this;
     }
@@ -187,7 +221,7 @@ class Browser
      */
     final public function uncheckField(string $selector): self
     {
-        $this->documentElement()->uncheckField($selector);
+        $this->session()->page()->uncheckField($selector);
 
         return $this;
     }
@@ -219,7 +253,7 @@ class Browser
      */
     final public function selectFieldOption(string $selector, string $value): self
     {
-        $this->documentElement()->selectFieldOption($selector, $value);
+        $this->session()->page()->selectFieldOption($selector, $value);
 
         return $this;
     }
@@ -230,7 +264,7 @@ class Browser
     final public function selectFieldOptions(string $selector, array $values): self
     {
         foreach ($values as $value) {
-            $this->documentElement()->selectFieldOption($selector, $value, true);
+            $this->session()->page()->selectFieldOption($selector, $value, true);
         }
 
         return $this;
@@ -250,7 +284,7 @@ class Browser
             }
         }
 
-        $this->documentElement()->attachFileToField($selector, $filename);
+        $this->session()->page()->attachFileToField($selector, $filename);
 
         return $this;
     }
@@ -262,20 +296,34 @@ class Browser
      */
     final public function click(string $selector): self
     {
-        try {
-            $this->documentElement()->pressButton($selector);
-        } catch (ElementNotFoundException $e) {
-            // try link
-            try {
-                $this->documentElement()->clickLink($selector);
-            } catch (ElementNotFoundException $e) {
-                if (!$element = $this->documentElement()->find('css', $selector)) {
-                    throw $e;
-                }
+        // try button
+        $element = $this->session()->page()->findButton($selector);
 
-                $element->click();
+        if (!$element) {
+            // try link
+            $element = $this->session()->page()->findLink($selector);
+        }
+
+        if (!$element) {
+            // try by css
+            $element = $this->session()->page()->find('css', $selector);
+        }
+
+        if (!$element) {
+            Assert::fail('Clickable element "%s" not found.', [$selector]);
+        }
+
+        if (!$element->isVisible()) {
+            Assert::fail('Clickable element "%s" is not visible.', [$selector]);
+        }
+
+        if ($button = $this->session()->page()->findButton($selector)) {
+            if (!$button->isVisible()) {
+                Assert::fail('Button "%s" is not visible.', [$selector]);
             }
         }
+
+        $element->click();
 
         return $this;
     }
@@ -283,81 +331,11 @@ class Browser
     /**
      * @return static
      */
-    final public function assertSee(string $expected): self
-    {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->pageTextContains($expected)
-        );
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertNotSee(string $expected): self
-    {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->pageTextNotContains($expected)
-        );
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertSeeIn(string $selector, string $expected): self
-    {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementTextContains('css', $selector, $expected)
-        );
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertNotSeeIn(string $selector, string $expected): self
-    {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementTextNotContains('css', $selector, $expected)
-        );
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertSeeElement(string $selector): self
-    {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementExists('css', $selector)
-        );
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertNotSeeElement(string $selector): self
-    {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementNotExists('css', $selector)
-        );
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertElementCount(string $selector, int $count): self
-    {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementsCount('css', $selector, $count)
-        );
-    }
-
-    /**
-     * @return static
-     */
     final public function assertFieldEquals(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->fieldValueEquals($selector, $expected)
-        );
+        $this->session()->assert()->fieldValueEquals($selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -365,9 +343,9 @@ class Browser
      */
     final public function assertFieldNotEquals(string $selector, string $expected): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->fieldValueNotEquals($selector, $expected)
-        );
+        $this->session()->assert()->fieldValueNotEquals($selector, $expected);
+
+        return $this;
     }
 
     /**
@@ -375,11 +353,7 @@ class Browser
      */
     final public function assertSelected(string $selector, string $expected): self
     {
-        try {
-            $field = $this->webAssert()->fieldExists($selector);
-        } catch (ExpectationException $e) {
-            Assert::fail($e->getMessage());
-        }
+        $field = $this->session()->assert()->fieldExists($selector);
 
         Assert::that((array) $field->getValue())->contains($expected);
 
@@ -391,11 +365,7 @@ class Browser
      */
     final public function assertNotSelected(string $selector, string $expected): self
     {
-        try {
-            $field = $this->webAssert()->fieldExists($selector);
-        } catch (ExpectationException $e) {
-            Assert::fail($e->getMessage());
-        }
+        $field = $this->session()->assert()->fieldExists($selector);
 
         Assert::that((array) $field->getValue())->doesNotContain($expected);
 
@@ -407,9 +377,9 @@ class Browser
      */
     final public function assertChecked(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->checkboxChecked($selector)
-        );
+        $this->session()->assert()->checkboxChecked($selector);
+
+        return $this;
     }
 
     /**
@@ -417,35 +387,53 @@ class Browser
      */
     final public function assertNotChecked(string $selector): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->checkboxNotChecked($selector)
-        );
+        $this->session()->assert()->checkboxNotChecked($selector);
+
+        return $this;
     }
 
     /**
      * @return static
      */
-    final public function assertElementAttributeContains(string $selector, string $attribute, string $expected): self
+    final public function use(callable $callback): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementAttributeContains('css', $selector, $attribute, $expected)
+        Callback::createFor($callback)->invokeAll(
+            Parameter::union(...$this->useParameters())
         );
+
+        return $this;
     }
 
     /**
      * @return static
      */
-    final public function assertElementAttributeNotContains(string $selector, string $attribute, string $expected): self
+    final public function saveSource(string $filename): self
     {
-        return $this->wrapMinkExpectation(
-            fn() => $this->webAssert()->elementAttributeNotContains('css', $selector, $attribute, $expected)
-        );
+        if ($this->sourceDir) {
+            $filename = \sprintf('%s/%s', \rtrim($this->sourceDir, '/'), \ltrim($filename, '/'));
+        }
+
+        (new Filesystem())->dumpFile($this->savedSources[] = $filename, $this->session()->source());
+
+        return $this;
     }
 
     /**
-     * @internal
+     * @return static
      */
-    public function dumpCurrentState(string $filename): void
+    final public function dump(?string $selector = null): self
+    {
+        $this->session()->dump($selector);
+
+        return $this;
+    }
+
+    final public function dd(?string $selector = null): void
+    {
+        $this->dump($selector)->session()->exit();
+    }
+
+    public function saveCurrentState(string $filename): void
     {
         $this->saveSource("{$filename}.txt");
     }
@@ -460,53 +448,12 @@ class Browser
         return ['Saved Source Files' => $this->savedSources];
     }
 
-    public function response(): Response
-    {
-        return Response::createFor($this->minkSession());
-    }
-
     /**
      * @internal
      */
-    final protected function minkSession(): Session
+    final protected function session(): Session
     {
-        return $this->mink->getSession(self::SESSION);
-    }
-
-    /**
-     * @internal
-     */
-    final protected function webAssert(): WebAssert
-    {
-        return $this->mink->assertSession(self::SESSION);
-    }
-
-    /**
-     * @internal
-     */
-    final protected function documentElement(): DocumentElement
-    {
-        return $this->minkSession()->getPage();
-    }
-
-    /**
-     * @internal
-     *
-     * @return static
-     */
-    final protected function wrapMinkExpectation(callable $callback): self
-    {
-        Assert::run(new MinkAssertion($callback));
-
-        return $this;
-    }
-
-    /**
-     * @internal
-     */
-    protected function die(): void
-    {
-        exit(1);
+        return $this->session;
     }
 
     /**
@@ -520,8 +467,9 @@ class Browser
             Parameter::untyped($this),
             Parameter::typed(self::class, $this),
             Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
-            Parameter::typed(Response::class, Parameter::factory(fn() => $this->response())),
-            Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->response()->assertDom()->crawler())),
+            Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->client()->getCrawler())),
+            Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->client()->getCookieJar())),
+            Parameter::typed(AbstractBrowser::class, Parameter::factory(fn() => $this->client())),
         ];
     }
 }

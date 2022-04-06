@@ -80,9 +80,7 @@ There are several environment variables available to configure:
 | `BROWSER_SCREENSHOT_DIR`  | Directory to save screenshots to.                                     | `<project-root>/var/browser/screenshots`  |
 | `BROWSER_CONSOLE_LOG_DIR` | Directory to save javascript console logs to.                         | `<project-root>/var/browser/console-logs` |
 | `KERNEL_BROWSER_CLASS`    | `KernelBrowser` class to use.                                         | `Zenstruck\Browser\KernelBrowser`         |
-| `HTTP_BROWSER_CLASS`      | `HttpBrowser` class to use.                                           | `Zenstruck\Browser\HttpBrowser`           |
 | `PANTHER_BROWSER_CLASS`   | `PantherBrowser` class to use.                                        | `Zenstruck\Browser\PantherBrowser`        |
-| `HTTP_BROWSER_URI`        | The URI to use for `HttpBrowser` (if not using `PantherTestCase`).    | `null`                                    |
 | `PANTHER_NO_HEADLESS`     | Disable headless-mode and allow usage of `PantherBrowser::inspect()`. | `0`                                       |
 
 
@@ -91,7 +89,6 @@ There are several environment variables available to configure:
 This library provides 3 different "browsers":
 
 1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel *(this is the fastest browser)*.
-2. [HttpBrowser](#httpbrowser): makes requests to a webserver using `symfony/http-client`.
 3. [PantherBrowser](#pantherbrowser): makes requests to a webserver with a real browser using `symfony/panther` which
    allows testing javascript *(this is the slowest browser)*.
 
@@ -129,30 +126,18 @@ class MyTest extends TestCase
             ->assertSeeIn('h1', 'Page Title')
         ;
     }
-
-    /**
-     * Requires this test extends Symfony\Component\Panther\PantherTestCase or
-     * have the "HTTP_BROWSER_URI" env var set to the root uri to test against.
-     */
-    public function test_using_http_browser(): void
-    {
-        $this->httpBrowser()
-            ->visit('/my/page')
-            ->assertSeeIn('h1', 'Page Title')
-        ;
-    }
 }
 ```
 
 All browsers have the following methods:
 
 ```php
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser|\Zenstruck\Browser\PantherBrowser $browser **/
+/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\PantherBrowser $browser **/
 
 $browser
     // ACTIONS
     ->visit('/my/page')
-    ->follow('A link')
+    ->click('A link')
     ->fillField('Name', 'Kevin')
     ->checkField('Accept Terms')
     ->uncheckField('Accept Terms')
@@ -208,6 +193,10 @@ $browser
         // access the current Browser instance
     })
 
+    ->use(function(\Symfony\Component\BrowserKit\AbstractBrowser $browser)) {
+        // access the "inner" browser
+    })
+
     ->use(function(\Symfony\Component\BrowserKit\CookieJar $cookieJar)) {
         // access the cookie jar
         $cookieJar->expire('MOCKSESSID');
@@ -234,42 +223,14 @@ $browser
     ->dd('foo') // if json response, array key
     ->dd('foo.*.baz') // if json response, JMESPath notation can be used
 ;
-
-// "response" object
-$response = $browser->response();
-$response->statusCode(); // ie 200
-$response->body(); // the raw body
-
-// html response
-$response->assertHtml()->crawler(); // Symfony\Component\DomCrawler\Crawler
-
-// xml response (not available with PantherBrowser)
-$response->assertXml()->crawler(); // Symfony\Component\DomCrawler\Crawler
-
-// json response (not available with PantherBrowser)
-$response->assertJson()->json(); // response content json decoded
-$response->assertJson()->search('some.selector'); // search the json using JMESPath expression
-
-// use the response without breaking the fluid browser session
-$browser
-    ->visit('/some/page')
-    ->use(function(\Zenstruck\Browser\Response $response) {
-        $response->statusCode(); // ie 200
-        $response->assertJson()->json(); // response content json decoded
-    })
-    ->use(function(\Zenstruck\Browser\Response\JsonResponse $response) {
-        // inject the expected response type
-        $response->json(); // response content json decoded
-    })
-;
 ```
 
-### KernelBrowser/HttpBrowser
+### KernelBrowser
 
 These browsers have the following methods:
 
 ```php
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
 $browser
     // response assertions
@@ -278,6 +239,11 @@ $browser
     ->assertRedirected() // 3xx status code
     ->assertHeaderEquals('Content-Type', 'text/html; charset=UTF-8')
     ->assertHeaderContains('Content-Type', 'html')
+
+    // helpers for quickly checking the content type
+    ->assertJson()
+    ->assertXml()
+    ->assertHtml()
 
     // by default, redirects are followed, this disables that behaviour
     ->interceptRedirects()
@@ -297,8 +263,7 @@ $browser
 
 // Access the Symfony Profiler for the last request
 $queryCount = $browser
-    // HttpBrowser requires profiling have collect globally enabled.
-    // If not globally enabled and using KernelBrowser, ->withProfiling()
+    // If profiling not not globally enabled for tests, ->withProfiling()
     // must be called before the request.
     ->profile()->getCollector('db')->getQueryCount()
 ;
@@ -314,7 +279,7 @@ $browser->use(function(\Symfony\Component\HttpKernel\DataCollector\RequestDataCo
 ```php
 use Zenstruck\Browser\HttpOptions;
 
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
 $browser
     // http methods
@@ -363,14 +328,35 @@ $browser
 Make assertions about json responses using [JMESPath expressions](https://jmespath.org/)
 See the [JMESPath Tutorials](https://jmespath.org/tutorial.html) to learn more.
 
+**NOTE:** `mtdowling/jmespath.php` is required: `composer require mtdowling/jmespath.php`.
+
 ```php
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
 $browser
     ->get('/api/endpoint')
     ->assertJson() // ensures the content-type is application/json
     ->assertJsonMatches('foo.bar.baz', 1) // automatically calls ->assertJson()
     ->assertJsonMatches('foo.*.baz', [1, 2, 3])
     ->assertJsonMatches('length(foo)', 3)
+;
+
+// access the json "crawler"
+$json = $browser
+    ->get('/api/endpoint')
+    ->json()
+;
+
+$json->assertMatches('foo.bar.baz', 1);
+$json->search('foo.bar.baz'); // mixed (the found value at "JMESPath expression")
+$json->decoded(); // the decoded json
+(string) $json; // the json string pretty-printed
+
+// "use" the json crawler
+$json = $browser
+    ->get('/api/endpoint')
+    ->use(function(\Zenstruck\Browser\Json $json) {
+        $json->assertMatches('foo.bar.baz', 1);
+    })
 ;
 ```
 
@@ -384,8 +370,10 @@ This browser has the following extra methods:
 
 $browser
     // authenticate a user for subsequent actions
-    // NOTE: only available in Symfony 5.1+
     ->actingAs($user)
+
+    // If using zenstruck/foundry, you can pass a factory/proxy
+    ->actingAs(UserFactory::new())
 
     // by default, exceptions are caught and converted to a response
     // this disables that behaviour allowing you to use TestCase::expectException()
@@ -406,10 +394,6 @@ $browser
 ;
 ```
 
-### HttpBrowser
-
-This browser has no extra methods.
-
 ### PantherBrowser
 
 *The `PantherBrowser` is experimental in 1.0 and may be subject to BC Breaks.*
@@ -423,7 +407,7 @@ $browser
     // pauses the tests and enters "interactive mode" which
     // allows you to investigate the current state in the browser
     // (requires the env variable PANTHER_NO_HEADLESS=1)
-    ->inspect()
+    ->pause()
 
     // take a screenshot of the current browser state
     // by default, saves to "<project-root>/var/browser/screenshots"
@@ -627,7 +611,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
 
 1. Use `->setDefaultHttpOptions()` for the current browser:
    ```php
-   /** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+   /** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
    $browser
        ->setDefaultHttpOptions(['headers' => ['X-Token' => 'my-token']])
@@ -696,7 +680,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
    ```php
    use Zenstruck\Browser\HttpOptions;
 
-   /** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\HttpBrowser $browser **/
+   /** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
    $browser
        // instead of
@@ -732,7 +716,6 @@ class AppBrowser extends KernelBrowser
 Then, depending on the implementation you extended from, set the appropriate env variable:
 
 * `KernelBrowser`: `KERNEL_BROWSER_CLASS`
-* `HttpBrowser`: `HTTP_BROWSER_CLASS`
 * `PantherBrowser`: `PANTHER_BROWSER_CLASS`
 
 For the example above, you would set `KERNEL_BROWSER_CLASS=App\Tests\AppBrowser`.
@@ -766,19 +749,62 @@ There are several packaged extensions. These are traits that can be added to a
 
 See https://github.com/zenstruck/mailer-test#zenstruckbrowser-integration.
 
-#### Authentication Extension
+#### Custom Extension
 
-This extension is more of an example. Each Symfony application handles authentication
-differently but this is a good starting point. You can either override the methods
-provided by the extension or write your own.
+You can create your own extensions for repetitive tasks. The example below is for
+an `AuthenticationExtension` to login/logout users and make assertions about
+a users authenticated status:
+
+```php
+namespace App\Tests\Browser;
+
+trait AuthenticationExtension
+{
+    public function loginAs(string $username, string $password): self
+    {
+        return $this
+            ->visit('/login')
+            ->fillField('email', $username)
+            ->fillField('password', $password)
+            ->click('Login')
+        ;
+    }
+
+    public function logout(): self
+    {
+        return $this->visit('/logout');
+    }
+
+    public function assertLoggedIn(): self
+    {
+        $this->assertSee('Logout');
+
+        return $this;
+    }
+
+    public function assertLoggedInAs(string $user): self
+    {
+        $this->assertSee($user);
+
+        return $this;
+    }
+
+    public function assertNotLoggedIn(): self
+    {
+        $this->assertSee('Login');
+
+        return $this;
+    }
+}
+```
 
 Add to your [Custom Browser](#custom-browser):
 
 ```php
 namespace App\Tests;
 
+use App\Tests\Browser\AuthenticationExtension;
 use Zenstruck\Browser\KernelBrowser;
-use Zenstruck\Browser\Extension\Authentication;
 
 class AppBrowser extends KernelBrowser
 {

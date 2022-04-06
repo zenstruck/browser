@@ -3,7 +3,8 @@
 namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
-use Symfony\Component\Panther\PantherTestCase;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Panther\PantherTestCaseTrait;
 use Zenstruck\Browser\PantherBrowser;
 
 /**
@@ -11,9 +12,9 @@ use Zenstruck\Browser\PantherBrowser;
  *
  * @group panther
  */
-final class PantherBrowserTest extends PantherTestCase
+final class PantherBrowserTest extends TestCase
 {
-    use BrowserTests;
+    use BrowserTests, PantherTestCaseTrait;
 
     /**
      * @test
@@ -179,11 +180,11 @@ final class PantherBrowserTest extends PantherTestCase
     public function cannot_follow_invisible_link(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectErrorMessage('Link "invisible link" is not visible.');
+        $this->expectErrorMessage('Clickable element "invisible link" is not visible.');
 
         $this->browser()
             ->visit('/javascript')
-            ->follow('invisible link')
+            ->click('invisible link')
         ;
     }
 

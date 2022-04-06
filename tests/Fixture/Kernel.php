@@ -84,7 +84,7 @@ final class Kernel extends BaseKernel
             'files' => $request->files->all(),
             'server' => $request->server->all(),
             'request' => $request->request->all(),
-            'content' => $request->getContent(),
+            'content' => \json_decode($request->getContent(), true),
             'ajax' => $request->isXmlHttpRequest(),
         ]);
     }

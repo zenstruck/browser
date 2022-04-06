@@ -2,26 +2,25 @@
 
 namespace Zenstruck\Browser;
 
-use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
-use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\Panther\DomCrawler\Crawler;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Mink\PantherDriver;
-use Zenstruck\Browser\Response\PantherResponse;
-use Zenstruck\Callback\Parameter;
+use Zenstruck\Browser\Session\Driver\PantherDriver;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @experimental in 1.0
+ *
+ * @method Client  client()
+ * @method Crawler crawler()
  */
 class PantherBrowser extends Browser
 {
-    private Client $client;
-    private ?string $screenshotDir = null;
-    private ?string $consoleLogDir = null;
+    private ?string $screenshotDir;
+    private ?string $consoleLogDir;
 
     /** @var string[] */
     private array $savedScreenshots = [];
@@ -29,46 +28,15 @@ class PantherBrowser extends Browser
     /** @var string[] */
     private array $savedConsoleLogs = [];
 
-    final public function __construct(Client $client)
-    {
-        parent::__construct(new PantherDriver($this->client = $client));
-    }
-
-    final public function client(): Client
-    {
-        return $this->client;
-    }
-
-    final public function setScreenshotDir(string $dir): self
-    {
-        $this->screenshotDir = $dir;
-
-        return $this;
-    }
-
-    final public function setConsoleLogDir(string $dir): self
-    {
-        $this->consoleLogDir = $dir;
-
-        return $this;
-    }
-
     /**
-     * @return static
+     * @internal
      */
-    final public function follow(string $link): self
+    final public function __construct(Client $client, array $options = [])
     {
-        if (!$element = $this->documentElement()->findLink($link)) {
-            Assert::fail('Link "%s" not found.', [$link]);
-        }
+        parent::__construct(new PantherDriver($client), $options);
 
-        if (!$element->isVisible()) {
-            Assert::fail('Link "%s" is not visible.', [$link]);
-        }
-
-        $this->documentElement()->clickLink($link);
-
-        return $this;
+        $this->screenshotDir = $options['screenshot_dir'] ?? null;
+        $this->consoleLogDir = $options['console_log_dir'] ?? null;
     }
 
     /**
@@ -76,11 +44,11 @@ class PantherBrowser extends Browser
      */
     final public function assertVisible(string $selector): self
     {
-        return $this->wrapMinkExpectation(function() use ($selector) {
-            $element = $this->webAssert()->elementExists('css', $selector);
+        $element = $this->session()->assert()->elementExists('css', $selector);
 
-            Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
-        });
+        Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
+
+        return $this;
     }
 
     /**
@@ -88,7 +56,7 @@ class PantherBrowser extends Browser
      */
     final public function assertNotVisible(string $selector): self
     {
-        $element = $this->documentElement()->find('css', $selector);
+        $element = $this->session()->page()->find('css', $selector);
 
         if (!$element) {
             Assert::pass();
@@ -116,7 +84,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilVisible(string $selector): self
     {
-        $this->client->waitForVisibility($selector);
+        $this->client()->waitForVisibility($selector);
 
         return $this;
     }
@@ -126,7 +94,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilNotVisible(string $selector): self
     {
-        $this->client->waitForInvisibility($selector);
+        $this->client()->waitForInvisibility($selector);
 
         return $this;
     }
@@ -136,7 +104,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilSeeIn(string $selector, string $expected): self
     {
-        $this->client->waitForElementToContain($selector, $expected);
+        $this->client()->waitForElementToContain($selector, $expected);
 
         return $this;
     }
@@ -146,7 +114,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilNotSeeIn(string $selector, string $expected): self
     {
-        $this->client->waitForElementToNotContain($selector, $expected);
+        $this->client()->waitForElementToNotContain($selector, $expected);
 
         return $this;
     }
@@ -154,7 +122,7 @@ class PantherBrowser extends Browser
     /**
      * @return static
      */
-    final public function inspect(): self
+    final public function pause(): self
     {
         if (!($_SERVER['PANTHER_NO_HEADLESS'] ?? false)) {
             throw new \RuntimeException('The "PANTHER_NO_HEADLESS" env variable must be set to inspect.');
@@ -175,7 +143,7 @@ class PantherBrowser extends Browser
             $filename = \sprintf('%s/%s', \rtrim($this->screenshotDir, '/'), \ltrim($filename, '/'));
         }
 
-        $this->client->takeScreenshot($this->savedScreenshots[] = $filename);
+        $this->client()->takeScreenshot($this->savedScreenshots[] = $filename);
 
         return $this;
     }
@@ -186,7 +154,7 @@ class PantherBrowser extends Browser
             $filename = \sprintf('%s/%s', \rtrim($this->consoleLogDir, '/'), \ltrim($filename, '/'));
         }
 
-        $log = $this->client->manage()->getLog('browser');
+        $log = $this->client()->manage()->getLog('browser');
         $log = \json_encode($log, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);
 
         (new Filesystem())->dumpFile($this->savedConsoleLogs[] = $filename, $log);
@@ -196,7 +164,7 @@ class PantherBrowser extends Browser
 
     final public function dumpConsoleLog(): self
     {
-        VarDumper::dump($this->client->manage()->getLog('browser'));
+        Session::varDump($this->client()->manage()->getLog('browser'));
 
         return $this;
     }
@@ -204,7 +172,7 @@ class PantherBrowser extends Browser
     final public function ddConsoleLog(): void
     {
         $this->dumpConsoleLog();
-        $this->die();
+        $this->session()->exit();
     }
 
     final public function ddScreenshot(string $filename = 'screenshot.png'): void
@@ -213,15 +181,12 @@ class PantherBrowser extends Browser
 
         echo \sprintf("\n\nScreenshot saved as \"%s\".\n\n", \end($this->savedScreenshots));
 
-        $this->die();
+        $this->session()->exit();
     }
 
-    /**
-     * @internal
-     */
-    final public function dumpCurrentState(string $filename): void
+    final public function saveCurrentState(string $filename): void
     {
-        parent::dumpCurrentState($filename);
+        parent::saveCurrentState($filename);
 
         $this->takeScreenshot("{$filename}.png");
         $this->saveConsoleLog("{$filename}.log");
@@ -236,27 +201,5 @@ class PantherBrowser extends Browser
             parent::savedArtifacts(),
             ['Saved Console Logs' => $this->savedConsoleLogs, 'Saved Screenshots' => $this->savedScreenshots]
         );
-    }
-
-    final public function response(): PantherResponse
-    {
-        return new PantherResponse($this->minkSession());
-    }
-
-    /**
-     * @internal
-     */
-    final protected function die(): void
-    {
-        $this->client->quit();
-        parent::die();
-    }
-
-    protected function useParameters(): array
-    {
-        return [
-            ...parent::useParameters(),
-            Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->client->getCookieJar())),
-        ];
     }
 }

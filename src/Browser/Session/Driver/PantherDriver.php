@@ -1,8 +1,7 @@
 <?php
 
-namespace Zenstruck\Browser\Mink;
+namespace Zenstruck\Browser\Session\Driver;
 
-use Behat\Mink\Driver\CoreDriver;
 use Behat\Mink\Exception\DriverException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates;
@@ -17,6 +16,7 @@ use Symfony\Component\Panther\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\Panther\DomCrawler\Field\FileFormField;
 use Symfony\Component\Panther\DomCrawler\Field\InputFormField;
 use Symfony\Component\Panther\DomCrawler\Field\TextareaFormField;
+use Zenstruck\Browser\Session\Driver;
 
 /**
  * @ref https://github.com/robertfausk/mink-panther-driver
@@ -25,50 +25,34 @@ use Symfony\Component\Panther\DomCrawler\Field\TextareaFormField;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
+ *
+ * @method Client client()
  */
-final class PantherDriver extends CoreDriver
+final class PantherDriver extends Driver
 {
-    private Client $client;
-    private bool $started = false;
-
     public function __construct(Client $client)
     {
-        $this->client = $client;
-    }
-
-    public function start(): void
-    {
-        $this->started = true;
-    }
-
-    public function stop(): void
-    {
-        $this->started = false;
-    }
-
-    public function isStarted(): bool
-    {
-        return $this->started;
-    }
-
-    public function reset(): void
-    {
-        $this->client->restart();
+        parent::__construct($client);
     }
 
     public function visit($url): void
     {
-        $this->client->request('GET', $this->prepareUrl($url));
+        $this->client()->request('GET', $this->prepareUrl($url));
+    }
+
+    public function quit(): void
+    {
+        $this->client()->quit();
     }
 
     public function getCurrentUrl(): string
     {
-        return $this->client->getCurrentURL();
+        return $this->client()->getCurrentURL();
     }
 
     public function getContent(): string
     {
-        return $this->client->getWebDriver()->getPageSource();
+        return $this->client()->getWebDriver()->getPageSource();
     }
 
     public function getText($xpath): string
@@ -79,7 +63,7 @@ final class PantherDriver extends CoreDriver
             // hack to get the text of the title html element
             // for this element, WebDriverElement::getText() returns an empty string
             // the only way to get the value is to get title from the client
-            return $this->client->getTitle();
+            return $this->client()->getTitle();
         }
 
         return \trim($crawler->text(null, true));
@@ -188,8 +172,8 @@ final class PantherDriver extends CoreDriver
 
     public function click($xpath): void
     {
-        $this->client->getMouse()->click($this->toCoordinates($xpath));
-        $this->client->refreshCrawler();
+        $this->client()->getMouse()->click($this->toCoordinates($xpath));
+        $this->client()->refreshCrawler();
     }
 
     public function executeScript($script): void
@@ -199,7 +183,7 @@ final class PantherDriver extends CoreDriver
             $script = '('.$script.')';
         }
 
-        $this->client->executeScript($script);
+        $this->client()->executeScript($script);
     }
 
     public function evaluateScript($script)
@@ -208,7 +192,7 @@ final class PantherDriver extends CoreDriver
             $script = 'return '.$script;
         }
 
-        return $this->client->executeScript($script);
+        return $this->client()->executeScript($script);
     }
 
     public function getHtml($xpath): string
@@ -271,7 +255,7 @@ final class PantherDriver extends CoreDriver
     private function crawler(): Crawler
     {
         try {
-            return $this->client->getCrawler();
+            return $this->client()->getCrawler();
         } catch (BadMethodCallException $e) {
             throw new DriverException('Unable to access the response content before visiting a page', 0, $e);
         }

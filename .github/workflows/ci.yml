@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }} - ${{ matrix.deps }}
+    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
