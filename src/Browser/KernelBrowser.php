@@ -27,6 +27,9 @@ class KernelBrowser extends Browser
      */
     final public function __construct(SymfonyKernelBrowser $client, array $options = [])
     {
+        $client->followRedirects((bool) ($options['follow_redirects'] ?? true));
+        $client->catchExceptions((bool) ($options['catch_exceptions'] ?? true));
+
         parent::__construct(new BrowserKitDriver($client), $options);
     }
 
