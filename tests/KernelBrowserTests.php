@@ -5,6 +5,7 @@ namespace Zenstruck\Browser\Tests;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Json;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
 use Zenstruck\Foundry\Configuration;
@@ -390,13 +391,16 @@ trait KernelBrowserTests
     /**
      * @test
      */
-    public function assert_json_alternate_content_types(): void
+    public function assert_content_types(): void
     {
         $this->browser()
-            ->get('/json?content-type=application/vnd.custom.json', ['json' => 'foo'])
+            ->get('/json')
             ->assertSuccessful()
             ->assertJson()
-            ->assertJson('application/vnd.custom.json')
+            ->get('/xml')
+            ->assertXml()
+            ->get('/page1')
+            ->assertHtml()
         ;
     }
 
@@ -501,18 +505,29 @@ trait KernelBrowserTests
     /**
      * @test
      */
-    public function can_access_json_response(): void
+    public function can_access_json_object(): void
     {
-        $this->markTestIncomplete();
-//        $response = $this->browser()
-//            ->post('/json', ['json' => $expected = ['foo' => 'bar']])
-//            ->assertSuccessful()
-//            ->response()
-//            ->assertJson()
-//        ;
-//
-//        $this->assertSame($expected, $response->json());
-//        $this->assertSame('bar', $response->search('foo'));
+        $json = $this->browser()
+            ->post('/json', ['json' => $expected = ['foo' => 'bar']])
+            ->assertSuccessful()
+            ->json()
+        ;
+
+        $this->assertSame($expected, $json->decoded());
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_json_object(): void
+    {
+        $this->browser()
+            ->post('/json', ['json' => ['foo' => 'bar']])
+            ->assertSuccessful()
+            ->use(function(Json $json) {
+                $json->assertMatches('foo', 'bar');
+            })
+        ;
     }
 
     /**

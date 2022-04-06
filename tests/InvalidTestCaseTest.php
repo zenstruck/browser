@@ -31,12 +31,4 @@ final class InvalidTestCaseTest extends TestCase
 
         $this->pantherBrowser();
     }
-
-    /**
-     * @test
-     */
-    public function cannot_create_api_browser(): void
-    {
-        $this->markTestIncomplete();
-    }
 }

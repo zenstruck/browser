@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser;
 
+use Zenstruck\Assert;
 use function JmesPath\search;
 
 /**
@@ -19,6 +20,17 @@ final class Json
     public function __toString(): string
     {
         return \json_encode($this->decoded(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @param string $expression JMESPath expression
+     * @param mixed  $expected
+     */
+    public function assertMatches(string $expression, $expected): self
+    {
+        Assert::that($this->search($expression))->is($expected);
+
+        return $this;
     }
 
     /**

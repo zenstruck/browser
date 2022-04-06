@@ -343,9 +343,25 @@ class KernelBrowser extends Browser
     /**
      * @return static
      */
-    final public function assertJson(string $expectedContentType = 'json'): self
+    final public function assertJson(): self
     {
-        return $this->assertHeaderContains('Content-Type', $expectedContentType);
+        return $this->assertHeaderContains('Content-Type', 'json');
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertXml(): self
+    {
+        return $this->assertHeaderContains('Content-Type', 'xml');
+    }
+
+    /**
+     * @return static
+     */
+    final public function assertHtml(): self
+    {
+        return $this->assertHeaderContains('Content-Type', 'html');
     }
 
     /**
@@ -356,15 +372,21 @@ class KernelBrowser extends Browser
      */
     final public function assertJsonMatches(string $expression, $expected): self
     {
-        Assert::that($this->session()->json()->search($expression))->is($expected);
+        $this->json()->assertMatches($expression, $expected);
 
         return $this;
+    }
+
+    final public function json(): Json
+    {
+        return $this->assertJson()->session()->json();
     }
 
     protected function useParameters(): array
     {
         return [
             ...parent::useParameters(),
+            Parameter::typed(Json::class, Parameter::factory(fn() => $this->json())),
             Parameter::typed(DataCollectorInterface::class, Parameter::factory(function(string $class) {
                 foreach ($this->profile()->getCollectors() as $collector) {
                     if ($class === \get_class($collector)) {

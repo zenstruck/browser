@@ -240,6 +240,11 @@ $browser
     ->assertHeaderEquals('Content-Type', 'text/html; charset=UTF-8')
     ->assertHeaderContains('Content-Type', 'html')
 
+    // helpers for quickly checking the content type
+    ->assertJson()
+    ->assertXml()
+    ->assertHtml()
+
     // by default, redirects are followed, this disables that behaviour
     ->interceptRedirects()
 
@@ -333,6 +338,25 @@ $browser
     ->assertJsonMatches('foo.bar.baz', 1) // automatically calls ->assertJson()
     ->assertJsonMatches('foo.*.baz', [1, 2, 3])
     ->assertJsonMatches('length(foo)', 3)
+;
+
+// access the json "crawler"
+$json = $browser
+    ->get('/api/endpoint')
+    ->json()
+;
+
+$json->assertMatches('foo.bar.baz', 1);
+$json->search('foo.bar.baz'); // mixed (the found value at "JMESPath expression")
+$json->decoded(); // the decoded json
+(string) $json; // the json string pretty-printed
+
+// "use" the json crawler
+$json = $browser
+    ->get('/api/endpoint')
+    ->use(function(\Zenstruck\Browser\Json $json) {
+        $json->assertMatches('foo.bar.baz', 1);
+    })
 ;
 ```
 
