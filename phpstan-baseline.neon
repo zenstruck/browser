@@ -11,6 +11,21 @@ parameters:
 			path: src/Browser.php
 
 		-
+			message: "#^Method Zenstruck\\\\Browser\\:\\:selectField\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser.php
+
+		-
+			message: "#^Method Zenstruck\\\\Browser\\:\\:selectFieldOptions\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Browser.php
+
+		-
+			message: "#^Parameter \\#2 \\$path of method Behat\\\\Mink\\\\Element\\\\TraversableElement\\:\\:attachFileToField\\(\\) expects string, array\\<string\\>\\|string given\\.$#"
+			count: 1
+			path: src/Browser.php
+
+		-
 			message: "#^Method Zenstruck\\\\Browser\\\\Assertion\\\\SameUrlAssertion\\:\\:__construct\\(\\) has parameter \\$partsToMatch with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Browser/Assertion/SameUrlAssertion.php
@@ -146,39 +161,9 @@ parameters:
 			path: src/Browser/KernelBrowser.php
 
 		-
-			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:selectField\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/KernelBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:selectFieldOptions\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/KernelBrowser.php
-
-		-
 			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:setDefaultHttpOptions\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Browser/KernelBrowser.php
-
-		-
-			message: "#^Parameter \\#2 \\$path of method Behat\\\\Mink\\\\Element\\\\TraversableElement\\:\\:attachFileToField\\(\\) expects string, array\\<string\\>\\|string given\\.$#"
-			count: 1
-			path: src/Browser/KernelBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\PantherBrowser\\:\\:selectField\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/PantherBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\PantherBrowser\\:\\:selectFieldOptions\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/PantherBrowser.php
-
-		-
-			message: "#^Parameter \\#2 \\$path of method Behat\\\\Mink\\\\Element\\\\TraversableElement\\:\\:attachFileToField\\(\\) expects string, array\\<string\\>\\|string given\\.$#"
-			count: 1
-			path: src/Browser/PantherBrowser.php
 
 		-
 			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:getFormField\\(\\) should return Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField but returns array\\<Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\>\\|Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\.$#"

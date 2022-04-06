@@ -7,7 +7,6 @@ use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\DomCrawler\Crawler;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Extension\InteractiveExtension;
 use Zenstruck\Browser\Session\Driver\PantherDriver;
 
 /**
@@ -20,8 +19,6 @@ use Zenstruck\Browser\Session\Driver\PantherDriver;
  */
 class PantherBrowser extends Browser
 {
-    use InteractiveExtension;
-
     private ?string $screenshotDir = null;
     private ?string $consoleLogDir = null;
 

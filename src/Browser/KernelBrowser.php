@@ -8,7 +8,6 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Extension\InteractiveExtension;
 use Zenstruck\Browser\Session\Driver\BrowserKitDriver;
 use Zenstruck\Callback\Parameter;
 use Zenstruck\Foundry\Factory;
@@ -21,8 +20,6 @@ use Zenstruck\Foundry\Proxy;
  */
 class KernelBrowser extends Browser
 {
-    use InteractiveExtension;
-
     private ?HttpOptions $defaultHttpOptions = null;
 
     /**
