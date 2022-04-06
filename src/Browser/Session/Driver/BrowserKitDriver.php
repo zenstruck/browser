@@ -12,6 +12,7 @@ namespace Zenstruck\Browser\Session\Driver;
 
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
@@ -23,6 +24,8 @@ use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
+use Zenstruck\Assert;
+use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Session\Driver;
 
 /**
@@ -44,11 +47,21 @@ final class BrowserKitDriver extends Driver
     /** @var array<string,string> */
     private array $serverParameters = [];
 
+    /** @var mixed */
+    private $expectedException;
+    private ?string $expectedExceptionMessage = null;
+
     public function __construct(AbstractBrowser $client)
     {
         $client->followRedirects(true);
 
         parent::__construct($client);
+    }
+
+    public function expectException($expectedException, ?string $expectedMessage = null): void
+    {
+        $this->expectedException = $expectedException;
+        $this->expectedExceptionMessage = $expectedMessage;
     }
 
     public function stop(): void
@@ -66,10 +79,20 @@ final class BrowserKitDriver extends Driver
         $this->serverParameters = [];
     }
 
-    public function visit($url): void
+    public function request(string $method, string $url, HttpOptions $options): void
     {
-        $this->client()->request('GET', $url, [], [], $this->serverParameters);
-        $this->forms = [];
+        $options = $options->merge(['server' => $this->serverParameters]);
+
+        $this->wrapRequest(function() use ($method, $url, $options) {
+            $this->client()->request(
+                $method,
+                $options->addQueryToUrl($url),
+                $options->parameters(),
+                $options->files(),
+                $options->server(),
+                $options->body()
+            );
+        });
     }
 
     public function getCurrentUrl(): string
@@ -299,7 +322,7 @@ final class BrowserKitDriver extends Driver
         $tagName = $node->nodeName;
 
         if ('a' === $tagName) {
-            $this->client()->click($crawler->link());
+            $this->wrapRequest(fn() => $this->client()->click($crawler->link()));
             $this->forms = [];
         } elseif ($this->canSubmitForm($node)) {
             $this->submit($crawler->form());
@@ -553,7 +576,7 @@ final class BrowserKitDriver extends Driver
             }
         }
 
-        $this->client()->submit($form, [], $this->serverParameters);
+        $this->wrapRequest(fn() => $this->client()->submit($form, [], $this->serverParameters));
 
         $this->forms = [];
     }
@@ -684,5 +707,25 @@ final class BrowserKitDriver extends Driver
         }
 
         return $cached;
+    }
+
+    private function wrapRequest(callable $callback): void
+    {
+        if (!$this->expectedException) {
+            $callback();
+
+            return;
+        }
+
+        $client = $this->client();
+
+        \assert($client instanceof KernelBrowser);
+
+        // todo reset to original value after request
+        $client->catchExceptions(false);
+
+        Assert::that($callback)->throws($this->expectedException, $this->expectedExceptionMessage);
+
+        $this->expectedException = $this->expectedExceptionMessage = null;
     }
 }

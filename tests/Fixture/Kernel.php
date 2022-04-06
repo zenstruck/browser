@@ -68,6 +68,10 @@ final class Kernel extends BaseKernel
             $request->files->all()
         );
 
+        if ('e' === $request->request->get('submit_1')) {
+            throw new \RuntimeException('fail!');
+        }
+
         return new JsonResponse(\array_merge(
             $request->request->all(),
             \array_filter($files)

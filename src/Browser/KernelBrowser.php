@@ -81,6 +81,24 @@ class KernelBrowser extends Browser
     }
 
     /**
+     * Expect the next request to throw this exception. Fails if not thrown.
+     *
+     * @param class-string|callable $expectedException string: class name of the expected exception
+     *                                                 callable: uses the first argument's type-hint
+     *                                                 to determine the expected exception class. When
+     *                                                 exception is caught, callable is invoked with
+     *                                                 the caught exception
+     * @param string|null           $expectedMessage   Assert the caught exception message "contains"
+     *                                                 this string
+     */
+    public function expectException($expectedException, ?string $expectedMessage = null): self
+    {
+        $this->session()->expectException($expectedException, $expectedMessage);
+
+        return $this;
+    }
+
+    /**
      * Enable profiling for the next request. Not required if profiling is
      * globally enabled.
      *
@@ -205,14 +223,7 @@ class KernelBrowser extends Browser
 
         $options = HttpOptions::create($options);
 
-        $this->client()->request(
-            $method,
-            $options->addQueryToUrl($url),
-            $options->parameters(),
-            $options->files(),
-            $options->server(),
-            $options->body()
-        );
+        $this->session()->request($method, $options->addQueryToUrl($url), $options);
 
         return $this;
     }
