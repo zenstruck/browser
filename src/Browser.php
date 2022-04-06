@@ -296,31 +296,10 @@ abstract class Browser
      */
     final public function click(string $selector): self
     {
-        // try button
-        $element = $this->session()->page()->findButton($selector);
-
-        if (!$element) {
-            // try link
-            $element = $this->session()->page()->findLink($selector);
-        }
-
-        if (!$element) {
-            // try by css
-            $element = $this->session()->page()->find('css', $selector);
-        }
-
-        if (!$element) {
-            Assert::fail('Clickable element "%s" not found.', [$selector]);
-        }
+        $element = $this->session()->find($selector);
 
         if (!$element->isVisible()) {
             Assert::fail('Clickable element "%s" is not visible.', [$selector]);
-        }
-
-        if ($button = $this->session()->page()->findButton($selector)) {
-            if (!$button->isVisible()) {
-                Assert::fail('Button "%s" is not visible.', [$selector]);
-            }
         }
 
         $element->click();

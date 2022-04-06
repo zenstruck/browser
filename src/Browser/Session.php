@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser;
 
 use Behat\Mink\Element\DocumentElement;
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Session as MinkSession;
 use Behat\Mink\WebAssert;
@@ -46,6 +47,11 @@ final class Session extends MinkSession
     public function page(): DocumentElement
     {
         return $this->getPage();
+    }
+
+    public function find(string $selector): NodeElement
+    {
+        return Selector::wrap($selector)->find($this->page());
     }
 
     public function isRedirect(): bool
