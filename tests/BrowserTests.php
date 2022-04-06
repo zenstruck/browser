@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
@@ -164,7 +165,7 @@ trait BrowserTests
         $browser = $this->browser();
 
         $browser
-            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2, Crawler $crawler) use ($browser) {
+            ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2, Crawler $crawler, AbstractBrowser $inner) use ($browser) {
                 $this->assertInstanceOf(Browser::class, $browser1);
                 $this->assertInstanceOf(Browser::class, $browser2);
                 $this->assertInstanceOf(\get_class($browser), $browser1);

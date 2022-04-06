@@ -193,6 +193,10 @@ $browser
         // access the current Browser instance
     })
 
+    ->use(function(\Symfony\Component\BrowserKit\AbstractBrowser $browser)) {
+        // access the "inner" browser
+    })
+
     ->use(function(\Symfony\Component\BrowserKit\CookieJar $cookieJar)) {
         // access the cookie jar
         $cookieJar->expire('MOCKSESSID');

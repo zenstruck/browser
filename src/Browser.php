@@ -170,6 +170,7 @@ abstract class Browser
             Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
             Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->client()->getCrawler())),
             Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->client()->getCookieJar())),
+            Parameter::typed(AbstractBrowser::class, Parameter::factory(fn() => $this->client())),
         ];
     }
 }
