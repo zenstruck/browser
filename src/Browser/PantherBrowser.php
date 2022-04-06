@@ -19,8 +19,8 @@ use Zenstruck\Browser\Session\Driver\PantherDriver;
  */
 class PantherBrowser extends Browser
 {
-    private ?string $screenshotDir = null;
-    private ?string $consoleLogDir = null;
+    private ?string $screenshotDir;
+    private ?string $consoleLogDir;
 
     /** @var string[] */
     private array $savedScreenshots = [];
@@ -31,23 +31,12 @@ class PantherBrowser extends Browser
     /**
      * @internal
      */
-    final public function __construct(Client $client)
+    final public function __construct(Client $client, array $options = [])
     {
-        parent::__construct(new PantherDriver($client));
-    }
+        parent::__construct(new PantherDriver($client), $options);
 
-    final public function setScreenshotDir(string $dir): self
-    {
-        $this->screenshotDir = $dir;
-
-        return $this;
-    }
-
-    final public function setConsoleLogDir(string $dir): self
-    {
-        $this->consoleLogDir = $dir;
-
-        return $this;
+        $this->screenshotDir = $options['screenshot_dir'] ?? null;
+        $this->consoleLogDir = $options['console_log_dir'] ?? null;
     }
 
     /**
@@ -195,12 +184,9 @@ class PantherBrowser extends Browser
         $this->session()->exit();
     }
 
-    /**
-     * @internal
-     */
-    final public function dumpCurrentState(string $filename): void
+    final public function saveCurrentState(string $filename): void
     {
-        parent::dumpCurrentState($filename);
+        parent::saveCurrentState($filename);
 
         $this->takeScreenshot("{$filename}.png");
         $this->saveConsoleLog("{$filename}.log");

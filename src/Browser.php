@@ -18,32 +18,25 @@ use Zenstruck\Callback\Parameter;
 abstract class Browser
 {
     private Session $session;
-    private ?string $sourceDir = null;
+    private ?string $sourceDir;
 
     /** @var string[] */
     private array $savedSources = [];
 
     /**
      * @internal
+     *
+     * @param array<string,mixed> $options
      */
-    public function __construct(Driver $driver)
+    public function __construct(Driver $driver, array $options = [])
     {
         $this->session = new Session($driver);
+        $this->sourceDir = $options['source_dir'] ?? null;
     }
 
     final public function client(): AbstractBrowser
     {
         return $this->session->client();
-    }
-
-    /**
-     * @return static
-     */
-    final public function setSourceDir(string $dir): self
-    {
-        $this->sourceDir = $dir;
-
-        return $this;
     }
 
     /**
@@ -437,13 +430,10 @@ abstract class Browser
 
     final public function dd(?string $selector = null): void
     {
-        $this->session()->dd($selector);
+        $this->dump($selector)->session()->exit();
     }
 
-    /**
-     * @internal
-     */
-    public function dumpCurrentState(string $filename): void
+    public function saveCurrentState(string $filename): void
     {
         $this->saveSource("{$filename}.txt");
     }

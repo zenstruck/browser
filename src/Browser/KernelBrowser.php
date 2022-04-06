@@ -25,9 +25,9 @@ class KernelBrowser extends Browser
     /**
      * @internal
      */
-    final public function __construct(SymfonyKernelBrowser $client)
+    final public function __construct(SymfonyKernelBrowser $client, array $options = [])
     {
-        parent::__construct(new BrowserKitDriver($client));
+        parent::__construct(new BrowserKitDriver($client), $options);
     }
 
     /**

@@ -113,12 +113,6 @@ final class Session extends MinkSession
         });
     }
 
-    public function dd(?string $selector = null): void
-    {
-        $this->dump($selector);
-        $this->exit();
-    }
-
     public function exit(): void
     {
         $this->getDriver()->quit();

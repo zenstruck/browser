@@ -45,8 +45,14 @@ trait HasBrowser
             throw new \LogicException(\sprintf('"PANTHER_BROWSER_CLASS" env variable must reference a class that extends %s.', PantherBrowser::class));
         }
 
+        $browserOptions = [
+            'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
+            'screenshot_dir' => $_SERVER['BROWSER_SCREENSHOT_DIR'] ?? './var/browser/screenshots',
+            'console_log_dir' => $_SERVER['BROWSER_CONSOLE_LOG_DIR'] ?? './var/browser/console-logs',
+        ];
+
         if (self::$primaryPantherClient) {
-            $browser = new $class(static::createAdditionalPantherClient());
+            $browser = new $class(static::createAdditionalPantherClient(), $browserOptions);
         } else {
             self::$primaryPantherClient = static::createPantherClient(
                 \array_merge(['browser' => $_SERVER['PANTHER_BROWSER'] ?? PantherTestCase::CHROME], $options),
@@ -54,16 +60,12 @@ trait HasBrowser
                 $managerOptions
             );
 
-            $browser = new $class(self::$primaryPantherClient);
+            $browser = new $class(self::$primaryPantherClient, $browserOptions);
         }
 
         BrowserExtension::registerBrowser($browser);
 
-        return $browser
-            ->setSourceDir($_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source')
-            ->setScreenshotDir($_SERVER['BROWSER_SCREENSHOT_DIR'] ?? './var/browser/screenshots')
-            ->setConsoleLogDir($_SERVER['BROWSER_CONSOLE_LOG_DIR'] ?? './var/browser/console-logs')
-        ;
+        return $browser;
     }
 
     /**
@@ -81,10 +83,14 @@ trait HasBrowser
             throw new \LogicException(\sprintf('"KERNEL_BROWSER_CLASS" env variable must reference a class that extends %s.', KernelBrowser::class));
         }
 
+        $browserOptions = [
+            'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
+        ];
+
         if ($this instanceof WebTestCase) {
             static::ensureKernelShutdown();
 
-            $browser = new $class(static::createClient($options, $server));
+            $browser = new $class(static::createClient($options, $server), $browserOptions);
         } else {
             // reboot kernel before starting browser
             static::bootKernel($options);
@@ -96,13 +102,11 @@ trait HasBrowser
             $client = static::getContainer()->get('test.client');
             $client->setServerParameters($server);
 
-            $browser = new $class($client);
+            $browser = new $class($client, $browserOptions);
         }
 
         BrowserExtension::registerBrowser($browser);
 
-        return $browser
-            ->setSourceDir($_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source')
-        ;
+        return $browser;
     }
 }
