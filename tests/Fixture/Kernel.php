@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use Symfony\Component\Routing\RouteCollectionBuilder;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -125,11 +124,7 @@ final class Kernel extends BaseKernel
 
     public function user(?UserInterface $user = null): Response
     {
-        if ($user) {
-            $username = \method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername();
-        }
-
-        return new Response($user ? "user: {$username}/{$user->getPassword()}" : 'anon');
+        return new Response($user ? "user: {$user->getUserIdentifier()}/{$user->getPassword()}" : 'anon');
     }
 
     public function registerBundles(): iterable
@@ -156,29 +151,8 @@ final class Kernel extends BaseKernel
         $c->register('logger', NullLogger::class); // disable logging
     }
 
-    /**
-     * @param RouteCollectionBuilder|RoutingConfigurator $routes
-     */
-    protected function configureRoutes($routes): void
+    private function configureRoutes(RoutingConfigurator $routes): void
     {
-        if ($routes instanceof RouteCollectionBuilder) {
-            $routes->add('/page1', 'kernel::page1');
-            $routes->add('/page2', 'kernel::page2');
-            $routes->add('/text', 'kernel::text');
-            $routes->add('/submit-form', 'kernel::submitForm');
-            $routes->add('/http-method', 'kernel::httpMethod');
-            $routes->add('/exception', 'kernel::exception');
-            $routes->add('/redirect1', 'kernel::redirect1');
-            $routes->add('/redirect2', 'kernel::redirect2');
-            $routes->add('/redirect3', 'kernel::redirect3');
-            $routes->add('/json', 'kernel::json');
-            $routes->add('/xml', 'kernel::xml');
-            $routes->add('/javascript', 'kernel::javascript');
-            $routes->add('/user', 'kernel::user');
-
-            return;
-        }
-
         $routes->add('page1', '/page1')->controller('kernel::page1');
         $routes->add('page2', '/page2')->controller('kernel::page2');
         $routes->add('text', '/text')->controller('kernel::text');
