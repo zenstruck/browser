@@ -71,6 +71,14 @@ final class Session extends MinkSession
         $this->getDriver()->request(\mb_strtoupper($method), $url, $options ?? new HttpOptions());
     }
 
+    /**
+     * @param class-string|callable $expectedException
+     */
+    public function expectException($expectedException, ?string $expectedMessage = null): void
+    {
+        $this->getDriver()->expectException($expectedException, $expectedMessage);
+    }
+
     public function source(): string
     {
         try {

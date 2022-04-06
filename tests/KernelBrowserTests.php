@@ -2,8 +2,10 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Zenstruck\Assert;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Json;
 use Zenstruck\Browser\KernelBrowser;
@@ -584,6 +586,91 @@ trait KernelBrowserTests
             ->use(function(RequestDataCollector $collector) {
                 $this->assertSame('/page1', $collector->getPathInfo());
             })
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_expect_exception_for_http_request(): void
+    {
+        $this->browser()
+            ->expectException(\Exception::class)
+            ->visit('/exception')
+            ->visit('/page1')
+            ->assertSuccessful()
+            ->expectException(\Exception::class, 'exception thrown')
+            ->post('/exception')
+            ->expectException(function(\Throwable $e) {
+                $this->assertSame('exception thrown', $e->getMessage());
+            })
+            ->put('/exception')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_expect_exception_for_form_submit(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->expectException(\RuntimeException::class, 'fail!')
+            ->click('Submit Exception')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_expect_exception_for_link_click(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->expectException(\Exception::class, 'exception thrown')
+            ->click('exception link')
+            ->assertOn('/exception')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function fails_if_expected_exception_not_thrown(): void
+    {
+        // http request
+        Assert::that(
+            function() {
+                $this->browser()
+                    ->expectException(\RuntimeException::class)
+                    ->get('/page1')
+                ;
+            })
+            ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
+        ;
+
+        // click link
+        Assert::that(
+            function() {
+                $this->browser()
+                    ->visit('/page1')
+                    ->expectException(\RuntimeException::class)
+                    ->click('a link')
+                ;
+            })
+            ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
+        ;
+
+        // submit form
+        Assert::that(
+            function() {
+                $this->browser()
+                    ->visit('/page1')
+                    ->expectException(\RuntimeException::class)
+                    ->click('Submit')
+                ;
+            })
+            ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
         ;
     }
 

@@ -259,6 +259,13 @@ $browser
     // combination of assertRedirected(), followRedirect(), assertOn()
     ->assertRedirectedTo('/some/page') // follows all redirects by default
     ->assertRedirectedTo('/some/page', 1) // just follow 1 redirect
+
+    // exception assertions for the "next request"
+    ->expectException(MyException::class, 'the message')
+    ->post('/url/that/throws/exception') // fails if above exception not thrown
+
+    ->expectException(MyException::class, 'the message')
+    ->click('link or button') // fails if above exception not thrown
 ;
 
 // Access the Symfony Profiler for the last request

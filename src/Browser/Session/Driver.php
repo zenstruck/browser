@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Session;
 
 use Behat\Mink\Driver\CoreDriver;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Zenstruck\Browser\HttpOptions;
 
@@ -48,6 +49,14 @@ abstract class Driver extends CoreDriver
 
     public function quit(): void
     {
+    }
+
+    /**
+     * @param class-string|callable $expectedException
+     */
+    public function expectException($expectedException, ?string $expectedMessage = null): void
+    {
+        throw new UnsupportedDriverActionException('%s does not support expecting exceptions.', $this);
     }
 
     abstract public function request(string $method, string $url, HttpOptions $options): void;
