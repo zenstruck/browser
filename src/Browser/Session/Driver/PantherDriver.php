@@ -3,6 +3,7 @@
 namespace Zenstruck\Browser\Session\Driver;
 
 use Behat\Mink\Exception\DriverException;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates;
 use Facebook\WebDriver\Internal\WebDriverLocatable;
@@ -16,6 +17,7 @@ use Symfony\Component\Panther\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\Panther\DomCrawler\Field\FileFormField;
 use Symfony\Component\Panther\DomCrawler\Field\InputFormField;
 use Symfony\Component\Panther\DomCrawler\Field\TextareaFormField;
+use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Session\Driver;
 
 /**
@@ -35,8 +37,12 @@ final class PantherDriver extends Driver
         parent::__construct($client);
     }
 
-    public function visit($url): void
+    public function request(string $method, string $url, HttpOptions $options): void
     {
+        if ('GET' !== $method) {
+            throw new UnsupportedDriverActionException('%s only supports "GET" requests.', $this);
+        }
+
         $this->client()->request('GET', $this->prepareUrl($url));
     }
 

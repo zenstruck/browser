@@ -62,6 +62,15 @@ final class Session extends MinkSession
         throw new DriverException('This is not a JSON response.');
     }
 
+    public function request(string $method, string $url, ?HttpOptions $options = null): void
+    {
+        if (!$this->isStarted()) {
+            $this->start();
+        }
+
+        $this->getDriver()->request(\mb_strtoupper($method), $url, $options ?? new HttpOptions());
+    }
+
     public function source(): string
     {
         try {

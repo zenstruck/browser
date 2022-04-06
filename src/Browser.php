@@ -44,7 +44,7 @@ abstract class Browser
      */
     final public function visit(string $uri): self
     {
-        $this->session()->visit($uri);
+        $this->session()->request('GET', $uri);
 
         return $this;
     }

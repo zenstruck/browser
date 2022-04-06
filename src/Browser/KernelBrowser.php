@@ -205,14 +205,7 @@ class KernelBrowser extends Browser
 
         $options = HttpOptions::create($options);
 
-        $this->client()->request(
-            $method,
-            $options->addQueryToUrl($url),
-            $options->parameters(),
-            $options->files(),
-            $options->server(),
-            $options->body()
-        );
+        $this->session()->request($method, $options->addQueryToUrl($url), $options);
 
         return $this;
     }
