@@ -366,7 +366,7 @@ $browser
 Make assertions about json responses using [JMESPath expressions](https://jmespath.org/)
 See the [JMESPath Tutorials](https://jmespath.org/tutorial.html) to learn more.
 
-**NOTE:** `mtdowling/jmespath.php` is required: `composer require mtdowling/jmespath.php`.
+**NOTE:** `mtdowling/jmespath.php` is required: `composer require --dev mtdowling/jmespath.php`.
 
 ```php
 /** @var \Zenstruck\Browser\KernelBrowser $browser **/

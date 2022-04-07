@@ -39,7 +39,7 @@ final class Json
     public function search(string $selector)
     {
         if (!\function_exists('JmesPath\search')) {
-            throw new \LogicException('"mtdowling/jmespath.php" is required to search JSON (composer require mtdowling/jmespath.php).');
+            throw new \LogicException('"mtdowling/jmespath.php" is required to search JSON (composer require --dev mtdowling/jmespath.php).');
         }
 
         return search($selector, $this->decoded());
