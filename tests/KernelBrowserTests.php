@@ -382,11 +382,13 @@ trait KernelBrowserTests
                     'bam' => ['baz' => 2],
                     'boo' => ['baz' => 3],
                 ],
+                '@some:count' => 6,
             ]])
             ->assertJson()
             ->assertJsonMatches('foo.bar.baz', 1)
             ->assertJsonMatches('foo.*.baz', [1, 2, 3])
             ->assertJsonMatches('length(foo)', 3)
+            ->assertJsonMatches('"@some:count"', 6)
         ;
     }
 
