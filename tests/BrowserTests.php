@@ -2,12 +2,14 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
+use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
@@ -599,6 +601,33 @@ trait BrowserTests
         ;
 
         $this->assertCount(2, $crawler);
+    }
+
+    /**
+     * @test
+     */
+    public function fails_if_trying_to_manipulate_exception_page(): void
+    {
+        Assert::that(function() {
+            $this->browser()
+                ->visit('/exception')
+                ->click('foo')
+            ;
+        })->throws(AssertionFailedError::class, 'The last request threw an exception: Zenstruck\Browser\Tests\Fixture\CustomException - exception thrown');
+
+        Assert::that(function() {
+            $this->browser()
+                ->visit('/exception')
+                ->fillField('foo', 'bar')
+            ;
+        })->throws(AssertionFailedError::class, 'The last request threw an exception: Zenstruck\Browser\Tests\Fixture\CustomException - exception thrown');
+
+        Assert::that(function() {
+            $this->browser()
+                ->visit('/exception')
+                ->assertSee('foo')
+            ;
+        })->throws(AssertionFailedError::class, 'The last request threw an exception: Zenstruck\Browser\Tests\Fixture\CustomException - exception thrown');
     }
 
     protected static function catchFileContents(string $expectedFile, callable $callback): string

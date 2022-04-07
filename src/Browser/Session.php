@@ -8,6 +8,7 @@ use Behat\Mink\Session as MinkSession;
 use Behat\Mink\WebAssert;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DomCrawler\Crawler;
+use Zenstruck\Assert as ZenstruckAssert;
 use Zenstruck\Browser\Session\Assert;
 use Zenstruck\Browser\Session\Driver;
 
@@ -40,11 +41,15 @@ final class Session extends MinkSession
 
     public function assert(): Assert
     {
+        $this->ensureNoException();
+
         return new Assert(new WebAssert($this));
     }
 
     public function page(): DocumentElement
     {
+        $this->ensureNoException();
+
         return $this->getPage();
     }
 
@@ -134,5 +139,25 @@ final class Session extends MinkSession
     {
         $this->getDriver()->quit();
         exit(1);
+    }
+
+    private function ensureNoException(): void
+    {
+        if (!$this->isStarted()) {
+            ZenstruckAssert::fail('A request has not yet been made.');
+        }
+
+        $crawler = $this->client()->getCrawler();
+
+        if (!\count($exceptionClassNode = $crawler->filter('.trace-details .trace-class')->first())) {
+            return;
+        }
+
+        $messageNode = $crawler->filter('.exception-message-wrapper .exception-message')->first();
+
+        ZenstruckAssert::fail('The last request threw an exception: %s - %s', [
+            \preg_replace('/\s+/', '', $exceptionClassNode->text()),
+            \count($messageNode) ? $messageNode->text() : 'unknown message',
+        ]);
     }
 }
