@@ -287,6 +287,10 @@ $browser
     ->assertRedirectedTo('/some/page') // follows all redirects by default
     ->assertRedirectedTo('/some/page', 1) // just follow 1 redirect
 
+    // combination of interceptRedirects(), withProfiling(), click()
+    // useful for submitting forms and making assertions on the "redirect response"
+    ->clickAndIntercept('button')
+
     // exception assertions for the "next request"
     ->expectException(MyException::class, 'the message')
     ->post('/url/that/throws/exception') // fails if above exception not thrown

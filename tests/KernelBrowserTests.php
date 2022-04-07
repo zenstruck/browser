@@ -636,6 +636,22 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    public function click_and_intercept(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->clickAndIntercept('Submit Redirect')
+            ->assertOn('/submit-form')
+            ->use(function(RequestDataCollector $collector) {
+                $this->assertSame('/submit-form', $collector->getPathInfo());
+            })
+            ->assertRedirectedTo('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function fails_if_expected_exception_not_thrown(): void
     {
         // http request
