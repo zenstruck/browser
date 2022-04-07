@@ -54,7 +54,7 @@ final class Kernel extends BaseKernel
         return new Response(\file_get_contents(__DIR__.'/files/xml.xml'), 200, ['Content-Type' => 'text/xml']);
     }
 
-    public function submitForm(Request $request): JsonResponse
+    public function submitForm(Request $request): Response
     {
         $files = \array_map(
             static function($value) {
@@ -69,6 +69,10 @@ final class Kernel extends BaseKernel
 
         if ('e' === $request->request->get('submit_1')) {
             throw new \RuntimeException('fail!');
+        }
+
+        if ('r' === $request->request->get('submit_1')) {
+            return new RedirectResponse('/redirect1');
         }
 
         return new JsonResponse(\array_merge(

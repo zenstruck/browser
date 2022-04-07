@@ -292,6 +292,23 @@ class KernelBrowser extends Browser
     }
 
     /**
+     * Macro for ->interceptRedirects()->withProfiling()->click().
+     *
+     * Useful for submitting a form and making assertions on the
+     * redirect response.
+     *
+     * @return static
+     */
+    final public function clickAndIntercept(string $selector): self
+    {
+        return $this
+            ->interceptRedirects()
+            ->withProfiling()
+            ->click($selector)
+        ;
+    }
+
+    /**
      * @return static
      */
     final public function assertStatus(int $expected): self
