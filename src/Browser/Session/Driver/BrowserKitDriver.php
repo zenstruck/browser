@@ -230,6 +230,9 @@ final class BrowserKitDriver extends Driver
         return null;
     }
 
+    /**
+     * @return array|bool|string|null
+     */
     public function getValue($xpath)
     {
         if (\in_array($this->getAttribute($xpath, 'type'), ['submit', 'image', 'button'], true)) {

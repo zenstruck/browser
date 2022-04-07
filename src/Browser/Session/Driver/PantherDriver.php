@@ -75,6 +75,9 @@ final class PantherDriver extends Driver
         return \trim($crawler->text(null, true));
     }
 
+    /**
+     * @return array|bool|string|null
+     */
     public function getValue($xpath)
     {
         try {
