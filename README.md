@@ -231,12 +231,6 @@ $browser
     ->assertXml()
     ->assertHtml()
 
-    // authenticate a user for subsequent actions
-    ->actingAs($user) // \Symfony\Component\Security\Core\User\UserInterface
-
-    // If using zenstruck/foundry, you can pass a factory/proxy
-    ->actingAs(UserFactory::new())
-
     // by default, exceptions are caught and converted to a response
     // use the BROWSER_CATCH_EXCEPTIONS environment variable to change default
     // this disables that behaviour allowing you to use TestCase::expectException()
@@ -294,6 +288,35 @@ $queryCount = $browser
 $browser->use(function(\Symfony\Component\HttpKernel\DataCollector\RequestDataCollector $collector) {
     // ...
 })
+```
+
+#### Authentication
+
+The _KernelBrowser_ has helpers and assertions for authentication:
+
+```php
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
+
+$browser
+    // authenticate a user for subsequent actions
+    ->actingAs($user) // \Symfony\Component\Security\Core\User\UserInterface
+
+    // If using zenstruck/foundry, you can pass a factory/proxy
+    ->actingAs(UserFactory::new())
+
+    // fail if authenticated
+    ->assertNotAuthenticated()
+
+    // fail if NOT authenticated
+    ->assertAuthenticated()
+
+    // fails if NOT authenticated as "kbond"
+    ->assertAuthenticated('kbond')
+
+    // \Symfony\Component\Security\Core\User\UserInterface or, if using
+    // zenstruck/foundry, you can pass a factory/proxy
+    ->assertAuthenticated($user)
+;
 ```
 
 #### HTTP Requests
