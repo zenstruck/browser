@@ -70,29 +70,13 @@ This extension provides the following features:
 2. After your test suite is finished, list of summary of all saved artifacts (source/screenshots/js
    console logs) in your console.
 
-## Configuration
-
-There are several environment variables available to configure:
-
-| Variable                   | Description                                                                      | Default                            |
-|----------------------------|----------------------------------------------------------------------------------|------------------------------------|
-| `BROWSER_SOURCE_DIR`       | Directory to save source files to.                                               | `./var/browser/source`             |
-| `BROWSER_SCREENSHOT_DIR`   | Directory to save screenshots to (only applies to `PantherBrowser`).             | `./var/browser/screenshots`        |
-| `BROWSER_CONSOLE_LOG_DIR`  | Directory to save javascript console logs to (only applies to `PantherBrowser`). | `./var/browser/console-logs`       |
-| `BROWSER_FOLLOW_REDIRECTS` | Whether to follow redirects by default (only applies to `KernelBrowser`).        | `1` _(true)_                       |
-| `BROWSER_CATCH_EXCEPTIONS` | Whether to catch exceptions by default (only applies to `KernelBrowser`).        | `1` _(true)_                       |
-| `KERNEL_BROWSER_CLASS`     | `KernelBrowser` class to use.                                                    | `Zenstruck\Browser\KernelBrowser`  |
-| `PANTHER_BROWSER_CLASS`    | `PantherBrowser` class to use.                                                   | `Zenstruck\Browser\PantherBrowser` |
-| `PANTHER_NO_HEADLESS`      | Disable headless-mode and allow usage of `PantherBrowser::pause()`.              | `0` _(false)_                      |
-
-
 ## Usage
 
-This library provides 3 different "browsers":
+This library provides 2 different "browsers":
 
-1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel *(this is the fastest browser)*.
-3. [PantherBrowser](#pantherbrowser): makes requests to a webserver with a real browser using `symfony/panther` which
-   allows testing javascript *(this is the slowest browser)*.
+1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel *(fast)*.
+2. [PantherBrowser](#pantherbrowser): makes requests to a webserver with a real browser using `symfony/panther` which
+   allows testing javascript *(slow)*.
 
 You can use these Browsers in your tests by having your test class use the `HasBrowser` trait:
 
@@ -134,7 +118,7 @@ class MyTest extends TestCase
 All browsers have the following methods:
 
 ```php
-/** @var \Zenstruck\Browser\KernelBrowser|\Zenstruck\Browser\PantherBrowser $browser **/
+/** @var \Zenstruck\Browser $browser **/
 
 $browser
     // ACTIONS
@@ -214,7 +198,7 @@ $browser
     ->saveSource('source.txt')
 
     // the following use symfony/var-dumper's dump() function and continue
-    ->dump() // raw response body or array if json
+    ->dump() // raw response body
     ->dump('h1') // html element
     ->dump('foo') // if json response, array key
     ->dump('foo.*.baz') // if json response, JMESPath notation can be used
@@ -229,7 +213,7 @@ $browser
 
 ### KernelBrowser
 
-These browsers have the following methods:
+This browser has the following methods:
 
 ```php
 /** @var \Zenstruck\Browser\KernelBrowser $browser **/
@@ -301,7 +285,7 @@ $browser
 
 // Access the Symfony Profiler for the last request
 $queryCount = $browser
-    // If profiling not not globally enabled for tests, ->withProfiling()
+    // If profiling is not globally enabled for tests, ->withProfiling()
     // must be called before the request.
     ->profile()->getCollector('db')->getQueryCount()
 ;
@@ -313,6 +297,8 @@ $browser->use(function(\Symfony\Component\HttpKernel\DataCollector\RequestDataCo
 ```
 
 #### HTTP Requests
+
+The _KernelBrowser_ can be used for testing API endpoints. The following http methods are available:
 
 ```php
 use Zenstruck\Browser\HttpOptions;
@@ -442,7 +428,7 @@ $browser
     // dd() the browser's console error log
     ->ddConsoleLog()
 
-    // take screenshot (default filename is "screenshot.png")
+    // dd() and take screenshot (default filename is "screenshot.png")
     ->ddScreenshot()
 ;
 ```
@@ -478,9 +464,20 @@ class MyTest extends PantherTestCase
 }
 ```
 
-### Mailer Component
+## Configuration
 
-See https://github.com/zenstruck/mailer-test#zenstruckbrowser-integration.
+There are several environment variables available to configure:
+
+| Variable                   | Description                                                                      | Default                            |
+|----------------------------|----------------------------------------------------------------------------------|------------------------------------|
+| `BROWSER_SOURCE_DIR`       | Directory to save source files to.                                               | `./var/browser/source`             |
+| `BROWSER_SCREENSHOT_DIR`   | Directory to save screenshots to (only applies to `PantherBrowser`).             | `./var/browser/screenshots`        |
+| `BROWSER_CONSOLE_LOG_DIR`  | Directory to save javascript console logs to (only applies to `PantherBrowser`). | `./var/browser/console-logs`       |
+| `BROWSER_FOLLOW_REDIRECTS` | Whether to follow redirects by default (only applies to `KernelBrowser`).        | `1` _(true)_                       |
+| `BROWSER_CATCH_EXCEPTIONS` | Whether to catch exceptions by default (only applies to `KernelBrowser`).        | `1` _(true)_                       |
+| `KERNEL_BROWSER_CLASS`     | `KernelBrowser` class to use.                                                    | `Zenstruck\Browser\KernelBrowser`  |
+| `PANTHER_BROWSER_CLASS`    | `PantherBrowser` class to use.                                                   | `Zenstruck\Browser\PantherBrowser` |
+| `PANTHER_NO_HEADLESS`      | Disable headless-mode and allow usage of `PantherBrowser::pause()`.              | `0` _(false)_                      |
 
 ## Extending
 
@@ -520,7 +517,27 @@ class MyTest extends KernelTestCase
 }
 ```
 
-### Custom Components
+### Components
+
+Components are objects that wrap common tasks into a _component_ object. These
+extend `Zenstruck\Browser\Component` and can be injected into a browser's `->use()`
+callable:
+
+```php
+/** @var \Zenstruck\Browser $browser **/
+
+$browser
+    ->use(function(MyComponent $component) {
+        $component->method();
+    })
+;
+```
+
+#### Mailer Component
+
+See https://github.com/zenstruck/mailer-test#zenstruckbrowser-integration.
+
+#### Custom Components
 
 You may have pages or page parts that have specific actions/assertions you use
 quite regularly in your tests. You can wrap these up into a *Component*. Let's create
@@ -629,7 +646,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
    ;
    ```
 
-2. Use `->setDefaultHttpOptions()` in your test case's [`configureBrowser()`](#test-browser-configuration) method:
+2. Use `->setDefaultHttpOptions()` in your test case's [default browser configuration](#test-browser-configuration):
    ```php
    namespace App\Tests;
 
@@ -747,8 +764,7 @@ abstract class MyTest extends WebTestCase
 
 ### Extensions
 
-There are several packaged extensions. These are traits that can be added to a
-[Custom Browser](#custom-browser).
+These are traits that can be added to a [Custom Browser](#custom-browser).
 
 #### Mailer Extension
 
