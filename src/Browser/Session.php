@@ -86,8 +86,10 @@ final class Session extends MinkSession
 
     public function source(): string
     {
+        $ret = "<!--\n";
+
         try {
-            $ret = "URL: {$this->getCurrentUrl()} ({$this->getStatusCode()})\n\n";
+            $ret .= "URL: {$this->getCurrentUrl()} ({$this->getStatusCode()})\n\n";
 
             foreach ($this->getResponseHeaders() as $header => $values) {
                 foreach ((array) $values as $value) {
@@ -98,7 +100,7 @@ final class Session extends MinkSession
             $ret = "URL: {$this->getCurrentUrl()}\n";
         }
 
-        $ret .= "\n";
+        $ret .= "-->\n";
 
         try {
             $ret .= $this->json();
