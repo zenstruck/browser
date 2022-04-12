@@ -435,7 +435,7 @@ abstract class Browser
 
     public function saveCurrentState(string $filename): void
     {
-        $this->saveSource("{$filename}.txt");
+        $this->saveSource("{$filename}.html");
     }
 
     /**
