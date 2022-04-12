@@ -103,7 +103,7 @@ final class Session extends MinkSession
         try {
             $ret .= $this->json();
         } catch (DriverException $e) {
-            $ret .= $this->page()->getContent();
+            $ret .= \trim($this->getDriver()->getContent());
         }
 
         return $ret;
