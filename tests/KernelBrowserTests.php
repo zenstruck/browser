@@ -509,6 +509,22 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    public function can_save_source_when_exception(): void
+    {
+        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/source.txt', function() {
+            $this->browser()
+                ->visit('/invalid-page')
+                ->assertStatus(404)
+                ->saveSource('/source.txt')
+            ;
+        });
+
+        $this->assertStringContainsString('No route found for', $contents);
+    }
+
+    /**
+     * @test
+     */
     public function can_access_json_object(): void
     {
         $json = $this->browser()
