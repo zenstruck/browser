@@ -50,7 +50,7 @@ public function testViewPostAndAddComment()
 ## Installation
 
 ```
-$ composer require zenstruck/browser --dev
+composer require zenstruck/browser --dev
 ```
 
 Optionally, enable the provided extension in your `phpunit.xml`:
