@@ -131,6 +131,16 @@ parameters:
 			path: src/Browser/HttpOptions.php
 
 		-
+			message: "#^Cannot call method getToken\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: src/Browser/KernelBrowser.php
+
+		-
+			message: "#^Cannot call method getUserIdentifier\\(\\) on Symfony\\\\Component\\\\Security\\\\Core\\\\Authentication\\\\Token\\\\TokenInterface\\|null\\.$#"
+			count: 1
+			path: src/Browser/KernelBrowser.php
+
+		-
 			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:delete\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Browser/KernelBrowser.php

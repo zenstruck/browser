@@ -5,6 +5,7 @@ namespace Zenstruck\Browser;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
@@ -115,7 +116,9 @@ class KernelBrowser extends Browser
     }
 
     /**
-     * @param object|UserInterface|Proxy|Factory $user
+     * @param UserInterface|Proxy<UserInterface>|Factory<UserInterface> $user
+     *
+     * @return static
      */
     public function actingAs(object $user, ?string $firewall = null): self
     {
@@ -132,6 +135,58 @@ class KernelBrowser extends Browser
         }
 
         $this->client()->loginUser(...\array_filter([$user, $firewall]));
+
+        return $this;
+    }
+
+    /**
+     * @param string|UserInterface|Proxy<UserInterface>|Factory<UserInterface>|null $as
+     *
+     * @return static
+     */
+    public function assertAuthenticated($as = null): self
+    {
+        Assert::that($token = $this->securityToken())
+            ->isNotNull('Expected to be authenticated but NOT.')
+        ;
+
+        if (!$as) {
+            return $this;
+        }
+
+        if ($as instanceof Factory) {
+            $as = $as->create();
+        }
+
+        if ($as instanceof Proxy) {
+            $as = $as->object();
+        }
+
+        if ($as instanceof UserInterface) {
+            $as = $as->getUserIdentifier();
+        }
+
+        if (!\is_string($as)) {
+            throw new \LogicException(\sprintf('%s() requires the "as" user be a string or %s.', __METHOD__, UserInterface::class));
+        }
+
+        Assert::that($token->getUserIdentifier())
+            ->is($as, 'Expected to be authenticated as "{expected}" but authenticated as "{actual}".')
+        ;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function assertNotAuthenticated(): self
+    {
+        Assert::that($token = $this->securityToken())
+            ->isNull('Expected to NOT be authenticated but authenticated as "{actual}".', [
+                'actual' => $token ? $token->getUserIdentifier() : null,
+            ])
+        ;
 
         return $this;
     }
@@ -427,5 +482,16 @@ class KernelBrowser extends Browser
                 Assert::fail('DataCollector %s is not available for this request.', [$class]);
             })),
         ];
+    }
+
+    private function securityToken(): ?TokenInterface
+    {
+        $container = $this->client()->getContainer();
+
+        if (!$container->has('security.token_storage')) {
+            throw new \LogicException('Security not available/enabled.');
+        }
+
+        return $container->get('security.token_storage')->getToken();
     }
 }

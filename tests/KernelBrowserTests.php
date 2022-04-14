@@ -86,6 +86,45 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    public function can_make_authentication_assertions(): void
+    {
+        // todo remove this requirement in foundry
+        Factory::boot(new Configuration());
+
+        $username = 'kevin';
+        $user = new InMemoryUser('kevin', 'pass');
+        $factory = factory(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
+        $proxy = factory(InMemoryUser::class)->create(['username' => 'kevin', 'password' => 'pass']);
+
+        $this->browser()
+            ->assertNotAuthenticated()
+            ->actingAs($user)
+            ->assertAuthenticated()
+            ->assertAuthenticated($username)
+            ->assertAuthenticated($user)
+            ->assertAuthenticated($factory)
+            ->assertAuthenticated($proxy)
+            ->visit('/user')
+            ->assertAuthenticated()
+            ->assertAuthenticated($username)
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_check_if_not_authenticated_after_request(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->assertNotAuthenticated()
+            ->assertSeeIn('a', 'a link')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_enable_exception_throwing(): void
     {
         $this->expectException(\Exception::class);
