@@ -143,7 +143,7 @@ final class Kernel extends BaseKernel
             'secret' => 'S3CRET',
             'router' => ['utf8' => true],
             'test' => true,
-            'profiler' => ['enabled' => true, 'collect' => true],
+            'profiler' => ['collect' => false],
             'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
         ]);
         $c->loadFromExtension('security', [

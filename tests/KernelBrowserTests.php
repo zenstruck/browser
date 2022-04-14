@@ -503,6 +503,7 @@ trait KernelBrowserTests
     public function can_access_the_profiler(): void
     {
         $profile = $this->browser()
+            ->withProfiling()
             ->visit('/page1')
             ->profile()
         ;
@@ -547,6 +548,7 @@ trait KernelBrowserTests
     public function can_use_data_collector(): void
     {
         $this->browser()
+            ->withProfiling()
             ->visit('/page1')
             ->use(function(RequestDataCollector $collector) {
                 $this->assertSame('/page1', $collector->getPathInfo());
