@@ -146,7 +146,13 @@ class KernelBrowser extends Browser
      */
     public function assertAuthenticated($as = null): self
     {
-        Assert::that($token = $this->securityToken())
+        $token = $this->securityToken();
+
+        if (!$token && $this->session()->isStarted() && !($this->session()->getStatusCode() >= 200 && $this->session()->getStatusCode() < 300)) {
+            Assert::fail('The last response was not successful so cannot check authentication.');
+        }
+
+        Assert::that($token)
             ->isNotNull('Expected to be authenticated but NOT.')
         ;
 

@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -126,9 +126,25 @@ final class Kernel extends BaseKernel
         return new RedirectResponse('/page1');
     }
 
-    public function user(?UserInterface $user = null): Response
+    public function user(Security $security): Response
     {
-        return new Response($user ? "user: {$user->getUserIdentifier()}/{$user->getPassword()}" : 'anon');
+        if (!$token = $security->getToken()) {
+            return new Response('anon');
+        }
+
+        $user = $token->getUser();
+
+        return new Response("user: {$user->getUserIdentifier()}/{$user->getPassword()}/".\get_class($token));
+    }
+
+    public function login(): Response
+    {
+        return new Response();
+    }
+
+    public function logout(): Response
+    {
+        return new Response();
     }
 
     public function registerBundles(): iterable
@@ -143,14 +159,25 @@ final class Kernel extends BaseKernel
             'secret' => 'S3CRET',
             'router' => ['utf8' => true],
             'test' => true,
-            'profiler' => ['enabled' => true, 'collect' => true],
+            'profiler' => ['collect' => false],
             'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
+            'property_access' => true,
         ]);
         $c->loadFromExtension('security', [
             'enable_authenticator_manager' => true,
             'password_hashers' => [InMemoryUser::class => 'plaintext'],
             'providers' => ['users' => ['memory' => ['users' => ['kevin' => ['password' => 'pass']]]]],
-            'firewalls' => ['main' => []],
+            'firewalls' => ['main' => [
+                'lazy' => true,
+                'provider' => 'users',
+                'form_login' => [
+                    'check_path' => '/login',
+                ],
+                'logout' => true,
+                'remember_me' => [
+                    'secret' => '%kernel.secret%',
+                ],
+            ]],
         ]);
         $c->register('logger', NullLogger::class); // disable logging
     }
@@ -170,5 +197,7 @@ final class Kernel extends BaseKernel
         $routes->add('xml', '/xml')->controller('kernel::xml');
         $routes->add('javascript', '/javascript')->controller('kernel::javascript');
         $routes->add('user', '/user')->controller('kernel::user');
+        $routes->add('login', '/login')->controller('kernel::login');
+        $routes->add('logout', '/logout')->controller('kernel::logout');
     }
 }

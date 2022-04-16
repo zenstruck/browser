@@ -319,6 +319,23 @@ $browser
 ;
 ```
 
+##### Troubleshooting Authentication
+
+> `LogicException: Cannot create the remember-me cookie; no master request available.`
+> exception when calling `->assertAuthenticated()`
+
+This is caused when the _token_ is a `RememberMeToken`, `lazy: true` in your firewall, and the
+previous request didn't perform any security-related operations. Possible solutions:
+
+1. Before calling `->assertAuthenticated()`, visit a page you know initiates security
+   (ie `is_granted()` in a Twig template).
+2. Call `->withProfiling()` before making the previous request. This enables the security
+   data collector which performs security operations.
+3. Set `framework.profiler.collect: true` in your test environment. This enables the profiler
+   for all requests removing the need to ever call `->withProfiling()` but can slow down
+   your tests.
+
+
 #### HTTP Requests
 
 The _KernelBrowser_ can be used for testing API endpoints. The following http methods are available:
