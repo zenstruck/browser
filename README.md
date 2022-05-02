@@ -192,6 +192,8 @@ $browser
         // access the current Browser instance and the current crawler
     })
 
+    ->crawler() // Symfony\Component\DomCrawler\Crawler instance for the current response
+
     // save the raw source of the current page
     // by default, saves to "<project-root>/var/browser/source"
     // configure with "BROWSER_SOURCE_DIR" env variable
