@@ -6,7 +6,6 @@ namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Assert;
 use Zenstruck\Browser\Json;
 
 class JsonTest extends TestCase
@@ -17,11 +16,7 @@ class JsonTest extends TestCase
      */
     public function assert_has_passes_if_selector_exists(string $json, string $selector): void
     {
-        try {
-            (new Json($json))->assertHas($selector);
-        } catch (AssertionFailedError $exception) {
-            Assert::fail("assertHas() did not assert that selector \"{$selector}\" exists.");
-        }
+        (new Json($json))->assertHas($selector);
     }
 
     /**
@@ -30,15 +25,10 @@ class JsonTest extends TestCase
      */
     public function assert_has_fails_if_selector_does_not_exist(string $json, string $selector): void
     {
-        try {
-            (new Json($json))->assertHas($selector);
-        } catch (AssertionFailedError $exception) {
-            Assert::pass();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Element with selector \"{$selector}\" not found.");
 
-            return;
-        }
-
-        Assert::fail("assertHas() asserted that selector \"{$selector}\" exists although it does not.");
+        (new Json($json))->assertHas($selector);
     }
 
     /**
@@ -47,11 +37,7 @@ class JsonTest extends TestCase
      */
     public function assert_missing_passes_if_selector_does_not_exist(string $json, string $selector): void
     {
-        try {
-            (new Json($json))->assertMissing($selector);
-        } catch (AssertionFailedError $exception) {
-            Assert::fail("assertMissing() asserted that selector \"{$selector}\" is missing although it does not.");
-        }
+        (new Json($json))->assertMissing($selector);
     }
 
     /**
@@ -60,15 +46,10 @@ class JsonTest extends TestCase
      */
     public function assert_missing_fails_if_selector_exists(string $json, string $selector): void
     {
-        try {
-            (new Json($json))->assertMissing($selector);
-        } catch (AssertionFailedError $exception) {
-            Assert::pass();
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Element with selector \"{$selector}\" exists but it should not.");
 
-            return;
-        }
-
-        Assert::fail("assertMissing() did not assert that \"{$selector}\" is missing.");
+        (new Json($json))->assertMissing($selector);
     }
 
     public function selectorExistsProvider(): iterable
@@ -92,11 +73,7 @@ class JsonTest extends TestCase
      */
     public function can_assert_a_selector_has_count(string $json, int $expectedCount): void
     {
-        try {
-            (new Json($json))->hasCount($expectedCount);
-        } catch (AssertionFailedError $exception) {
-            Assert::fail("assertCount() did not assert that json matches expected count \"{$expectedCount}\"");
-        }
+        (new Json($json))->hasCount($expectedCount);
     }
 
     public function selectHasCountProvider(): iterable
@@ -149,15 +126,9 @@ class JsonTest extends TestCase
      */
     public function assert_that_each_throws_if_invalid_array_given(string $json, string $selector, callable $asserter): void
     {
-        try {
-            (new Json($json))->assertThatEach($selector, $asserter);
-        } catch (AssertionFailedError $e) {
-            Assert::pass();
+        $this->expectException(AssertionFailedError::class);
 
-            return;
-        }
-
-        Assert::fail('Json::assertThatEach() should raise exception with invalid arrays.');
+        (new Json($json))->assertThatEach($selector, $asserter);
     }
 
     public function invalidArrayChildAssertionProvider(): iterable

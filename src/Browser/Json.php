@@ -8,6 +8,7 @@ use function JmesPath\search;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
  * @mixin Expectation
  */
 final class Json
@@ -54,7 +55,11 @@ final class Json
      */
     public function assertHas(string $selector): self
     {
-        Assert::try(fn() => $this->search("length({$selector})"));
+        Assert::try(
+            fn() => $this->search("length({$selector})"),
+            'Element with selector "{selector}" not found.',
+            ['selector' => $selector]
+        );
 
         return $this;
     }
@@ -72,7 +77,7 @@ final class Json
             return $this;
         }
 
-        Assert::fail("Selector \"{$selector}\" does exists.");
+        Assert::fail('Element with selector "{selector}" exists but it should not.', ['selector' => $selector]);
     }
 
     /**
@@ -93,7 +98,7 @@ final class Json
         $value = $this->search($selector);
 
         if (!\is_array($value)) {
-            Assert::fail("Value for selector \"{$selector}\" is not an array.");
+            Assert::fail('Value for selector "{selector}" is not an array.', ['selector' => $selector]);
         }
 
         Assert::that($value)->isNotEmpty();
