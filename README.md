@@ -414,6 +414,8 @@ $json = $browser
 ;
 
 $json->assertMatches('foo.bar.baz', 1);
+$json->assertHas('foo.bar.baz');
+$json->assertMissing('foo.bar.boo');
 $json->search('foo.bar.baz'); // mixed (the found value at "JMESPath expression")
 $json->decoded(); // the decoded json
 (string) $json; // the json string pretty-printed
@@ -422,7 +424,15 @@ $json->decoded(); // the decoded json
 $json = $browser
     ->get('/api/endpoint')
     ->use(function(\Zenstruck\Browser\Json $json) {
-        $json->assertMatches('foo.bar.baz', 1);
+        // Json acts like a proxy of zenstruck/assert Expectation class
+        $json->hasCount(5);
+        $json->contains('foo');
+        // assert on children: the closure gets Json object contextualized on given selector
+        // {"foo": "bar"}
+        $json->assertThat('foo', fn(Json $json) => $json->equals('bar'))
+        // assert on each element of an array
+        // {"foo": [1, 2, 3]}
+        $json->assertThatEach('foo', fn(Json $json) => $json->isGreaterThan(0));
     })
 ;
 ```
