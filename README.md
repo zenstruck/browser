@@ -881,7 +881,7 @@ use Zenstruck\Browser\KernelBrowser;
 
 class AppBrowser extends KernelBrowser
 {
-    use Authentication;
+    use AuthenticationExtension;
 }
 ```
 
