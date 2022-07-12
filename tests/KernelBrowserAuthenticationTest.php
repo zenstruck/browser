@@ -11,6 +11,7 @@ use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Tests\Fixture\Kernel;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+
 use function Zenstruck\Foundry\factory;
 
 /**

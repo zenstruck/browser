@@ -4,6 +4,7 @@ namespace Zenstruck\Browser;
 
 use Zenstruck\Assert;
 use Zenstruck\Assert\Expectation;
+
 use function JmesPath\search;
 
 /**
