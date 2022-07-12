@@ -4,6 +4,7 @@ namespace Zenstruck\Browser;
 
 use Zenstruck\Assert;
 use Zenstruck\Assert\Expectation;
+
 use function JmesPath\search;
 
 /**
@@ -14,6 +15,9 @@ use function JmesPath\search;
 final class Json
 {
     private string $source;
+
+    /** @var mixed */
+    private $decoded;
 
     public function __construct(string $source)
     {
@@ -125,11 +129,7 @@ final class Json
      */
     public function decoded()
     {
-        if (empty($this->source)) {
-            return null;
-        }
-
-        return \json_decode($this->source, true, 512, \JSON_THROW_ON_ERROR);
+        return $this->decoded ??= empty($this->source) ? null : \json_decode($this->source, true, 512, \JSON_THROW_ON_ERROR);
     }
 
     /**

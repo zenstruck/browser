@@ -394,7 +394,8 @@ $browser
 Make assertions about json responses using [JMESPath expressions](https://jmespath.org/)
 See the [JMESPath Tutorials](https://jmespath.org/tutorial.html) to learn more.
 
-**NOTE:** `mtdowling/jmespath.php` is required: `composer require --dev mtdowling/jmespath.php`.
+> **Note**
+> `mtdowling/jmespath.php` is required: `composer require --dev mtdowling/jmespath.php`.
 
 ```php
 /** @var \Zenstruck\Browser\KernelBrowser $browser **/
@@ -436,6 +437,10 @@ $json = $browser
     })
 ;
 ```
+
+> **Note**
+> See the [full `zenstruck/assert` expectation API documentation](https://github.com/zenstruck/assert#expectation-api)
+> to see all the methods available on `Zenstruck\Browser\Json`.
 
 ### PantherBrowser
 
