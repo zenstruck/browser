@@ -414,7 +414,7 @@ class KernelBrowser extends Browser
     /**
      * @return static
      */
-    final public function assertHeaderEquals(string $header, string $expected): self
+    final public function assertHeaderEquals(string $header, ?string $expected): self
     {
         $this->session()->assert()->responseHeaderEquals($header, $expected);
 

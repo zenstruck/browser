@@ -227,6 +227,7 @@ $browser
     ->assertRedirected() // 3xx status code
     ->assertHeaderEquals('Content-Type', 'text/html; charset=UTF-8')
     ->assertHeaderContains('Content-Type', 'html')
+    ->assertHeaderEquals('X-Not-Present-Header', null)
 
     // helpers for quickly checking the content type
     ->assertJson()

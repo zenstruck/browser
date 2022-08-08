@@ -233,6 +233,7 @@ trait KernelBrowserTests
             ->visit('/page1')
             ->assertHeaderEquals('Content-Type', 'text/html; charset=UTF-8')
             ->assertHeaderContains('Content-Type', 'text/html')
+            ->assertHeaderEquals('X-Not-Present-Header', null)
         ;
     }
 
