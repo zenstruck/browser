@@ -137,4 +137,29 @@ class JsonTest extends TestCase
         yield ['{"foo": "bar"}', 'foo', static function(Json $json) {}];
         yield ['{"foo": []}', 'foo', static function(Json $json) {}];
     }
+
+    /** @test */
+    public function can_match_json_schema(): void
+    {
+        (new Json('{"foo1": "bar", "foo2": [1, 2], "foo3": {"bar": "baz"}, "foo4": [{"bar": "baz"}]}'))->assertMatchesSchema(
+            <<<'JSON'
+            {
+                "$schema": "http://json-schema.org/draft-04/schema#",
+                "type": "object",
+                "properties": {
+                    "foo1": { "type": "string" },
+                    "foo2": { "type": "array", "items": [ { "type": "integer" }, { "type": "integer" } ] },
+                    "foo3": { "type": "object", "properties": { "bar": { "type": "string" } }, "required": [ "bar" ] },
+                    "foo4": { "type": "array", "items": [ { "type": "object", "properties": { "bar": { "type": "string" } }, "required": [ "bar" ] } ] }
+                },
+                "required": [
+                    "foo1",
+                    "foo2",
+                    "foo3",
+                    "foo4"
+                ]
+            }
+            JSON
+        );
+    }
 }
