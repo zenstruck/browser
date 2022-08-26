@@ -2,6 +2,7 @@
 
 namespace Zenstruck;
 
+use Behat\Mink\Element\NodeElement;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
@@ -289,12 +290,8 @@ abstract class Browser
         return $this;
     }
 
-    /**
-     * Click on a button, link or any DOM element.
-     *
-     * @return static
-     */
-    final public function click(string $selector): self
+
+    protected function getClickableElement(string $selector): NodeElement
     {
         // try button
         $element = $this->session()->page()->findButton($selector);
@@ -322,6 +319,18 @@ abstract class Browser
                 Assert::fail('Button "%s" is not visible.', [$selector]);
             }
         }
+
+        return $element;
+    }
+
+    /**
+     * Click on a button, link or any DOM element.
+     *
+     * @return static
+     */
+    final public function click(string $selector): self
+    {
+        $element = $this->getClickableElement($selector);
 
         $element->click();
 

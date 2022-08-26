@@ -185,6 +185,18 @@ final class PantherDriver extends Driver
         $this->client()->refreshCrawler();
     }
 
+    public function doubleClick($xpath): void
+    {
+        $this->client()->getMouse()->doubleClick($this->toCoordinates($xpath));
+        $this->client()->refreshCrawler();
+    }
+
+    public function rightClick($xpath): void
+    {
+        $this->client()->getMouse()->contextClick($this->toCoordinates($xpath));
+        $this->client()->refreshCrawler();
+    }
+
     public function executeScript($script): void
     {
         if (\preg_match('/^function[\s(]/', $script)) {

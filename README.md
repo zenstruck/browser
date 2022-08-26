@@ -480,6 +480,9 @@ $browser
     ->waitUntilSeeIn('.selector', 'some text')
     ->waitUntilNotSeeIn('.selector', 'some text')
 
+    ->doubleClick('Link')
+    ->rightClick('Link')
+
     // dump() the browser's console error log
     ->dumpConsoleLog()
 
