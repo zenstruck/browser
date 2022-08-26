@@ -202,4 +202,20 @@ class PantherBrowser extends Browser
             ['Saved Console Logs' => $this->savedConsoleLogs, 'Saved Screenshots' => $this->savedScreenshots]
         );
     }
+
+    final public function doubleClick(string $selector): self
+    {
+        $element = $this->getClickableElement($selector);
+        $element->doubleClick();
+
+        return $this;
+    }
+
+    final public function rightClick(string $selector): self
+    {
+        $element = $this->getClickableElement($selector);
+        $element->rightClick();
+
+        return $this;
+    }
 }

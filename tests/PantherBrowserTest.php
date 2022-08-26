@@ -188,6 +188,42 @@ final class PantherBrowserTest extends TestCase
         ;
     }
 
+    /**
+     * @test
+     */
+    public function double_click_on_element(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->click('#double-click-link a')
+            ->assertOn('/page1')
+        ;
+
+        $this->browser()
+            ->visit('/page1')
+            ->doubleClick('#double-click-link a')
+            ->assertOn('/page2')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function context_menu_on_element(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->click('#double-click-link a')
+            ->assertOn('/page1')
+        ;
+
+        $this->browser()
+            ->visit('/page1')
+            ->rightClick('#context-menu-link a')
+            ->assertOn('/page2')
+        ;
+    }
+
     protected function browser(): PantherBrowser
     {
         return $this->pantherBrowser();

@@ -2,6 +2,7 @@
 
 namespace Zenstruck;
 
+use Behat\Mink\Element\NodeElement;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
@@ -296,32 +297,7 @@ abstract class Browser
      */
     final public function click(string $selector): self
     {
-        // try button
-        $element = $this->session()->page()->findButton($selector);
-
-        if (!$element) {
-            // try link
-            $element = $this->session()->page()->findLink($selector);
-        }
-
-        if (!$element) {
-            // try by css
-            $element = $this->session()->page()->find('css', $selector);
-        }
-
-        if (!$element) {
-            Assert::fail('Clickable element "%s" not found.', [$selector]);
-        }
-
-        if (!$element->isVisible()) {
-            Assert::fail('Clickable element "%s" is not visible.', [$selector]);
-        }
-
-        if ($button = $this->session()->page()->findButton($selector)) {
-            if (!$button->isVisible()) {
-                Assert::fail('Button "%s" is not visible.', [$selector]);
-            }
-        }
+        $element = $this->getClickableElement($selector);
 
         $element->click();
 
@@ -446,6 +422,38 @@ abstract class Browser
     public function savedArtifacts(): array
     {
         return ['Saved Source Files' => $this->savedSources];
+    }
+
+    final protected function getClickableElement(string $selector): NodeElement
+    {
+        // try button
+        $element = $this->session()->page()->findButton($selector);
+
+        if (!$element) {
+            // try link
+            $element = $this->session()->page()->findLink($selector);
+        }
+
+        if (!$element) {
+            // try by css
+            $element = $this->session()->page()->find('css', $selector);
+        }
+
+        if (!$element) {
+            Assert::fail('Clickable element "%s" not found.', [$selector]);
+        }
+
+        if (!$element->isVisible()) {
+            Assert::fail('Clickable element "%s" is not visible.', [$selector]);
+        }
+
+        if ($button = $this->session()->page()->findButton($selector)) {
+            if (!$button->isVisible()) {
+                Assert::fail('Button "%s" is not visible.', [$selector]);
+            }
+        }
+
+        return $element;
     }
 
     /**
