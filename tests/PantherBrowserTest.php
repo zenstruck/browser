@@ -191,7 +191,7 @@ final class PantherBrowserTest extends TestCase
     /**
      * @test
      */
-    public function doubleClick_on_element(): void
+    public function double_click_on_element(): void
     {
         $this->browser()
             ->visit('/page1')
@@ -209,7 +209,7 @@ final class PantherBrowserTest extends TestCase
     /**
      * @test
      */
-    public function contextMenu_on_element(): void
+    public function context_menu_on_element(): void
     {
         $this->browser()
             ->visit('/page1')
