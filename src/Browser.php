@@ -424,7 +424,7 @@ abstract class Browser
         return ['Saved Source Files' => $this->savedSources];
     }
 
-    protected function getClickableElement(string $selector): NodeElement
+    final protected function getClickableElement(string $selector): NodeElement
     {
         // try button
         $element = $this->session()->page()->findButton($selector);
