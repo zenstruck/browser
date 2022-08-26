@@ -203,7 +203,7 @@ class PantherBrowser extends Browser
         );
     }
 
-    public function doubleClick(string $selector): self
+    final public function doubleClick(string $selector): self
     {
         $element = $this->getClickableElement($selector);
         $element->doubleClick();
