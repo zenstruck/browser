@@ -176,6 +176,11 @@ parameters:
 			path: src/Browser/KernelBrowser.php
 
 		-
+			message: "#^Parameter \\#2 \\$value of method Behat\\\\Mink\\\\WebAssert\\:\\:responseHeaderEquals\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: src/Browser/KernelBrowser.php
+
+		-
 			message: "#^Method Zenstruck\\\\Browser\\\\Session\\\\Driver\\\\BrowserKitDriver\\:\\:getFormField\\(\\) should return Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField but returns array\\<Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\>\\|Symfony\\\\Component\\\\DomCrawler\\\\Field\\\\FormField\\.$#"
 			count: 1
 			path: src/Browser/Session/Driver/BrowserKitDriver.php
