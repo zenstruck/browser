@@ -24,6 +24,7 @@
     },
     "require-dev": {
         "dbrekelmans/bdi": "^1.0",
+        "justinrainbow/json-schema": "^5.2",
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5",
@@ -32,6 +33,10 @@
         "symfony/phpunit-bridge": "^6.0",
         "symfony/security-bundle": "^5.4|^6.0",
         "zenstruck/foundry": "^1.17"
+    },
+    "suggest": {
+        "justinrainbow/json-schema": "Json schema validator. Needed to use Json::assertMatchesSchema().",
+        "mtdowling/jmespath.php":  "PHP implementation for JMESPath. Needed to use Json assertions."
     },
     "config": {
         "preferred-install": "dist",

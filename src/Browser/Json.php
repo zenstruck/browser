@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Browser;
 
+use JsonSchema\Validator;
 use Zenstruck\Assert;
 use Zenstruck\Assert\Expectation;
 
@@ -97,7 +98,7 @@ final class Json
     /**
      * @param callable(Json):mixed $assert
      */
-    public function assertThatEach(string $selector, callable $assert): void
+    public function assertThatEach(string $selector, callable $assert): self
     {
         $value = $this->search($selector);
 
@@ -110,6 +111,26 @@ final class Json
         foreach ($value as $item) {
             $assert(self::encode($item));
         }
+
+        return $this;
+    }
+
+    public function assertMatchesSchema(string $jsonSchema): self
+    {
+        if (!\class_exists(Validator::class)) {
+            throw new \LogicException('"justinrainbow/json-schema" is required to check JSON schema (composer require --dev justinrainbow/json-schema".');
+        }
+
+        $validator = new Validator();
+        $decoded = \json_decode($this->source, null, 512, \JSON_THROW_ON_ERROR);
+        $validator->validate(
+            $decoded,
+            \json_decode($jsonSchema, true, 512, \JSON_THROW_ON_ERROR)
+        );
+
+        Assert::that($validator->isValid())->is(true, (string) \json_encode($validator->getErrors()));
+
+        return $this;
     }
 
     /**
