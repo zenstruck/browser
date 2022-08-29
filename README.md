@@ -435,6 +435,8 @@ $json = $browser
         // assert on each element of an array
         // {"foo": [1, 2, 3]}
         $json->assertThatEach('foo', fn(Json $json) => $json->isGreaterThan(0));
+        // assert json matches given json schema
+        $json->assertMatchesSchema(file_get_contents('/path/to/json-schema.json'));
     })
 ;
 ```
