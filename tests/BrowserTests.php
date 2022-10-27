@@ -631,6 +631,16 @@ trait BrowserTests
         })->throws(AssertionFailedError::class, 'The last request threw an exception: Zenstruck\Browser\Tests\Fixture\CustomException - exception thrown');
     }
 
+    /**
+     * @test
+     */
+    public function can_get_content(): void
+    {
+        $content = $this->browser()->visit('/text')->content();
+
+        $this->assertStringContainsString('text content', $content);
+    }
+
     protected static function catchFileContents(string $expectedFile, callable $callback): string
     {
         (new Filesystem())->remove($expectedFile);
