@@ -65,6 +65,7 @@ trait BrowserTests
 
     /**
      * @test
+     *
      * @dataProvider encodedUrlProvider
      */
     public function assert_on_encoded($url, $expected): void

@@ -19,6 +19,7 @@ trait HasBrowser
 
     /**
      * @internal
+     *
      * @after
      */
     final public static function _resetBrowserClients(): void
