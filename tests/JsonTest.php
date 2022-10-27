@@ -12,6 +12,7 @@ class JsonTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider selectorExistsProvider
      */
     public function assert_has_passes_if_selector_exists(string $json, string $selector): void
@@ -21,6 +22,7 @@ class JsonTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider selectorDoesNotExistProvider
      */
     public function assert_has_fails_if_selector_does_not_exist(string $json, string $selector): void
@@ -33,6 +35,7 @@ class JsonTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider selectorDoesNotExistProvider
      */
     public function assert_missing_passes_if_selector_does_not_exist(string $json, string $selector): void
@@ -42,6 +45,7 @@ class JsonTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider selectorExistsProvider
      */
     public function assert_missing_fails_if_selector_exists(string $json, string $selector): void
@@ -69,6 +73,7 @@ class JsonTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider selectHasCountProvider
      */
     public function can_assert_a_selector_has_count(string $json, int $expectedCount): void
@@ -92,6 +97,7 @@ class JsonTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider scalarChildAssertionProvider
      */
     public function can_perform_assertion_on_scalar_child(string $selector, callable $asserter): void
@@ -107,6 +113,7 @@ class JsonTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider arrayChildAssertionProvider
      */
     public function can_perform_assertion_on_array_child(string $json, string $selector, callable $asserter): void
@@ -122,6 +129,7 @@ class JsonTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider invalidArrayChildAssertionProvider
      */
     public function assert_that_each_throws_if_invalid_array_given(string $json, string $selector, callable $asserter): void

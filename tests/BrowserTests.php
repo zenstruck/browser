@@ -65,6 +65,7 @@ trait BrowserTests
 
     /**
      * @test
+     *
      * @dataProvider encodedUrlProvider
      */
     public function assert_on_encoded($url, $expected): void
@@ -628,6 +629,16 @@ trait BrowserTests
                 ->assertSee('foo')
             ;
         })->throws(AssertionFailedError::class, 'The last request threw an exception: Zenstruck\Browser\Tests\Fixture\CustomException - exception thrown');
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_content(): void
+    {
+        $content = $this->browser()->visit('/text')->content();
+
+        $this->assertStringContainsString('text content', $content);
     }
 
     protected static function catchFileContents(string $expectedFile, callable $callback): string
