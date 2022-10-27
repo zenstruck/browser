@@ -193,6 +193,8 @@ $browser
     })
 
     ->crawler() // Symfony\Component\DomCrawler\Crawler instance for the current response
+    
+    ->content() // Obtain the raw content from the response object
 
     // save the raw source of the current page
     // by default, saves to "<project-root>/var/browser/source"
