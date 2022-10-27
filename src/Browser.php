@@ -98,6 +98,11 @@ abstract class Browser
     {
         return $this->client()->getCrawler();
     }
+    
+    final public function content(): string
+    {
+        return $this->client()->getResponse()->getContent();
+    }
 
     /**
      * @return static
