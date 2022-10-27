@@ -17,6 +17,8 @@ use Zenstruck\Foundry\Proxy;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
+ * @phpstan-import-type Options from HttpOptions
+ *
  * @method SymfonyKernelBrowser client()
  */
 class KernelBrowser extends Browser
@@ -263,7 +265,7 @@ class KernelBrowser extends Browser
     }
 
     /**
-     * @param HttpOptions|array $options
+     * @param HttpOptions|Options $options
      *
      * @return static
      */

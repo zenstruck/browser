@@ -4,6 +4,25 @@ namespace Zenstruck\Browser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-type RequiredOptions = array{
+ *     headers: array<string,string>,
+ *     query: mixed[],
+ *     files: array<string,string>,
+ *     server: array<string,string>,
+ *     body: string|mixed[]|null,
+ *     json: mixed,
+ *     ajax: bool
+ * }
+ * @phpstan-type Options = array{
+ *     headers?: array<string,string>,
+ *     query?: mixed[],
+ *     files?: array<string,string>,
+ *     server?: array<string,string>,
+ *     body?: string|mixed[]|null,
+ *     json?: mixed,
+ *     ajax?: bool
+ * }
  */
 class HttpOptions
 {
@@ -32,15 +51,19 @@ class HttpOptions
         'ajax' => false,
     ];
 
+    /** @var RequiredOptions */
     private array $options;
 
+    /**
+     * @param Options $options
+     */
     final public function __construct(array $options = [])
     {
         $this->options = \array_merge(self::DEFAULT_OPTIONS, $options);
     }
 
     /**
-     * @param self|array $options
+     * @param static|Options $options
      *
      * @return static
      */
@@ -82,7 +105,7 @@ class HttpOptions
     }
 
     /**
-     * @param self|array $options
+     * @param static|Options $options
      *
      * @return static
      */
@@ -123,6 +146,8 @@ class HttpOptions
     }
 
     /**
+     * @param array<string,string> $headers
+     *
      * @return static
      */
     final public function withHeaders(array $headers): self
@@ -133,6 +158,8 @@ class HttpOptions
     }
 
     /**
+     * @param mixed[] $query
+     *
      * @return static
      */
     final public function withQuery(array $query): self
@@ -143,6 +170,8 @@ class HttpOptions
     }
 
     /**
+     * @param array<string,string> $server
+     *
      * @return static
      */
     final public function withServer(array $server): self
@@ -153,6 +182,8 @@ class HttpOptions
     }
 
     /**
+     * @param array<string,string> $files
+     *
      * @return static
      */
     final public function withFiles(array $files): self
@@ -163,7 +194,7 @@ class HttpOptions
     }
 
     /**
-     * @param string|array|null $body
+     * @param string|mixed[]|null $body
      *
      * @return static
      */
@@ -198,7 +229,9 @@ class HttpOptions
 
     final public function addQueryToUrl(string $url): string
     {
-        $parts = \parse_url($url);
+        if (false === $parts = \parse_url($url)) {
+            throw new \InvalidArgumentException(\sprintf('Url "%s" is invalid.', $url));
+        }
 
         if (isset($parts['query'])) {
             \parse_str($parts['query'], $query);
@@ -216,7 +249,7 @@ class HttpOptions
         $pass = isset($parts['pass']) ? ':'.$parts['pass'] : '';
         $pass = ($user || $pass) ? "{$pass}@" : '';
         $path = $parts['path'] ?? '';
-        $query = isset($parts['query']) && $parts['query'] ? '?'.$parts['query'] : '';
+        $query = $parts['query'] ? '?'.$parts['query'] : '';
         $fragment = isset($parts['fragment']) ? '#'.$parts['fragment'] : '';
 
         return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;
@@ -224,6 +257,8 @@ class HttpOptions
 
     /**
      * @internal
+     *
+     * @return mixed[]
      */
     final public function parameters(): array
     {
@@ -233,6 +268,8 @@ class HttpOptions
 
     /**
      * @internal
+     *
+     * @return array<string,string>
      */
     final public function files(): array
     {
@@ -243,6 +280,8 @@ class HttpOptions
      * @co-author Kévin Dunglas <dunglas@gmail.com>
      *
      * @internal
+     *
+     * @return array<string,string>
      */
     final public function server(): array
     {

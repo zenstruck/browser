@@ -56,81 +56,6 @@ parameters:
 			path: src/Browser/Assertion/SameUrlAssertion.php
 
 		-
-			message: "#^Cannot access offset 'query' on array\\{scheme\\?\\: string, host\\?\\: string, port\\?\\: int, user\\?\\: string, pass\\?\\: string, path\\?\\: string, query\\?\\: string, fragment\\?\\: string\\}\\|false\\.$#"
-			count: 2
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:__construct\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:create\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:files\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:merge\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:parameters\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:server\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:withBody\\(\\) has parameter \\$body with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:withFiles\\(\\) has parameter \\$files with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:withHeaders\\(\\) has parameter \\$headers with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:withQuery\\(\\) has parameter \\$query with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\HttpOptions\\:\\:withServer\\(\\) has parameter \\$server with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Parameter \\#1 \\$options of class Zenstruck\\\\Browser\\\\HttpOptions constructor expects array, array\\|Zenstruck\\\\Browser\\\\HttpOptions given\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Parameter \\#3 \\$subject of function str_replace expects array\\|string, int\\|string given\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
-			message: "#^Property Zenstruck\\\\Browser\\\\HttpOptions\\:\\:\\$options type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/HttpOptions.php
-
-		-
 			message: "#^Cannot call method getToken\\(\\) on object\\|null\\.$#"
 			count: 1
 			path: src/Browser/KernelBrowser.php
@@ -167,11 +92,6 @@ parameters:
 
 		-
 			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:request\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Browser/KernelBrowser.php
-
-		-
-			message: "#^Method Zenstruck\\\\Browser\\\\KernelBrowser\\:\\:setDefaultHttpOptions\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Browser/KernelBrowser.php
 
