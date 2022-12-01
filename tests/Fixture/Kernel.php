@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -151,6 +152,7 @@ final class Kernel extends BaseKernel
     {
         yield new FrameworkBundle();
         yield new SecurityBundle();
+        yield new ZenstruckFoundryBundle();
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
@@ -178,6 +180,9 @@ final class Kernel extends BaseKernel
                     'secret' => '%kernel.secret%',
                 ],
             ]],
+        ]);
+        $c->loadFromExtension('zenstruck_foundry', [
+            'auto_refresh_proxies' => false,
         ]);
         $c->register('logger', NullLogger::class); // disable logging
     }
