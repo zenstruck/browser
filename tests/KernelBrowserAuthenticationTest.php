@@ -8,9 +8,7 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Zenstruck\Browser\Test\HasBrowser;
-use Zenstruck\Browser\Tests\Fixture\Kernel;
-use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Test\Factories;
 
 use function Zenstruck\Foundry\factory;
 
@@ -19,7 +17,7 @@ use function Zenstruck\Foundry\factory;
  */
 final class KernelBrowserAuthenticationTest extends KernelTestCase
 {
-    use HasBrowser;
+    use Factories, HasBrowser;
 
     /**
      * @test
@@ -39,9 +37,6 @@ final class KernelBrowserAuthenticationTest extends KernelTestCase
      */
     public function can_act_as_user_with_foundry_factory(): void
     {
-        // todo remove this requirement in foundry
-        Factory::boot(new Configuration());
-
         $user = factory(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
 
         $this->browser()
@@ -57,9 +52,6 @@ final class KernelBrowserAuthenticationTest extends KernelTestCase
      */
     public function can_act_as_user_with_foundry_proxy(): void
     {
-        // todo remove this requirement in foundry
-        Factory::boot(new Configuration());
-
         $user = factory(InMemoryUser::class)->create(['username' => 'kevin', 'password' => 'pass']);
 
         $this->browser()
@@ -75,9 +67,6 @@ final class KernelBrowserAuthenticationTest extends KernelTestCase
      */
     public function can_make_authentication_assertions(): void
     {
-        // todo remove this requirement in foundry
-        Factory::boot(new Configuration());
-
         $username = 'kevin';
         $user = new InMemoryUser('kevin', 'pass');
         $factory = factory(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
@@ -114,9 +103,7 @@ final class KernelBrowserAuthenticationTest extends KernelTestCase
      */
     public function can_authenticate_with_form_login_and_remember_me(): void
     {
-        if (Kernel::VERSION_ID < 60000) {
-            $this->markTestIncomplete('For some reason, the login token is always remember me, even before expiring the session'); // todo
-        }
+        $this->markTestIncomplete('For some reason, under certain dependency conditions, the login token is always remember me, even before expiring the session'); // todo
 
         $this->browser()
             ->visit('/user')

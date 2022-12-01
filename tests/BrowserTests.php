@@ -663,7 +663,7 @@ trait BrowserTests
         $callback();
 
         // reset to default handler
-        VarDumper::setHandler();
+        VarDumper::setHandler(null);
 
         // a null value is added to the beginning
         return \array_values(\array_filter($output));
