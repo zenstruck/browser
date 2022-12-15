@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/browser package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
@@ -629,7 +638,8 @@ trait KernelBrowserTests
                     ->expectException(\RuntimeException::class)
                     ->get('/page1')
                 ;
-            })
+            }
+        )
             ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
         ;
 
@@ -641,7 +651,8 @@ trait KernelBrowserTests
                     ->expectException(\RuntimeException::class)
                     ->click('a link')
                 ;
-            })
+            }
+        )
             ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
         ;
 
@@ -653,7 +664,8 @@ trait KernelBrowserTests
                     ->expectException(\RuntimeException::class)
                     ->click('Submit')
                 ;
-            })
+            }
+        )
             ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
         ;
     }

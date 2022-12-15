@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/browser package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
@@ -151,23 +160,23 @@ class JsonTest extends TestCase
     {
         (new Json('{"foo1": "bar", "foo2": [1, 2], "foo3": {"bar": "baz"}, "foo4": [{"bar": "baz"}]}'))->assertMatchesSchema(
             <<<'JSON'
-            {
-                "$schema": "http://json-schema.org/draft-04/schema#",
-                "type": "object",
-                "properties": {
-                    "foo1": { "type": "string" },
-                    "foo2": { "type": "array", "items": [ { "type": "integer" }, { "type": "integer" } ] },
-                    "foo3": { "type": "object", "properties": { "bar": { "type": "string" } }, "required": [ "bar" ] },
-                    "foo4": { "type": "array", "items": [ { "type": "object", "properties": { "bar": { "type": "string" } }, "required": [ "bar" ] } ] }
-                },
-                "required": [
-                    "foo1",
-                    "foo2",
-                    "foo3",
-                    "foo4"
-                ]
-            }
-            JSON
+                {
+                    "$schema": "http://json-schema.org/draft-04/schema#",
+                    "type": "object",
+                    "properties": {
+                        "foo1": { "type": "string" },
+                        "foo2": { "type": "array", "items": [ { "type": "integer" }, { "type": "integer" } ] },
+                        "foo3": { "type": "object", "properties": { "bar": { "type": "string" } }, "required": [ "bar" ] },
+                        "foo4": { "type": "array", "items": [ { "type": "object", "properties": { "bar": { "type": "string" } }, "required": [ "bar" ] } ] }
+                    },
+                    "required": [
+                        "foo1",
+                        "foo2",
+                        "foo3",
+                        "foo4"
+                    ]
+                }
+                JSON
         );
     }
 }
