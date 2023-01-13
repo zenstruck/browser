@@ -69,11 +69,8 @@ final class Json
      */
     public function assertHas(string $selector): self
     {
-        Assert::try(
-            fn() => $this->search("length({$selector})"),
-            'Element with selector "{selector}" not found.',
-            ['selector' => $selector]
-        );
+        Assert::that($this->search($selector))
+            ->isNotNull('Element with selector "{selector}" not found.', ['selector' => $selector]);
 
         return $this;
     }
@@ -83,15 +80,10 @@ final class Json
      */
     public function assertMissing(string $selector): self
     {
-        try {
-            $this->search("length({$selector})");
-        } catch (\RuntimeException $e) {
-            Assert::pass();
+        Assert::that($this->search($selector))
+            ->isNull('Element with selector "{selector}" exists but it should not.', ['selector' => $selector]);
 
-            return $this;
-        }
-
-        Assert::fail('Element with selector "{selector}" exists but it should not.', ['selector' => $selector]);
+        return $this;
     }
 
     /**
