@@ -74,7 +74,6 @@ final class Json
         $key = array_pop($exploded);
         $keySelector = implode('.', $exploded);
 
-        dump($keySelector, $key);
         Assert::that($this->search("contains(keys($keySelector), '$key')"))
             ->equals(true, 'Element with selector "{selector}" not found.', ['selector' => $selector]);
 
@@ -91,7 +90,6 @@ final class Json
         $key = array_pop($exploded);
         $keySelector = implode('.', $exploded);
 
-        dump($selector, $keySelector, $key);
         Assert::that($this->search("contains(keys($keySelector), '$key')"))
             ->equals(false, 'Element with selector "{selector}" exists but it should not.', ['selector' => $selector]);
 
