@@ -71,6 +71,13 @@ class JsonTest extends TestCase
         yield ['{"foo":{"bar": "baz"}}', 'foo.bar'];
         yield ['[{"foo":"bar"}]', '[0].foo'];
         yield ['{"foo":[{"bar": "baz"}]}', 'foo[0].bar'];
+        yield ['{"foo": 1}', 'foo'];
+        yield ['{"foo": ""}', 'foo'];
+        yield ['{"foo": 0}', 'foo'];
+        yield ['{"foo": false}', 'foo'];
+        yield ['{"foo": null}', 'foo'];
+        yield ['{"foo": {"bar": null}}', 'foo.bar'];
+        yield ['{"foo": [{"bar": null}]}', 'foo[0].bar'];
     }
 
     public function selectorDoesNotExistProvider(): iterable

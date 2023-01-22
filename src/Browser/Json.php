@@ -69,11 +69,13 @@ final class Json
      */
     public function assertHas(string $selector): self
     {
-        Assert::try(
-            fn() => $this->search("length({$selector})"),
-            'Element with selector "{selector}" not found.',
-            ['selector' => $selector]
-        );
+        $prefix = 1 === preg_match('#^\[#', $selector) ? '' : '@.';
+        $exploded = explode('.', $prefix.$selector);
+        $key = array_pop($exploded);
+        $keySelector = implode('.', $exploded);
+
+        Assert::that($this->search("contains(keys($keySelector), '$key')"))
+            ->equals(true, 'Element with selector "{selector}" not found.', ['selector' => $selector]);
 
         return $this;
     }
@@ -83,15 +85,15 @@ final class Json
      */
     public function assertMissing(string $selector): self
     {
-        try {
-            $this->search("length({$selector})");
-        } catch (\RuntimeException $e) {
-            Assert::pass();
+        $prefix = 1 === preg_match('#^\[#', $selector) ? '' : '@.';
+        $exploded = explode('.', $prefix.$selector);
+        $key = array_pop($exploded);
+        $keySelector = implode('.', $exploded);
 
-            return $this;
-        }
+        Assert::that($this->search("contains(keys($keySelector), '$key')"))
+            ->equals(false, 'Element with selector "{selector}" exists but it should not.', ['selector' => $selector]);
 
-        Assert::fail('Element with selector "{selector}" exists but it should not.', ['selector' => $selector]);
+        return $this;
     }
 
     /**
