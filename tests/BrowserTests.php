@@ -366,7 +366,7 @@ trait BrowserTests
             ->checkField('Input 2')
             ->uncheckField('Input 3')
             ->selectFieldOption('Input 4', 'option 2')
-            ->attachFile('Input 5', __FILE__)
+            ->attachFile('Input 5', new \SplFileInfo(__FILE__))
             ->selectFieldOptions('Input 6', ['option 1', 'option 3'])
             ->checkField('Radio 3')
             ->click('Submit')
@@ -547,7 +547,7 @@ trait BrowserTests
     {
         $this->browser()
             ->visit('/page1')
-            ->attachFile('Input 9', [__DIR__.'/Fixture/files/attachment.txt', __DIR__.'/Fixture/files/xml.xml'])
+            ->attachFile('Input 9', [__DIR__.'/Fixture/files/attachment.txt', new \SplFileInfo(__DIR__.'/Fixture/files/xml.xml')])
             ->click('Submit')
             ->assertContains('"input_9":["attachment.txt","xml.xml"]')
         ;
