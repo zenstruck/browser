@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## [v1.3.0](https://github.com/zenstruck/browser/releases/tag/v1.3.0)
+
+February 15th, 2023 - [v1.2.0...v1.3.0](https://github.com/zenstruck/browser/compare/v1.2.0...v1.3.0)
+
+* 25c5ea5 fix(tests): deprecation (#119) by @kbond
+* ab4b548 fix(ci): don't run fixcs/sync-with-template on forks (#119) by @kbond
+* d03de6a fix: enable attaching `\SplFileInfo` objects (#119) by @kbond
+* 90e99fc feat: require php 8+ (#117) by @kbond
+* f4596c8 fix: Json::assertMissing/assertHas better handle empty-ish values (#116) by @flohw
+* 0173c11 fix(ci): add token by @kbond
+* ea600b7 chore(ci): fix by @kbond
+* 3fe911f chore: update ci config (#114) by @kbond
+* 9f6024a fix: tests (#113) by @kbond
+* 301e072 [minor] adjust sca (#111) by @kbond
+* b5f7b4a [minor] adjust `Browser::content()` and add test (#111) by @kbond
+* 29fbc93 [minor] cs fixes (#111) by @kbond
+* 51bb8b1 [feature] Add `Browser::content()` to fetch the raw response body (#109) by @benr77
+
 ## [v1.2.0](https://github.com/zenstruck/browser/releases/tag/v1.2.0)
 
 August 29th, 2022 - [v1.1.0...v1.2.0](https://github.com/zenstruck/browser/compare/v1.1.0...v1.2.0)
