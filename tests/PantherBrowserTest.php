@@ -189,7 +189,7 @@ final class PantherBrowserTest extends TestCase
     public function cannot_follow_invisible_link(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectErrorMessage('Clickable element "invisible link" is not visible.');
+        $this->expectExceptionMessage('Clickable element "invisible link" is not visible.');
 
         $this->browser()
             ->visit('/javascript')

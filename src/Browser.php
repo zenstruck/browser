@@ -286,12 +286,12 @@ abstract class Browser
     }
 
     /**
-     * @param string[]|string $filename string: single file
+     * @param string|string[] $filename string: single file
      *                                  array: multiple files
      *
      * @return static
      */
-    final public function attachFile(string $selector, $filename): self
+    final public function attachFile(string $selector, array|string $filename): self
     {
         foreach ((array) $filename as $file) {
             if (!\file_exists($file)) {
