@@ -445,9 +445,17 @@ class KernelBrowser extends Browser
     /**
      * @return static
      */
+    final public function assertContentType(string $contentType): self
+    {
+        return $this->assertHeaderContains('Content-Type', $contentType);
+    }
+
+    /**
+     * @return static
+     */
     final public function assertJson(): self
     {
-        return $this->assertHeaderContains('Content-Type', 'json');
+        return $this->assertContentType('json');
     }
 
     /**
@@ -455,7 +463,7 @@ class KernelBrowser extends Browser
      */
     final public function assertXml(): self
     {
-        return $this->assertHeaderContains('Content-Type', 'xml');
+        return $this->assertContentType('xml');
     }
 
     /**
@@ -463,7 +471,7 @@ class KernelBrowser extends Browser
      */
     final public function assertHtml(): self
     {
-        return $this->assertHeaderContains('Content-Type', 'html');
+        return $this->assertContentType('html');
     }
 
     /**

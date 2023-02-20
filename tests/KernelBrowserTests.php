@@ -362,6 +362,8 @@ trait KernelBrowserTests
             ->assertXml()
             ->get('/page1')
             ->assertHtml()
+            ->get('/zip')
+            ->assertContentType('zip')
         ;
     }
 
