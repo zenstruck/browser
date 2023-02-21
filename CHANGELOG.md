@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v1.4.0](https://github.com/zenstruck/browser/releases/tag/v1.4.0)
+
+February 21st, 2023 - [v1.3.0...v1.4.0](https://github.com/zenstruck/browser/compare/v1.3.0...v1.4.0)
+
+* a99150a doc: document `BROWSER_SOURCE_DEBUG` by @kbond
+* d64b773 feat: add `KernelBrowser::assertContentType()` and prevent saving corrupt files (#121) by @welcoMattic
+
 ## [v1.3.0](https://github.com/zenstruck/browser/releases/tag/v1.3.0)
 
 February 15th, 2023 - [v1.2.0...v1.3.0](https://github.com/zenstruck/browser/compare/v1.2.0...v1.3.0)
