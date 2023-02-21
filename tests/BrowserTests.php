@@ -271,7 +271,7 @@ trait BrowserTests
         });
 
         $this->assertEquals(
-            file_get_contents(__DIR__.'/../var/browser/source/attachment.zip'),
+            \file_get_contents(__DIR__.'/../var/browser/source/attachment.zip'),
             $contents
         );
     }
