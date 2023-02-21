@@ -13,6 +13,7 @@ namespace Zenstruck\Browser;
 
 use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Exception\DriverException;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Session as MinkSession;
 use Behat\Mink\WebAssert;
 use Symfony\Component\BrowserKit\AbstractBrowser;
@@ -93,28 +94,33 @@ final class Session extends MinkSession
         $this->getDriver()->expectException($expectedException, $expectedMessage);
     }
 
-    public function source(): string
+    public function source(bool $sourceDebug = false): string
     {
-        $ret = "<!--\n";
+        $ret = '';
 
-        try {
-            $ret .= "URL: {$this->getCurrentUrl()} ({$this->getStatusCode()})\n\n";
+        // We never want to prepend non-text files with metadata.
+        if ($sourceDebug && $this->isTextContent()) {
+            $ret .= "<!--\n";
 
-            foreach ($this->getResponseHeaders() as $header => $values) {
-                foreach ((array) $values as $value) {
-                    $ret .= "{$header}: {$value}\n";
+            try {
+                $ret .= "URL: {$this->getCurrentUrl()} ({$this->getStatusCode()})\n\n";
+
+                foreach ($this->getResponseHeaders() as $header => $values) {
+                    foreach ((array) $values as $value) {
+                        $ret .= "{$header}: {$value}\n";
+                    }
                 }
+            } catch (DriverException $e) {
+                $ret = "URL: {$this->getCurrentUrl()}\n";
             }
-        } catch (DriverException $e) {
-            $ret = "URL: {$this->getCurrentUrl()}\n";
-        }
 
-        $ret .= "-->\n";
+            $ret .= "-->\n";
+        }
 
         try {
             $ret .= $this->json();
         } catch (DriverException $e) {
-            $ret .= \trim($this->getDriver()->getContent());
+            $ret .= $this->getDriver()->getContent();
         }
 
         return $ret;
@@ -123,7 +129,7 @@ final class Session extends MinkSession
     public function dump(?string $selector = null): void
     {
         if (!$selector) {
-            self::varDump($this->source());
+            self::varDump($this->source(true));
 
             return;
         }
@@ -170,5 +176,22 @@ final class Session extends MinkSession
             \preg_replace('/\s+/', '', $exceptionClassNode->text()),
             \count($messageNode) ? $messageNode->text() : 'unknown message',
         ]);
+    }
+
+    private function isTextContent(): bool
+    {
+        try {
+            return match (true) {
+                str_contains((string) $this->getResponseHeader('Content-Type'), 'text/plain'),
+                str_contains((string) $this->getResponseHeader('Content-Type'), 'xml'), // to cover all possible XML content-types: "application/xml (is recommended as of RFC 7303 (section 4.1)), text/xml "
+                str_contains((string) $this->getResponseHeader('Content-Type'), 'html'), // to cover all possible (x)HTML content-types: "text/html, application/xhtml+xml"
+                str_contains((string) $this->getResponseHeader('Content-Type'), 'json'), // to cover all possible JSON content-types: "application/json, application/ld+json"
+                => true,
+                default => false,
+            };
+        } catch (UnsupportedDriverActionException) {
+            // We never want to add metadata to source content if Panther is used.
+            return false;
+        }
     }
 }

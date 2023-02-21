@@ -18,6 +18,7 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -157,6 +158,14 @@ final class Kernel extends BaseKernel
         return new Response();
     }
 
+    public function zip(): Response
+    {
+        return new Response(\file_get_contents(__DIR__.'/files/attachment.zip'), 200, [
+            'Content-Disposition' => HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, 'attachment.zip'),
+            'Content-Type' => 'application/zip',
+        ]);
+    }
+
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
@@ -213,5 +222,6 @@ final class Kernel extends BaseKernel
         $routes->add('user', '/user')->controller('kernel::user');
         $routes->add('login', '/login')->controller('kernel::login');
         $routes->add('logout', '/logout')->controller('kernel::logout');
+        $routes->add('zip', '/zip')->controller('kernel::zip');
     }
 }

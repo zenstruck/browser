@@ -235,6 +235,7 @@ $browser
     ->assertJson()
     ->assertXml()
     ->assertHtml()
+    ->assertContentType('zip')
 
     // by default, exceptions are caught and converted to a response
     // use the BROWSER_CATCH_EXCEPTIONS environment variable to change default

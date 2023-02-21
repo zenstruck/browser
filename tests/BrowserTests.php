@@ -233,7 +233,11 @@ trait BrowserTests
             ;
         });
 
-        $this->assertStringContainsString('/page1', $output[0]);
+        // Metadata are never prepended to source content with PantherBrowser
+        if ($this->browser() instanceof Browser\KernelBrowser) {
+            $this->assertStringContainsString('/page1', $output[0]);
+        }
+
         $this->assertStringContainsString('<html', $output[0]);
         $this->assertStringContainsString('<h1>h1 title</h1>', $output[0]);
     }
@@ -250,9 +254,26 @@ trait BrowserTests
             ;
         });
 
-        $this->assertStringContainsString('/page1', $contents);
         $this->assertStringContainsString('<html', $contents);
         $this->assertStringContainsString('<h1>h1 title</h1>', $contents);
+    }
+
+    /**
+     * @test
+     */
+    public function can_save_source_as_zip(): void
+    {
+        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/attachment.zip', function() {
+            $this->browser()
+                ->visit('/zip')
+                ->saveSource('attachment.zip')
+            ;
+        });
+
+        $this->assertEquals(
+            file_get_contents(__DIR__.'/../var/browser/source/attachment.zip'),
+            $contents
+        );
     }
 
     /**

@@ -29,6 +29,7 @@ abstract class Browser
 {
     private Session $session;
     private ?string $sourceDir;
+    private bool $sourceDebug;
 
     /** @var string[] */
     private array $savedSources = [];
@@ -42,6 +43,7 @@ abstract class Browser
     {
         $this->session = new Session($driver);
         $this->sourceDir = $options['source_dir'] ?? null;
+        $this->sourceDebug = $options['source_debug'] ?? false;
     }
 
     final public function client(): AbstractBrowser
@@ -403,7 +405,7 @@ abstract class Browser
             $filename = \sprintf('%s/%s', \rtrim($this->sourceDir, '/'), \ltrim($filename, '/'));
         }
 
-        (new Filesystem())->dumpFile($this->savedSources[] = $filename, $this->session()->source());
+        (new Filesystem())->dumpFile($this->savedSources[] = $filename, $this->session()->source($this->sourceDebug));
 
         return $this;
     }
