@@ -31,7 +31,7 @@
         "symfony/panther": "^1.1|^2.0.1",
         "symfony/phpunit-bridge": "^6.0",
         "symfony/security-bundle": "^5.4|^6.0",
-        "zenstruck/foundry": "^1.23"
+        "zenstruck/foundry": "^1.30"
     },
     "suggest": {
         "justinrainbow/json-schema": "Json schema validator. Needed to use Json::assertMatchesSchema().",

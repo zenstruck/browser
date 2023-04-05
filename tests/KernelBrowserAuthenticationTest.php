@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Foundry\Test\Factories;
 
-use function Zenstruck\Foundry\factory;
+use function Zenstruck\Foundry\anonymous;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -46,7 +46,7 @@ final class KernelBrowserAuthenticationTest extends KernelTestCase
      */
     public function can_act_as_user_with_foundry_factory(): void
     {
-        $user = factory(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
+        $user = anonymous(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
 
         $this->browser()
             ->throwExceptions()
@@ -61,7 +61,7 @@ final class KernelBrowserAuthenticationTest extends KernelTestCase
      */
     public function can_act_as_user_with_foundry_proxy(): void
     {
-        $user = factory(InMemoryUser::class)->create(['username' => 'kevin', 'password' => 'pass']);
+        $user = anonymous(InMemoryUser::class)->create(['username' => 'kevin', 'password' => 'pass']);
 
         $this->browser()
             ->throwExceptions()
@@ -78,8 +78,8 @@ final class KernelBrowserAuthenticationTest extends KernelTestCase
     {
         $username = 'kevin';
         $user = new InMemoryUser('kevin', 'pass');
-        $factory = factory(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
-        $proxy = factory(InMemoryUser::class)->create(['username' => 'kevin', 'password' => 'pass']);
+        $factory = anonymous(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
+        $proxy = anonymous(InMemoryUser::class)->create(['username' => 'kevin', 'password' => 'pass']);
 
         $this->browser()
             ->assertNotAuthenticated()
