@@ -16,18 +16,22 @@ use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\DomCrawler\Crawler;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Session\Driver\PantherDriver;
+use Zenstruck\Browser\Dom\Selector;
+use Zenstruck\Browser\Session\PantherSession;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @experimental in 1.0
  *
+ * @phpstan-import-type SelectorType from Selector
+ *
  * @method Client  client()
  * @method Crawler crawler()
  */
 class PantherBrowser extends Browser
 {
+    private PantherSession $session;
     private ?string $screenshotDir;
     private ?string $consoleLogDir;
 
@@ -42,38 +46,66 @@ class PantherBrowser extends Browser
      */
     final public function __construct(Client $client, array $options = [])
     {
-        parent::__construct(new PantherDriver($client), $options);
+        parent::__construct($this->session = new PantherSession($client), $options);
 
         $this->screenshotDir = $options['screenshot_dir'] ?? null;
         $this->consoleLogDir = $options['console_log_dir'] ?? null;
     }
 
     /**
+     * @param SelectorType $selector
+     */
+    public function assertSeeIn(Selector|string|callable $selector, string $expected): self
+    {
+        if ('title' === $selector) {
+            // hack to get the text of the title html element
+            // for this element, WebDriverElement::getText() returns an empty string
+            // the only way to get the value is to get title from the client
+            Assert::that($this->client()->getTitle())->contains($expected);
+
+            return $this;
+        }
+
+        return parent::assertSeeIn($selector, $expected);
+    }
+
+    /**
+     * @param SelectorType $selector
+     */
+    public function assertNotSeeIn(Selector|string|callable $selector, string $expected): self
+    {
+        if ('title' === $selector) {
+            // hack to get the text of the title html element
+            // for this element, WebDriverElement::getText() returns an empty string
+            // the only way to get the value is to get title from the client
+            Assert::that($this->client()->getTitle())->doesNotContain($expected);
+
+            return $this;
+        }
+
+        return parent::assertNotSeeIn($selector, $expected);
+    }
+
+    /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertVisible(string $selector): self
+    final public function assertVisible(Selector|string|callable $selector): self
     {
-        $element = $this->session()->assert()->elementExists('css', $selector);
-
-        Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
+        $this->dom()->expect()->elementIsVisible($selector);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertNotVisible(string $selector): self
+    final public function assertNotVisible(Selector|string|callable $selector): self
     {
-        $element = $this->session()->page()->find('css', $selector);
-
-        if (!$element) {
-            Assert::pass();
-
-            return $this;
-        }
-
-        Assert::false($element->isVisible(), 'Expected element "%s" to not be visible but it is.', [$selector]);
+        $this->dom()->expect()->elementIsNotVisible($selector);
 
         return $this;
     }
@@ -173,7 +205,7 @@ class PantherBrowser extends Browser
 
     final public function dumpConsoleLog(): self
     {
-        Session::varDump($this->client()->manage()->getLog('browser'));
+        Dumper::dump($this->client()->manage()->getLog('browser'));
 
         return $this;
     }
@@ -181,7 +213,7 @@ class PantherBrowser extends Browser
     final public function ddConsoleLog(): void
     {
         $this->dumpConsoleLog();
-        $this->session()->exit();
+        $this->exit();
     }
 
     final public function ddScreenshot(string $filename = 'screenshot.png'): void
@@ -190,7 +222,7 @@ class PantherBrowser extends Browser
 
         echo \sprintf("\n\nScreenshot saved as \"%s\".\n\n", \end($this->savedScreenshots));
 
-        $this->session()->exit();
+        $this->exit();
     }
 
     final public function saveCurrentState(string $filename): void
@@ -212,19 +244,66 @@ class PantherBrowser extends Browser
         );
     }
 
-    final public function doubleClick(string $selector): self
+    /**
+     * @param SelectorType $selector
+     *
+     * @return static
+     */
+    final public function doubleClick(Selector|string|callable $selector): self
     {
-        $element = $this->getClickableElement($selector);
-        $element->doubleClick();
+        $this->session->doubleClick($this->dom()->findOrFail($selector));
 
         return $this;
     }
 
-    final public function rightClick(string $selector): self
+    /**
+     * @param SelectorType $selector
+     *
+     * @return static
+     */
+    final public function rightClick(Selector|string|callable $selector): self
     {
-        $element = $this->getClickableElement($selector);
-        $element->rightClick();
+        $this->session->rightClick($this->dom()->findOrFail($selector));
 
         return $this;
+    }
+
+    final public function dump(Selector|string|callable|null $selector = null): self
+    {
+        if (!$selector) {
+            Dumper::dump($this->source(true));
+
+            return $this;
+        }
+
+        $this->dom()->dump($selector);
+
+        return $this;
+    }
+
+    /**
+     * @internal
+     */
+    final protected function source(bool $debug): string
+    {
+        $ret = '';
+
+        if ($debug) {
+            $ret .= "<!--\n";
+            $ret .= "URL: {$this->client()->getCurrentURL()}\n";
+            $ret .= "-->\n";
+        }
+
+        return $ret.$this->client()->getPageSource();
+    }
+
+    /**
+     * @internal
+     */
+    final protected function exit(): void
+    {
+        $this->client()->quit();
+
+        parent::exit();
     }
 }

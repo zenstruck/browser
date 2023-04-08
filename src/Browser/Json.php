@@ -174,6 +174,25 @@ final class Json
         return $this->decoded = \json_decode($this->source, true, 512, \JSON_THROW_ON_ERROR);
     }
 
+    public function dump(?string $selector = null): self
+    {
+        if (!$selector) {
+            Dumper::dump((string) $this);
+
+            return $this;
+        }
+
+        Dumper::dump($this->search($selector));
+
+        return $this;
+    }
+
+    public function dd(?string $selector = null): void
+    {
+        $this->dump($selector);
+        exit(1);
+    }
+
     /**
      * @param mixed $data
      */
