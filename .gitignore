@@ -6,3 +6,4 @@
 /drivers/
 /.php-cs-fixer.cache
 /.phpunit.result.cache
+/.idea
