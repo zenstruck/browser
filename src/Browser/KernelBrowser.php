@@ -310,7 +310,7 @@ class KernelBrowser extends Browser
      *
      * @return static
      */
-    final public function get(string $url, $options = []): self
+    public function get(string $url, $options = []): self
     {
         return $this->request('GET', $url, $options);
     }
@@ -322,7 +322,7 @@ class KernelBrowser extends Browser
      *
      * @return static
      */
-    final public function post(string $url, $options = []): self
+    public function post(string $url, $options = []): self
     {
         return $this->request('POST', $url, $options);
     }
@@ -334,7 +334,7 @@ class KernelBrowser extends Browser
      *
      * @return static
      */
-    final public function put(string $url, $options = []): self
+    public function put(string $url, $options = []): self
     {
         return $this->request('PUT', $url, $options);
     }
@@ -346,7 +346,7 @@ class KernelBrowser extends Browser
      *
      * @return static
      */
-    final public function delete(string $url, $options = []): self
+    public function delete(string $url, $options = []): self
     {
         return $this->request('DELETE', $url, $options);
     }
@@ -358,7 +358,7 @@ class KernelBrowser extends Browser
      *
      * @return static
      */
-    final public function patch(string $url, $options = []): self
+    public function patch(string $url, $options = []): self
     {
         return $this->request('PATCH', $url, $options);
     }
