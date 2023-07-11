@@ -12,6 +12,7 @@
 namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Zenstruck\Assert;
 use Zenstruck\Browser\HttpOptions;
@@ -36,6 +37,21 @@ trait KernelBrowserTests
                 $browser->visit('/redirect1');
             })
             ->assertOn('/page1')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_container_as_typehint(): void
+    {
+        $browser = $this->browser();
+        $c=$browser->client()->getContainer();
+
+        $browser
+            ->use(function(ContainerInterface $container) use ($c) {
+                $this->assertSame($c, $container);
+            })
         ;
     }
 
