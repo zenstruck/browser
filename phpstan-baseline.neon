@@ -56,7 +56,7 @@ parameters:
 			path: src/Browser/Assertion/SameUrlAssertion.php
 
 		-
-			message: "#^Cannot call method getToken\\(\\) on object\\|null\\.$#"
+			message: "#^Call to an undefined method object\\:\\:getToken\\(\\)\\.$#"
 			count: 1
 			path: src/Browser/KernelBrowser.php
 
