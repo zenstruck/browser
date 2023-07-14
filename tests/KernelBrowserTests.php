@@ -46,7 +46,7 @@ trait KernelBrowserTests
     public function can_use_container_as_typehint(): void
     {
         $browser = $this->browser();
-        $c=$browser->client()->getContainer();
+        $c = $browser->client()->getContainer();
 
         $browser
             ->use(function(ContainerInterface $container) use ($c) {

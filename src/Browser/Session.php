@@ -70,7 +70,7 @@ final class Session extends MinkSession
 
     public function json(): Json
     {
-        if (str_contains((string) $this->getResponseHeader('content-type'), 'json')) {
+        if (\str_contains((string) $this->getResponseHeader('content-type'), 'json')) {
             return new Json($this->page()->getContent());
         }
 
@@ -182,10 +182,10 @@ final class Session extends MinkSession
     {
         try {
             return match (true) {
-                str_contains((string) $this->getResponseHeader('Content-Type'), 'text/plain'),
-                str_contains((string) $this->getResponseHeader('Content-Type'), 'xml'), // to cover all possible XML content-types: "application/xml (is recommended as of RFC 7303 (section 4.1)), text/xml "
-                str_contains((string) $this->getResponseHeader('Content-Type'), 'html'), // to cover all possible (x)HTML content-types: "text/html, application/xhtml+xml"
-                str_contains((string) $this->getResponseHeader('Content-Type'), 'json'), // to cover all possible JSON content-types: "application/json, application/ld+json"
+                \str_contains((string) $this->getResponseHeader('Content-Type'), 'text/plain'),
+                \str_contains((string) $this->getResponseHeader('Content-Type'), 'xml'), // to cover all possible XML content-types: "application/xml (is recommended as of RFC 7303 (section 4.1)), text/xml "
+                \str_contains((string) $this->getResponseHeader('Content-Type'), 'html'), // to cover all possible (x)HTML content-types: "text/html, application/xhtml+xml"
+                \str_contains((string) $this->getResponseHeader('Content-Type'), 'json'), // to cover all possible JSON content-types: "application/json, application/ld+json"
                 => true,
                 default => false,
             };

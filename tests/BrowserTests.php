@@ -180,8 +180,8 @@ trait BrowserTests
             ->use(function(Browser $browser1, $browser2, TestComponent1 $component1, TestComponent2 $component2, Crawler $crawler, AbstractBrowser $inner) use ($browser) {
                 $this->assertInstanceOf(Browser::class, $browser1);
                 $this->assertInstanceOf(Browser::class, $browser2);
-                $this->assertInstanceOf(\get_class($browser), $browser1);
-                $this->assertInstanceOf(\get_class($browser), $browser2);
+                $this->assertInstanceOf($browser::class, $browser1);
+                $this->assertInstanceOf($browser::class, $browser2);
                 $this->assertInstanceOf(TestComponent1::class, $component1);
                 $this->assertInstanceOf(TestComponent2::class, $component2);
             })

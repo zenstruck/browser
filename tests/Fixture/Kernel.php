@@ -145,7 +145,7 @@ final class Kernel extends BaseKernel
 
         $user = $token->getUser();
 
-        return new Response("user: {$user->getUserIdentifier()}/{$user->getPassword()}/".\get_class($token));
+        return new Response("user: {$user->getUserIdentifier()}/{$user->getPassword()}/".$token::class);
     }
 
     public function login(): Response

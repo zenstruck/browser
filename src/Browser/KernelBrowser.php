@@ -499,7 +499,7 @@ class KernelBrowser extends Browser
             Parameter::typed(Json::class, Parameter::factory(fn() => $this->json())),
             Parameter::typed(DataCollectorInterface::class, Parameter::factory(function(string $class) {
                 foreach ($this->profile()->getCollectors() as $collector) {
-                    if ($class === \get_class($collector)) {
+                    if ($class === $collector::class) {
                         return $collector;
                     }
                 }

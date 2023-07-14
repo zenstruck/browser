@@ -495,7 +495,7 @@ abstract class Browser
             Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->client()->getCrawler())),
             Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->client()->getCookieJar())),
             Parameter::typed(AbstractBrowser::class, Parameter::factory(fn() => $this->client())),
-            Parameter::typed(ContainerInterface::class, Parameter::factory(fn() => method_exists($this->client(), 'getContainer') ? $this->client()->getContainer() : null))->optional(),
+            Parameter::typed(ContainerInterface::class, Parameter::factory(fn() => \method_exists($this->client(), 'getContainer') ? $this->client()->getContainer() : null))->optional(),
         ];
     }
 }
