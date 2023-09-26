@@ -14,10 +14,10 @@
     "require": {
         "php": ">=8.0",
         "behat/mink": "^1.8",
-        "symfony/browser-kit": "^5.4|^6.0",
-        "symfony/css-selector": "^5.4|^6.0",
-        "symfony/dom-crawler": "^5.4|^6.0",
-        "symfony/framework-bundle": "^5.4|^6.0",
+        "symfony/browser-kit": "^5.4|^6.0|^7.0",
+        "symfony/css-selector": "^5.4|^6.0|^7.0",
+        "symfony/dom-crawler": "^5.4|^6.0|^7.0",
+        "symfony/framework-bundle": "^5.4|^6.0|^7.0",
         "zenstruck/assert": "^1.1",
         "zenstruck/callback": "^1.4.2"
     },
@@ -27,10 +27,10 @@
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5",
-        "symfony/mime": "^5.4|^6.0",
+        "symfony/mime": "^5.4|^6.0|^7.0",
         "symfony/panther": "^1.1|^2.0.1",
-        "symfony/phpunit-bridge": "^6.0",
-        "symfony/security-bundle": "^5.4|^6.0",
+        "symfony/phpunit-bridge": "^6.0|^7.0",
+        "symfony/security-bundle": "^5.4|^6.0|^7.0",
         "zenstruck/foundry": "^1.30"
     },
     "suggest": {
