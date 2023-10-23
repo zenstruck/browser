@@ -287,4 +287,12 @@ final class HttpOptionsTest extends TestCase
             $options->server()
         );
     }
+
+    /**
+     * @test
+     */
+    public function dots_in_query_string_are_preserved(): void
+    {
+        $this->assertSame('/?nested.param=value&deeper.nested.param=y', (new HttpOptions())->addQueryToUrl('/?nested.param=value&deeper.nested.param=y'));
+    }
 }

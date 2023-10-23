@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Browser;
 
+use Symfony\Component\HttpFoundation\HeaderUtils;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -243,7 +245,7 @@ class HttpOptions
         }
 
         if (isset($parts['query'])) {
-            \parse_str($parts['query'], $query);
+            $query = HeaderUtils::parseQuery($parts['query']);
         } else {
             $query = [];
         }
