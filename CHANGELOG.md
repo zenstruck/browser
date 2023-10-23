@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [v1.5.0](https://github.com/zenstruck/browser/releases/tag/v1.5.0)
+
+October 23rd, 2023 - [v1.4.0...v1.5.0](https://github.com/zenstruck/browser/compare/v1.4.0...v1.5.0)
+
+* ec27abb fix: preserving dots in query string (#132) by @norkunas
+* 7b8a982 minor: allow Symfony 7.0 (#130) by @kbond
+* 9b4887d minor(ci): remove php version from fixcs job by @kbond
+* 2e738a6 feat: Allow to use `Psr\Container\ContainerInterface` in `->use` callback (#129) by @norkunas
+* 48bb602 feat: Enable overriding of HTTP methods (#126) by @nathan-de-pachtere
+* 45cc396 fix(tests): deprecations (#123) by @kbond
+
 ## [v1.4.0](https://github.com/zenstruck/browser/releases/tag/v1.4.0)
 
 February 21st, 2023 - [v1.3.0...v1.4.0](https://github.com/zenstruck/browser/compare/v1.3.0...v1.4.0)
