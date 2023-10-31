@@ -41,6 +41,14 @@ use Zenstruck\Browser\Session\Driver;
  */
 final class BrowserKitDriver extends Driver
 {
+    private const EMPTY_FILE_VALUE = [
+        'name' => '',
+        'type' => '',
+        'tmp_name' => '',
+        'error' => 4,
+        'size' => 0,
+    ];
+
     /** @var Form[] */
     private array $forms = [];
 
@@ -349,39 +357,33 @@ final class BrowserKitDriver extends Driver
     }
 
     /**
-     * @param string|string[] $path
+     * @param string $path
      */
     public function attachFile($xpath, $path): void
     {
-        $files = (array) $path;
         $field = $this->getFormField($xpath);
 
         if (!$field instanceof FileFormField) {
             throw new DriverException(\sprintf('Impossible to attach a file on the element with XPath "%s" as it is not a file input', $xpath));
         }
 
-        $field->upload(\array_shift($files));
+        if (self::EMPTY_FILE_VALUE === $field->getValue()) {
+            // first file
+            $field->upload($path);
 
-        if (!$files) {
-            // not multiple files
             return;
         }
 
-        $node = $this->getFilteredCrawler($xpath);
-
-        if (null === $node->attr('multiple')) {
+        if (null === $this->getFilteredCrawler($xpath)->attr('multiple')) {
             throw new \InvalidArgumentException('Cannot attach multiple files to a non-multiple file field.');
         }
 
+        // field has values, so append
         $fieldNode = $this->getCrawlerNode($this->getFilteredCrawler($xpath));
         $form = $this->getFormForFieldNode($fieldNode);
-
-        foreach ($files as $file) {
-            $field = new FileFormField($fieldNode);
-            $field->upload($file);
-
-            $form->set($field);
-        }
+        $field = new FileFormField($fieldNode);
+        $field->upload($path);
+        $form->set($field);
     }
 
     public function submitForm($xpath): void

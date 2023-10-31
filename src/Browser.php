@@ -300,9 +300,9 @@ abstract class Browser
             if (!\file_exists($file)) {
                 throw new \InvalidArgumentException(\sprintf('File "%s" does not exist.', $file));
             }
-        }
 
-        $this->session()->page()->attachFileToField($selector, $filename);
+            $this->session()->page()->attachFileToField($selector, $file);
+        }
 
         return $this;
     }

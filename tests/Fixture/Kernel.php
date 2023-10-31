@@ -11,9 +11,11 @@
 
 namespace Zenstruck\Browser\Tests\Fixture;
 
+use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,7 +27,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
@@ -137,8 +138,10 @@ final class Kernel extends BaseKernel
         return new RedirectResponse('/page1');
     }
 
-    public function user(Security $security): Response
+    public function user(?ContainerInterface $container = null, ?Security $security = null): Response
     {
+        $security ??= $container->get('security.token_storage');
+
         if (!$token = $security->getToken()) {
             return new Response('anon');
         }
@@ -183,8 +186,8 @@ final class Kernel extends BaseKernel
             'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
             'property_access' => true,
         ]);
-        $c->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
+
+        $security = [
             'password_hashers' => [InMemoryUser::class => 'plaintext'],
             'providers' => ['users' => ['memory' => ['users' => ['kevin' => ['password' => 'pass']]]]],
             'firewalls' => ['main' => [
@@ -198,7 +201,13 @@ final class Kernel extends BaseKernel
                     'secret' => '%kernel.secret%',
                 ],
             ]],
-        ]);
+        ];
+
+        if (!\class_exists(Security::class)) {
+            $security['enable_authenticator_manager'] = true;
+        }
+
+        $c->loadFromExtension('security', $security);
         $c->loadFromExtension('zenstruck_foundry', [
             'auto_refresh_proxies' => false,
         ]);

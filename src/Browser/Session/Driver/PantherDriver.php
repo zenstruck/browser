@@ -41,6 +41,14 @@ use Zenstruck\Browser\Session\Driver;
  */
 final class PantherDriver extends Driver
 {
+    private const EMPTY_FILE_VALUE = [
+        'name' => '',
+        'type' => '',
+        'tmp_name' => '',
+        'error' => 4,
+        'size' => 0,
+    ];
+
     public function __construct(Client $client)
     {
         parent::__construct($client);
@@ -164,17 +172,24 @@ final class PantherDriver extends Driver
     }
 
     /**
-     * @param string|string[] $path
+     * @param string $path
      */
     public function attachFile($xpath, $path): void
     {
-        if (\is_array($path) && empty($this->filteredCrawler($xpath)->attr('multiple'))) {
+        $field = $this->fileFormField($xpath);
+
+        if (self::EMPTY_FILE_VALUE === $field->getValue()) {
+            // first file
+            $field->upload($path);
+
+            return;
+        }
+
+        if (!$this->filteredCrawler($xpath)->attr('multiple')) {
             throw new \InvalidArgumentException('Cannot attach multiple files to a non-multiple file field.');
         }
 
-        foreach ((array) $path as $file) {
-            $this->fileFormField($xpath)->upload($file);
-        }
+        $field->upload($path);
     }
 
     public function isChecked($xpath): bool
