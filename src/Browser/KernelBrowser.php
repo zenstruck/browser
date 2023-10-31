@@ -427,6 +427,16 @@ class KernelBrowser extends Browser
      */
     final public function assertHeaderEquals(string $header, ?string $expected): self
     {
+        if (null === $expected) {
+            Assert::that($this->session()->getResponseHeader($header))
+                ->isNull('Current response header "{header}" is "{actual}", but was not expected.', [
+                    'header' => $header,
+                ])
+            ;
+
+            return $this;
+        }
+
         $this->session()->assert()->responseHeaderEquals($header, $expected);
 
         return $this;
