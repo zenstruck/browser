@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v1.6.0](https://github.com/zenstruck/browser/releases/tag/v1.6.0)
+
+October 31st, 2023 - [v1.5.0...v1.6.0](https://github.com/zenstruck/browser/compare/v1.5.0...v1.6.0)
+
+* 41af33b feat: support Symfony 7.0 (#134) by @kbond
+
 ## [v1.5.0](https://github.com/zenstruck/browser/releases/tag/v1.5.0)
 
 October 23rd, 2023 - [v1.4.0...v1.5.0](https://github.com/zenstruck/browser/compare/v1.4.0...v1.5.0)
