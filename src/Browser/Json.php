@@ -163,7 +163,15 @@ final class Json
      */
     public function decoded()
     {
-        return $this->decoded ??= empty($this->source) ? null : \json_decode($this->source, true, 512, \JSON_THROW_ON_ERROR);
+        if (isset($this->decoded)) {
+            return $this->decoded;
+        }
+
+        if ('' === trim($this->source)) {
+            return null;
+        }
+
+        return $this->decoded = \json_decode($this->source, true, 512, \JSON_THROW_ON_ERROR);
     }
 
     /**
