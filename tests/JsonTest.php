@@ -116,15 +116,17 @@ class JsonTest extends TestCase
      *
      * @dataProvider scalarChildAssertionProvider
      */
-    public function can_perform_assertion_on_scalar_child(string $selector, callable $asserter): void
+    public function can_perform_assertion_on_scalar_child(string $json, string $selector, callable $asserter): void
     {
-        (new Json('{"foo":{"bar":"baz"}}'))->assertThat($selector, $asserter);
+        (new Json($json))->assertThat($selector, $asserter);
     }
 
     public function scalarChildAssertionProvider(): iterable
     {
-        yield ['noop', function(Json $json) {$json->isNull(); }];
-        yield ['foo.bar', function(Json $json) {$json->isNotEmpty()->equals('baz'); }];
+        yield ['{"foo":{"bar":"baz"}}', 'noop', function(Json $json) {$json->isNull(); }];
+        yield ['{"foo":{"bar":"baz"}}', 'foo.bar', function(Json $json) {$json->isNotEmpty()->equals('baz'); }];
+        yield ['{"hydra:totalItems":0}', '"hydra:totalItems"', function(Json $json) {$json->is(0);}];
+        yield ['{"hydra":{"totalItems":0}}', 'hydra.totalItems', function(Json $json) {$json->is(0);}];
     }
 
     /**

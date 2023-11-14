@@ -185,6 +185,7 @@ final class Kernel extends BaseKernel
             'profiler' => ['collect' => false],
             'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
             'property_access' => true,
+            'http_method_override' => false,
         ]);
 
         $security = [
