@@ -125,8 +125,8 @@ class JsonTest extends TestCase
     {
         yield ['{"foo":{"bar":"baz"}}', 'noop', function(Json $json) {$json->isNull(); }];
         yield ['{"foo":{"bar":"baz"}}', 'foo.bar', function(Json $json) {$json->isNotEmpty()->equals('baz'); }];
-        yield ['{"hydra:totalItems":0}', '"hydra:totalItems"', function(Json $json) {$json->is(0);}];
-        yield ['{"hydra":{"totalItems":0}}', 'hydra.totalItems', function(Json $json) {$json->is(0);}];
+        yield ['{"hydra:totalItems":0}', '"hydra:totalItems"', function(Json $json) {$json->is(0); }];
+        yield ['{"hydra":{"totalItems":0}}', 'hydra.totalItems', function(Json $json) {$json->is(0); }];
     }
 
     /**
