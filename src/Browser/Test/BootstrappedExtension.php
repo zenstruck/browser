@@ -120,7 +120,8 @@ class BootstrappedExtension implements Extension
         });
     }
 
-    public static function testName(Test $test) {
+    public static function testName(Test $test): string
+    {
         if ($test->isTestMethod()) {
             return $test->nameWithClass();
         }

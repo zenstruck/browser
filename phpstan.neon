@@ -8,4 +8,4 @@ parameters:
 
     excludePaths:
         # skip phpunit 10 missing classes
-        - src/Browser/Test/BootstrappedExtension.php
+        - src/Browser/Test/BrowserExtension.php
