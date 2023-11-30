@@ -5,3 +5,7 @@ parameters:
     level: 8
     paths:
         - src
+
+    excludePaths:
+        # skip phpunit 10 missing classes
+        - src/Browser/Test/BootstrappedExtension.php
