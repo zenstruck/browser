@@ -65,7 +65,7 @@ class JsonTest extends TestCase
         (new Json($json))->assertMissing($selector);
     }
 
-    public function selectorExistsProvider(): iterable
+    public static function selectorExistsProvider(): iterable
     {
         yield ['{"foo":"bar"}', 'foo'];
         yield ['{"foo":{"bar": "baz"}}', 'foo.bar'];
@@ -80,7 +80,7 @@ class JsonTest extends TestCase
         yield ['{"foo": [{"bar": null}]}', 'foo[0].bar'];
     }
 
-    public function selectorDoesNotExistProvider(): iterable
+    public static function selectorDoesNotExistProvider(): iterable
     {
         yield ['{}', 'foo'];
         yield ['{"foo":"bar"}', 'bar'];
@@ -97,7 +97,7 @@ class JsonTest extends TestCase
         (new Json($json))->hasCount($expectedCount);
     }
 
-    public function selectHasCountProvider(): iterable
+    public static function selectHasCountProvider(): iterable
     {
         yield ['[]', 0];
         yield ['[1,2,3]', 3];
@@ -121,7 +121,7 @@ class JsonTest extends TestCase
         (new Json($json))->assertThat($selector, $asserter);
     }
 
-    public function scalarChildAssertionProvider(): iterable
+    public static function scalarChildAssertionProvider(): iterable
     {
         yield ['{"foo":{"bar":"baz"}}', 'noop', function(Json $json) {$json->isNull(); }];
         yield ['{"foo":{"bar":"baz"}}', 'foo.bar', function(Json $json) {$json->isNotEmpty()->equals('baz'); }];
@@ -139,7 +139,7 @@ class JsonTest extends TestCase
         (new Json($json))->assertThatEach($selector, $asserter);
     }
 
-    public function arrayChildAssertionProvider(): iterable
+    public static function arrayChildAssertionProvider(): iterable
     {
         yield ['{"foo":[1, 2]}', 'foo', function(Json $json) {$json->isGreaterThan(0); }];
         yield ['{"foo":[{"bar": 1}, {"bar": 2}]}', 'foo[*].bar', function(Json $json) {$json->isGreaterThan(0); }];
@@ -157,7 +157,7 @@ class JsonTest extends TestCase
         (new Json($json))->assertThatEach($selector, $asserter);
     }
 
-    public function invalidArrayChildAssertionProvider(): iterable
+    public static function invalidArrayChildAssertionProvider(): iterable
     {
         yield ['{}', 'foo', static function(Json $json) {}];
         yield ['{"foo": "bar"}', 'foo', static function(Json $json) {}];

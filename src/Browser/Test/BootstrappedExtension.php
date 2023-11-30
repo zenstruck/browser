@@ -120,6 +120,9 @@ class BootstrappedExtension implements Extension
         });
     }
 
+    /**
+     * @internal
+     */
     public static function testName(Test $test): string
     {
         if ($test->isTestMethod()) {
@@ -129,6 +132,9 @@ class BootstrappedExtension implements Extension
         return $test->name();
     }
 
+    /**
+     * @internal
+     */
     public static function registerBrowser(Browser $browser): void
     {
         LegacyExtension::registerBrowser($browser);
