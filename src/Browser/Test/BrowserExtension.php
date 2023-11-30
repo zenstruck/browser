@@ -19,16 +19,13 @@ use PHPUnit\Runner\BeforeFirstTestHook;
 use PHPUnit\Runner\BeforeTestHook;
 use PHPUnit\Runner\Extension\Extension;
 
-/*
- *  @author Dany Maillard <danymaillard93b@gmail.com>
- */
 if (interface_exists(Extension::class)) {
     /**
      * PHPUnit >= 10.
      */
     final class BrowserExtension extends BootstrappedExtension implements Extension
     {}
-} elseif (interface_exists(BeforeFirstTestHook::class)) {
+} else {
     /**
      * PHPUnit < 10.
      */
@@ -40,6 +37,4 @@ if (interface_exists(Extension::class)) {
         AfterTestErrorHook,
         AfterTestFailureHook
     {}
-} else {
-    exit("Failed to initialize Zenstruck\Browser\Test\BrowserExtension, undetectable or unsupported phpunit version.");
 }
