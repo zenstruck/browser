@@ -115,7 +115,7 @@ class LegacyExtension
     {
         // Try to match for a numeric data set index. If it didn't, match for a string one.
         if (!\preg_match('#^([\w:\\\]+)(.+\#(\d+))#', $name, $matches)) {
-            \preg_match('#^([\w:\\\]+)(.+"([^"]+)")#', $name, $matches);
+            \preg_match('#^([\w:\\\]+)(.+"([^"]+)")?#', $name, $matches);
         }
 
         $normalized = \strtr($matches[1], '\\:', '-_');

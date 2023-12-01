@@ -12,7 +12,6 @@
 namespace Zenstruck\Browser\Test;
 
 use PHPUnit\Event\Code\Test;
-use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Event\Test\Errored;
 use PHPUnit\Event\Test\ErroredSubscriber;
 use PHPUnit\Event\Test\Failed;
@@ -25,13 +24,12 @@ use PHPUnit\Event\TestRunner\Finished as TestRunnerFinishedEvent;
 use PHPUnit\Event\TestRunner\FinishedSubscriber as TestRunnerFinishedSubscriber;
 use PHPUnit\Event\TestRunner\Started as TestRunnerStartedEvent;
 use PHPUnit\Event\TestRunner\StartedSubscriber as TestRunnerStartedSubscriber;
-use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use Zenstruck\Browser;
 
-class BootstrappedExtension implements Extension
+class BootstrappedExtension
 {
     public function bootstrap(Configuration $configuration, Facade $facade, ParameterCollection $parameters): void
     {
