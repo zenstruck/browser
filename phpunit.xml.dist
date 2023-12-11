@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         colors="true"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          failOnRisky="true"
          failOnWarning="true"
+         colors="true"
 >
-  <coverage>
-    <include>
-      <directory>./src/</directory>
-    </include>
-  </coverage>
+    <coverage/>
+    <php>
+        <ini name="error_reporting" value="-1"/>
+        <server name="KERNEL_CLASS" value="Zenstruck\Browser\Tests\Fixture\Kernel"/>
+        <server name="SHELL_VERBOSITY" value="-1"/>
+        <server name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0"/>
+        <server name="PANTHER_WEB_SERVER_DIR" value="./tests/Fixture/public"/>
+    </php>
 
-  <php>
-    <ini name="error_reporting" value="-1"/>
-    <server name="KERNEL_CLASS" value="Zenstruck\Browser\Tests\Fixture\Kernel"/>
-    <server name="SHELL_VERBOSITY" value="-1"/>
-    <server name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0"/>
-    <server name="PANTHER_WEB_SERVER_DIR" value="./tests/Fixture/public"/>
-  </php>
+    <testsuites>
+        <testsuite name="Project Test Suite">
+            <directory>./tests/</directory>
+        </testsuite>
+    </testsuites>
 
-  <testsuites>
-    <testsuite name="Project Test Suite">
-      <directory>./tests/</directory>
-    </testsuite>
-  </testsuites>
-
+    <source>
+        <include>
+            <directory>./src/</directory>
+        </include>
+    </source>
 </phpunit>
