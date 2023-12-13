@@ -19,35 +19,35 @@ final class NormalizationTest extends TestCase
 {
     public static function namesProvider(): \Generator
     {
-        $baseTemplate = 'error_' . __METHOD__;
+        $baseTemplate = 'error_'.__METHOD__;
 
         yield 'test name without datasets' => [
             'test name' => __METHOD__,
-            'expected output' => \strtr($baseTemplate, '\\:', '-_') . '__0',
+            'expected output' => \strtr($baseTemplate, '\\:', '-_').'__0',
         ];
 
-        $datasetTemplate = $baseTemplate . '__data-set-%s__0';
+        $datasetTemplate = $baseTemplate.'__data-set-%s__0';
 
-        $alphaTemplate = sprintf($datasetTemplate, 'test-set', '');
+        $alphaTemplate = \sprintf($datasetTemplate, 'test-set', '');
         $alphaOutput = \strtr($alphaTemplate, '\\:', '-_');
 
-        $numericTemplate = sprintf($datasetTemplate, '0', '');
+        $numericTemplate = \sprintf($datasetTemplate, '0', '');
         $numericOutput = \strtr($numericTemplate, '\\:', '-_');
 
         yield 'phpunit 10 alpha' => [
-            'test name' => __METHOD__ . ' with data set "test set"',
+            'test name' => __METHOD__.' with data set "test set"',
             'expected output' => $alphaOutput,
         ];
         yield 'phpunit 10 numeric' => [
-            'test name' => __METHOD__ . ' with data set #0',
+            'test name' => __METHOD__.' with data set #0',
             'expected output' => $numericOutput,
         ];
         yield 'legacy alpha' => [
-            'test name' => __METHOD__ . ' with data set "test set" (test set)',
+            'test name' => __METHOD__.' with data set "test set" (test set)',
             'expected output' => $alphaOutput,
         ];
         yield 'legacy numeric' => [
-            'test name' => __METHOD__ . ' with data set #0 (test set)',
+            'test name' => __METHOD__.' with data set #0 (test set)',
             'expected output' => $numericOutput,
         ];
     }

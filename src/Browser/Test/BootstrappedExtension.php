@@ -64,6 +64,7 @@ class BootstrappedExtension
                 private LegacyExtension $extension,
             ) {
             }
+
             public function notify(TestStartedEvent $event): void
             {
                 $this->extension->executeBeforeTest($event->test()->name());

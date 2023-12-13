@@ -19,22 +19,18 @@ use PHPUnit\Runner\BeforeFirstTestHook;
 use PHPUnit\Runner\BeforeTestHook;
 use PHPUnit\Runner\Extension\Extension;
 
-if (interface_exists(Extension::class)) {
+if (\interface_exists(Extension::class)) {
     /**
      * PHPUnit >= 10.
      */
     final class BrowserExtension extends BootstrappedExtension implements Extension
-    {}
+    {
+    }
 } else {
     /**
      * PHPUnit < 10.
      */
-    final class BrowserExtension extends LegacyExtension implements
-        BeforeFirstTestHook,
-        BeforeTestHook,
-        AfterTestHook,
-        AfterLastTestHook,
-        AfterTestErrorHook,
-        AfterTestFailureHook
-    {}
+    final class BrowserExtension extends LegacyExtension implements BeforeFirstTestHook, BeforeTestHook, AfterTestHook, AfterLastTestHook, AfterTestErrorHook, AfterTestFailureHook
+    {
+    }
 }
