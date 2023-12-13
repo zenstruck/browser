@@ -26,7 +26,7 @@
         "justinrainbow/json-schema": "^5.2",
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^1.4",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.5|^10.4",
         "symfony/mime": "^5.4|^6.0|^7.0",
         "symfony/panther": "^1.1|^2.0.1",
         "symfony/phpunit-bridge": "^6.0|^7.0",
