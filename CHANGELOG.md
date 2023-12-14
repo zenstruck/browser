@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v1.7.0](https://github.com/zenstruck/browser/releases/tag/v1.7.0)
+
+December 14th, 2023 - [v1.6.0...v1.7.0](https://github.com/zenstruck/browser/compare/v1.6.0...v1.7.0)
+
+* 89c1112 feat: phpunit 10 support (#137) by @raneomik, marek
+* 7de7c02 fix: asserting `json->decoded()` on zeros (#136) by @norkunas
+
 ## [v1.6.0](https://github.com/zenstruck/browser/releases/tag/v1.6.0)
 
 October 31st, 2023 - [v1.5.0...v1.6.0](https://github.com/zenstruck/browser/compare/v1.5.0...v1.6.0)
