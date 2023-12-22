@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Test;
 
+use PHPUnit\Runner\Version;
 use Zenstruck\Browser;
 
 /**
@@ -113,15 +114,19 @@ class LegacyExtension
 
     private static function normalizeTestName(string $name): string
     {
+        if (!strchr($name, 'with data set')) {
+            return \strtr($name, '\\:', '-_');
+        }
+
         // Try to match for a numeric data set index. If it didn't, match for a string one.
-        if (!\preg_match('#^([\w:\\\]+)(.+\#(\d+))#', $name, $matches)) {
-            \preg_match('#^([\w:\\\]+)(.+"([^"]+)")?#', $name, $matches);
+        if (!\preg_match('#^([\w:\\\]+) with data set \#(\d+)#', $name, $matches)) {
+            \preg_match('#^([\w:\\\]+) with data set "(.*)"#', $name, $matches);
         }
 
         $normalized = \strtr($matches[1], '\\:', '-_');
 
-        if (isset($matches[3])) {
-            $normalized .= '__data-set-'.\strtr($matches[3], '\\: ', '-_-');
+        if (isset($matches[2])) {
+            $normalized .= '__data-set-'.preg_replace('/\W/', '-', $matches[2]);
         }
 
         return $normalized;
