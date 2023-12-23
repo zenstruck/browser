@@ -74,7 +74,7 @@ final class NormalizationTest extends TestCase
 
     public static function edgeCaseTestNames(): \Generator
     {
-        $baseTemplate = \strtr('error_'.__METHOD__."__data-set-", '\\:', '-_');
+        $baseTemplate = \strtr('error_'.__METHOD__.'__data-set-', '\\:', '-_');
         yield 'self within moustache' => [
             'test name' => __METHOD__.' with data set "te{{self}}st" (test set)',
             'expected output' => $baseTemplate.'te-self-st__0',

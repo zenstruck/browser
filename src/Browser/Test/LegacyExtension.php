@@ -113,7 +113,7 @@ class LegacyExtension
 
     private static function normalizeTestName(string $name): string
     {
-        if (!strchr($name, 'with data set')) {
+        if (!\mb_strstr($name, 'with data set')) {
             return \strtr($name, '\\:', '-_');
         }
 
@@ -125,7 +125,7 @@ class LegacyExtension
         $normalized = \strtr($matches['test'], '\\:', '-_');
 
         if (isset($matches['dataset'])) {
-            $normalized .= '__data-set-'.preg_replace('/\W+/', '-', $matches['dataset']);
+            $normalized .= '__data-set-'.\preg_replace('/\W+/', '-', $matches['dataset']);
         }
 
         return $normalized;
