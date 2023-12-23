@@ -119,14 +119,14 @@ class LegacyExtension
         }
 
         // Try to match for a numeric data set index. If it didn't, match for a string one.
-        if (!\preg_match('#^([\w:\\\]+) with data set \#(\d+)#', $name, $matches)) {
-            \preg_match('#^([\w:\\\]+) with data set "(.*)"#', $name, $matches);
+        if (!\preg_match('#^(?<test>[\w:\\\]+) with data set \#(?<dataset>\d+)#', $name, $matches)) {
+            \preg_match('#^(?<test>[\w:\\\]+) with data set "(?<dataset>.*)"#', $name, $matches);
         }
 
-        $normalized = \strtr($matches[1], '\\:', '-_');
+        $normalized = \strtr($matches['test'], '\\:', '-_');
 
-        if (isset($matches[2])) {
-            $normalized .= '__data-set-'.preg_replace('/\W/', '-', $matches[2]);
+        if (isset($matches['dataset'])) {
+            $normalized .= '__data-set-'.preg_replace('/\W/', '-', $matches['dataset']);
         }
 
         return $normalized;
