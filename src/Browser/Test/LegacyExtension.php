@@ -113,15 +113,19 @@ class LegacyExtension
 
     private static function normalizeTestName(string $name): string
     {
-        // Try to match for a numeric data set index. If it didn't, match for a string one.
-        if (!\preg_match('#^([\w:\\\]+)(.+\#(\d+))#', $name, $matches)) {
-            \preg_match('#^([\w:\\\]+)(.+"([^"]+)")?#', $name, $matches);
+        if (!strchr($name, 'with data set')) {
+            return \strtr($name, '\\:', '-_');
         }
 
-        $normalized = \strtr($matches[1], '\\:', '-_');
+        // Try to match for a numeric data set index. If it didn't, match for a string one.
+        if (!\preg_match('#^(?<test>[\w:\\\]+) with data set \#(?<dataset>\d+)#', $name, $matches)) {
+            \preg_match('#^(?<test>[\w:\\\]+) with data set "(?<dataset>.*)"#', $name, $matches);
+        }
 
-        if (isset($matches[3])) {
-            $normalized .= '__data-set-'.\strtr($matches[3], '\\: ', '-_-');
+        $normalized = \strtr($matches['test'], '\\:', '-_');
+
+        if (isset($matches['dataset'])) {
+            $normalized .= '__data-set-'.preg_replace('/\W+/', '-', $matches['dataset']);
         }
 
         return $normalized;
