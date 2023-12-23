@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Browser\Test;
 
-use PHPUnit\Runner\Version;
 use Zenstruck\Browser;
 
 /**
