@@ -17,6 +17,26 @@ use Zenstruck\Browser\Test\LegacyExtension;
 
 final class NormalizationTest extends TestCase
 {
+    /**
+     * @test
+     * @dataProvider namesProvider
+     * @dataProvider edgeCaseTestNames
+     */
+    public function can_normalize_test_names(string $testName, string $expectedOutput): void
+    {
+        $browser = $this->createMock(Browser::class);
+        $browser
+            ->expects(self::once())
+            ->method('saveCurrentState')
+            ->with($expectedOutput);
+
+        $extension = new LegacyExtension();
+        $extension->executeBeforeFirstTest();
+        $extension->executeBeforeTest($testName);
+        $extension::registerBrowser($browser);
+        $extension->executeAfterTestError($testName, '', 0);
+    }
+
     public static function namesProvider(): \Generator
     {
         $baseTemplate = 'error_'.__METHOD__;
@@ -50,26 +70,6 @@ final class NormalizationTest extends TestCase
             'test name' => __METHOD__.' with data set #0 (test set)',
             'expected output' => $numericOutput,
         ];
-    }
-
-    /**
-     * @test
-     * @dataProvider namesProvider
-     * @dataProvider edgeCaseTestNames
-     */
-    public function can_normalize_test_names(string $testName, string $expectedOutput): void
-    {
-        $browser = $this->createMock(Browser::class);
-        $browser
-            ->expects(self::once())
-            ->method('saveCurrentState')
-            ->with($expectedOutput);
-
-        $extension = new LegacyExtension();
-        $extension->executeBeforeFirstTest();
-        $extension->executeBeforeTest($testName);
-        $extension::registerBrowser($browser);
-        $extension->executeAfterTestError($testName, '', 0);
     }
 
     public static function edgeCaseTestNames(): \Generator
