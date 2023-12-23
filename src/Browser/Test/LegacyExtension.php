@@ -126,7 +126,7 @@ class LegacyExtension
         $normalized = \strtr($matches['test'], '\\:', '-_');
 
         if (isset($matches['dataset'])) {
-            $normalized .= '__data-set-'.preg_replace('/\W/', '-', $matches['dataset']);
+            $normalized .= '__data-set-'.preg_replace('/\W+/', '-', $matches['dataset']);
         }
 
         return $normalized;
