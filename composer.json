@@ -4,7 +4,7 @@
     "homepage": "https://github.com/zenstruck/browser",
     "type": "library",
     "license": "MIT",
-    "keywords": ["test", "symfony"],
+    "keywords": ["dev", "test", "symfony"],
     "authors": [
         {
             "name": "Kevin Bond",
