@@ -138,7 +138,7 @@ final class Json
         $decoded = \json_decode($this->source, null, 512, \JSON_THROW_ON_ERROR);
         $validator->validate(
             $decoded,
-            \json_decode($jsonSchema, true, 512, \JSON_THROW_ON_ERROR)
+            \json_decode($jsonSchema, true, 512, \JSON_THROW_ON_ERROR),
         );
 
         Assert::that($validator->isValid())->is(true, (string) \json_encode($validator->getErrors()));

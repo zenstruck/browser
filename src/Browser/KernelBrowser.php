@@ -400,7 +400,7 @@ class KernelBrowser extends Browser
         Assert::true(
             $this->session()->getStatusCode() >= 200 && $this->session()->getStatusCode() < 300,
             'Expected successful status code (2xx) but got {actual}.',
-            ['actual' => $this->session()->getStatusCode()]
+            ['actual' => $this->session()->getStatusCode()],
         );
 
         return $this;

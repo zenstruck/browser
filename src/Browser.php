@@ -391,7 +391,7 @@ abstract class Browser
     final public function use(callable $callback): self
     {
         Callback::createFor($callback)->invokeAll(
-            Parameter::union(...$this->useParameters())
+            Parameter::union(...$this->useParameters()),
         );
 
         return $this;

@@ -208,7 +208,7 @@ class PantherBrowser extends Browser
     {
         return \array_merge(
             parent::savedArtifacts(),
-            ['Saved Console Logs' => $this->savedConsoleLogs, 'Saved Screenshots' => $this->savedScreenshots]
+            ['Saved Console Logs' => $this->savedConsoleLogs, 'Saved Screenshots' => $this->savedScreenshots],
         );
     }
 

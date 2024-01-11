@@ -185,7 +185,7 @@ class JsonTest extends TestCase
                         "foo4"
                     ]
                 }
-                JSON
+                JSON,
         );
     }
 }

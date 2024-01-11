@@ -46,7 +46,7 @@ final class SameUrlAssertion implements Negatable
             \array_merge($this->context(), [
                 'compare_actual' => $parsedCurrent,
                 'compare_expected' => $parsedExpected,
-            ])
+            ]),
         );
     }
 
@@ -54,7 +54,7 @@ final class SameUrlAssertion implements Negatable
     {
         return new AssertionFailed(
             'Expected current URL ({current}) to not be "{expected}" (comparing parts: "{parts}").',
-            $this->context()
+            $this->context(),
         );
     }
 

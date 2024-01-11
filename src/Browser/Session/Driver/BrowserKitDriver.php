@@ -91,7 +91,7 @@ final class BrowserKitDriver extends Driver
                 $options->parameters(),
                 $options->files(),
                 $options->server(),
-                $options->body()
+                $options->body(),
             );
         });
     }

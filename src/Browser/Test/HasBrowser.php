@@ -68,7 +68,7 @@ trait HasBrowser
             self::$primaryPantherClient = static::createPantherClient(
                 \array_merge(['browser' => $_SERVER['PANTHER_BROWSER'] ?? PantherTestCase::CHROME], $options),
                 $kernelOptions,
-                $managerOptions
+                $managerOptions,
             );
 
             $browser = new $class(self::$primaryPantherClient, $browserOptions);

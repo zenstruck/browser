@@ -76,7 +76,7 @@ final class HttpOptionsTest extends TestCase
                 'HTTP_HEADER1' => 'header1 value',
                 'HTTP_HEADER2' => 'header2 value',
             ],
-            $options->server()
+            $options->server(),
         );
     }
 
@@ -117,7 +117,7 @@ final class HttpOptionsTest extends TestCase
             [
                 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
             ],
-            $options->server()
+            $options->server(),
         );
     }
 
@@ -134,7 +134,7 @@ final class HttpOptionsTest extends TestCase
                 'HTTP_ACCEPT' => 'application/json',
                 'CONTENT_TYPE' => 'application/json',
             ],
-            $options->server()
+            $options->server(),
         );
     }
 
@@ -151,7 +151,7 @@ final class HttpOptionsTest extends TestCase
                 'HTTP_ACCEPT' => 'application/json',
                 'CONTENT_TYPE' => 'application/json',
             ],
-            $options->server()
+            $options->server(),
         );
     }
 
@@ -169,7 +169,7 @@ final class HttpOptionsTest extends TestCase
                 'CONTENT_TYPE' => 'application/json',
                 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
             ],
-            $options->server()
+            $options->server(),
         );
     }
 
@@ -187,7 +187,7 @@ final class HttpOptionsTest extends TestCase
                 'CONTENT_TYPE' => 'application/json',
                 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
             ],
-            $options->server()
+            $options->server(),
         );
     }
 
@@ -232,7 +232,7 @@ final class HttpOptionsTest extends TestCase
                 'CONTENT_TYPE' => 'application/json',
                 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
             ],
-            $options->server()
+            $options->server(),
         );
     }
 
@@ -262,7 +262,7 @@ final class HttpOptionsTest extends TestCase
                 'HTTP_HEADER2' => 'header2 value',
                 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
             ],
-            $options->server()
+            $options->server(),
         );
     }
 
@@ -284,7 +284,7 @@ final class HttpOptionsTest extends TestCase
                 'CONTENT_TYPE' => 'application/ld+json',
                 'HTTP_X_REQUESTED_WITH' => 'something',
             ],
-            $options->server()
+            $options->server(),
         );
     }
 

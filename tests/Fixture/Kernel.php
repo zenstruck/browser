@@ -76,7 +76,7 @@ final class Kernel extends BaseKernel
 
                 return $value instanceof UploadedFile ? $value->getClientOriginalName() : null;
             },
-            $request->files->all()
+            $request->files->all(),
         );
 
         if ('e' === $request->request->get('submit_1')) {
@@ -89,7 +89,7 @@ final class Kernel extends BaseKernel
 
         return new JsonResponse(\array_merge(
             $request->request->all(),
-            \array_filter($files)
+            \array_filter($files),
         ));
     }
 
@@ -114,7 +114,7 @@ final class Kernel extends BaseKernel
             $request->getContent(),
             200,
             ['Content-Type' => $request->query->get('content-type', 'application/json')],
-            true
+            true,
         );
     }
 

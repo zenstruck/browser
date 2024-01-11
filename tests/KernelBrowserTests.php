@@ -656,7 +656,7 @@ trait KernelBrowserTests
                     ->expectException(\RuntimeException::class)
                     ->get('/page1')
                 ;
-            }
+            },
         )
             ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
         ;
@@ -669,7 +669,7 @@ trait KernelBrowserTests
                     ->expectException(\RuntimeException::class)
                     ->click('a link')
                 ;
-            }
+            },
         )
             ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
         ;
@@ -682,7 +682,7 @@ trait KernelBrowserTests
                     ->expectException(\RuntimeException::class)
                     ->click('Submit')
                 ;
-            }
+            },
         )
             ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
         ;

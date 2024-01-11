@@ -81,7 +81,7 @@ class BootstrappedExtension
             {
                 $this->extension->executeAfterTest(
                     $event->test()->name(),
-                    (float) $event->telemetryInfo()->time()->seconds()
+                    (float) $event->telemetryInfo()->time()->seconds(),
                 );
             }
         });
@@ -97,7 +97,7 @@ class BootstrappedExtension
                 $this->extension->executeAfterTestError(
                     BootstrappedExtension::testName($event->test()),
                     $event->throwable()->message(),
-                    (float) $event->telemetryInfo()->time()->seconds()
+                    (float) $event->telemetryInfo()->time()->seconds(),
                 );
             }
         });
