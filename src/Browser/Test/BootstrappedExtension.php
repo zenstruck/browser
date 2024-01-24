@@ -33,11 +33,11 @@ class BootstrappedExtension
 {
     public function bootstrap(Configuration $configuration, Facade $facade, ParameterCollection $parameters): void
     {
-        $extension = new Browser\Test\LegacyExtension();
+        $extension = new LegacyExtension();
 
         $facade->registerSubscriber(new class($extension) implements TestRunnerStartedSubscriber {
             public function __construct(
-                private Browser\Test\LegacyExtension $extension,
+                private LegacyExtension $extension,
             ) {
             }
 
@@ -49,7 +49,7 @@ class BootstrappedExtension
 
         $facade->registerSubscriber(new class($extension) implements TestRunnerFinishedSubscriber {
             public function __construct(
-                private Browser\Test\LegacyExtension $extension,
+                private LegacyExtension $extension,
             ) {
             }
 
@@ -61,7 +61,7 @@ class BootstrappedExtension
 
         $facade->registerSubscriber(new class($extension) implements TestStartedSubscriber {
             public function __construct(
-                private Browser\Test\LegacyExtension $extension,
+                private LegacyExtension $extension,
             ) {
             }
 
@@ -73,7 +73,7 @@ class BootstrappedExtension
 
         $facade->registerSubscriber(new class($extension) implements TestFinishedSubscriber {
             public function __construct(
-                private Browser\Test\LegacyExtension $extension,
+                private LegacyExtension $extension,
             ) {
             }
 
@@ -88,14 +88,14 @@ class BootstrappedExtension
 
         $facade->registerSubscriber(new class($extension) implements ErroredSubscriber {
             public function __construct(
-                private Browser\Test\LegacyExtension $extension,
+                private LegacyExtension $extension,
             ) {
             }
 
             public function notify(Errored $event): void
             {
                 $this->extension->executeAfterTestError(
-                    Browser\Test\BootstrappedExtension::testName($event->test()),
+                    BootstrappedExtension::testName($event->test()),
                     $event->throwable()->message(),
                     (float) $event->telemetryInfo()->time()->seconds(),
                 );
@@ -104,14 +104,14 @@ class BootstrappedExtension
 
         $facade->registerSubscriber(new class($extension) implements FailedSubscriber {
             public function __construct(
-                private Browser\Test\LegacyExtension $extension,
+                private LegacyExtension $extension,
             ) {
             }
 
             public function notify(Failed $event): void
             {
                 $this->extension->executeAfterTestFailure(
-                    Browser\Test\BootstrappedExtension::testName($event->test()),
+                    BootstrappedExtension::testName($event->test()),
                     $event->throwable()->message(),
                     (float) $event->telemetryInfo()->time()->seconds())
                 ;
@@ -136,6 +136,6 @@ class BootstrappedExtension
      */
     public static function registerBrowser(Browser $browser): void
     {
-        Browser\Test\LegacyExtension::registerBrowser($browser);
+        LegacyExtension::registerBrowser($browser);
     }
 }

@@ -32,7 +32,7 @@ use Zenstruck\Foundry\Proxy;
  */
 class KernelBrowser extends Browser
 {
-    private ?Browser\HttpOptions $defaultHttpOptions = null;
+    private ?HttpOptions $defaultHttpOptions = null;
 
     /**
      * @internal
@@ -103,7 +103,7 @@ class KernelBrowser extends Browser
      *                                                 to determine the expected exception class. When
      *                                                 exception is caught, callable is invoked with
      *                                                 the caught exception
-     * @param Browser\string|null   $expectedMessage   Assert the caught exception message "contains"
+     * @param string|null           $expectedMessage   Assert the caught exception message "contains"
      *                                                 this string
      */
     public function expectException($expectedException, ?string $expectedMessage = null): self
@@ -280,7 +280,7 @@ class KernelBrowser extends Browser
      */
     final public function setDefaultHttpOptions($options): self
     {
-        $this->defaultHttpOptions = Browser\HttpOptions::create($options);
+        $this->defaultHttpOptions = HttpOptions::create($options);
 
         return $this;
     }
@@ -296,7 +296,7 @@ class KernelBrowser extends Browser
             $options = $this->defaultHttpOptions->merge($options);
         }
 
-        $options = Browser\HttpOptions::create($options);
+        $options = HttpOptions::create($options);
 
         $this->session()->request($method, $options->addQueryToUrl($url), $options);
 
@@ -497,7 +497,7 @@ class KernelBrowser extends Browser
         return $this;
     }
 
-    final public function json(): Browser\Json
+    final public function json(): Json
     {
         return $this->assertJson()->session()->json();
     }
@@ -506,7 +506,7 @@ class KernelBrowser extends Browser
     {
         return [
             ...parent::useParameters(),
-            Parameter::typed(Browser\Json::class, Parameter::factory(fn() => $this->json())),
+            Parameter::typed(Json::class, Parameter::factory(fn() => $this->json())),
             Parameter::typed(DataCollectorInterface::class, Parameter::factory(function(string $class) {
                 foreach ($this->profile()->getCollectors() as $collector) {
                     if ($class === $collector::class) {

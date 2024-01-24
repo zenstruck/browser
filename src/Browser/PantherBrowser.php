@@ -173,7 +173,7 @@ class PantherBrowser extends Browser
 
     final public function dumpConsoleLog(): self
     {
-        Browser\Session::varDump($this->client()->manage()->getLog('browser'));
+        Session::varDump($this->client()->manage()->getLog('browser'));
 
         return $this;
     }
