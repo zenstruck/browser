@@ -389,6 +389,7 @@ trait BrowserTests
             ->selectFieldOption('Input 4', 'option 2')
             ->attachFile('Input 5', new \SplFileInfo(__FILE__))
             ->selectFieldOptions('Input 6', ['option 1', 'option 3'])
+            ->selectFieldOptions('Input 7', [])
             ->checkField('Radio 3')
             ->click('Submit')
             ->assertOn('/submit-form')
@@ -398,6 +399,7 @@ trait BrowserTests
             ->assertContains('"input_4":"option 2"')
             ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, \PATHINFO_BASENAME)))
             ->assertContains('"input_6":["option 1","option 3"]')
+            ->assertNotContains('"input_7')
             ->assertContains('"input_8":"option 3"')
         ;
     }
@@ -415,6 +417,7 @@ trait BrowserTests
             ->selectFieldOption('input4', 'option 2')
             ->attachFile('input5', __FILE__)
             ->selectFieldOptions('input6', ['option 1', 'option 3'])
+            ->selectFieldOptions('input7', [])
             ->checkField('radio3')
             ->click('Submit')
             ->assertOn('/submit-form')
@@ -424,6 +427,7 @@ trait BrowserTests
             ->assertContains('"input_4":"option 2"')
             ->assertContains(\sprintf('"input_5":"%s"', \pathinfo(__FILE__, \PATHINFO_BASENAME)))
             ->assertContains('"input_6":["option 1","option 3"]')
+            ->assertNotContains('"input_7')
             ->assertContains('"input_8":"option 3"')
         ;
     }
