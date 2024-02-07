@@ -118,6 +118,10 @@ final class PantherDriver extends Driver
         $element = $this->crawlerElement($this->filteredCrawler($xpath));
         $jsNode = $this->jsNode($xpath);
 
+        if (!$value && 'select' === $element->getTagName() && $element->getAttribute('multiple')) {
+            $this->executeScript(\sprintf('%s.selectedIndex = -1', $jsNode));
+        }
+
         if ('input' === $element->getTagName() && \in_array($element->getAttribute('type'), ['date', 'time', 'color'])) {
             $this->executeScript(\sprintf('%s.value = \'%s\'', $jsNode, $value));
         } else {
