@@ -142,6 +142,7 @@ $browser
     ->selectField('Canada') // "radio" select
     ->selectField('Type', 'Employee') // "select" single option
     ->selectField('Notification', ['Email', 'SMS']) // "select" multiple options
+    ->selectField('Notification', []) // "un-select" all multiple options
     ->attachFile('Photo', '/path/to/photo.jpg')
     ->attachFile('Photo', ['/path/to/photo1.jpg', '/path/to/photo2.jpg']) // attach multiple files (if field supports this)
     ->click('Submit')

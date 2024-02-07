@@ -281,6 +281,12 @@ abstract class Browser
      */
     final public function selectFieldOptions(string $selector, array $values): self
     {
+        if (!$values) {
+            $this->session->page()->fillField($selector, $values);
+
+            return $this;
+        }
+
         foreach ($values as $value) {
             $this->session()->page()->selectFieldOption($selector, $value, true);
         }
