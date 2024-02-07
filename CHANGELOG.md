@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [v1.8.0](https://github.com/zenstruck/browser/releases/tag/v1.8.0)
+
+February 7th, 2024 - [v1.7.0...v1.8.0](https://github.com/zenstruck/browser/compare/v1.7.0...v1.8.0)
+
+* f7ac67a feat: Allow `selectFieldOptions` to deselect all values (#143) by @kbond, @notFloran
+* 4ad6074 doc: Fix typo in readme (#140) by @t-richard
+* fbdc2cd minor: add "dev" to `composer.json` tags by @kbond
+* 7144c6a fix: Complex test name normalization (#139) by @flohw
+
 ## [v1.7.0](https://github.com/zenstruck/browser/releases/tag/v1.7.0)
 
 December 14th, 2023 - [v1.6.0...v1.7.0](https://github.com/zenstruck/browser/compare/v1.6.0...v1.7.0)
