@@ -32,7 +32,7 @@ use Zenstruck\Foundry\Proxy;
  */
 class KernelBrowser extends Browser
 {
-    private ?HttpOptions $defaultHttpOptions = null;
+    protected ?HttpOptions $defaultHttpOptions = null;
 
     /**
      * @internal
