@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Test;
 
+use PHPUnit\Framework\Attributes\After;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Panther\Client as PantherClient;
@@ -31,6 +32,7 @@ trait HasBrowser
      *
      * @after
      */
+    #[After]
     final public static function _resetBrowserClients(): void
     {
         self::$primaryPantherClient = null;
