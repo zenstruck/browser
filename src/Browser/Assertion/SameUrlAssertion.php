@@ -19,16 +19,7 @@ use Zenstruck\Assert\AssertionFailed;
  *
  * @internal
  *
- * @phpstan-type PartsToMatch array{
- *     scheme?: string,
- *     host?: string,
- *     port?: int<0,65535>,
- *     user?: string,
- *     pass?: string,
- *     path?: string,
- *     query?: string,
- *     fragment?: string,
- * }
+ * @phpstan-type PartsToMatch list<"scheme"|"host"|"port"|"user"|"pass"|"path"|"query"|"fragment">
  */
 final class SameUrlAssertion implements Negatable
 {
@@ -78,7 +69,16 @@ final class SameUrlAssertion implements Negatable
     }
 
     /**
-     * @return PartsToMatch
+     * @return array{
+     *      scheme?: string,
+     *      host?: string,
+     *      port?: int<0,65535>,
+     *      user?: string,
+     *      pass?: string,
+     *      path?: string,
+     *      query?: string,
+     *      fragment?: string,
+     *  }
      */
     private function parseUrl(string $url): array
     {
