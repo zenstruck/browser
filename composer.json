@@ -22,10 +22,10 @@
     },
     "require-dev": {
         "dbrekelmans/bdi": "^1.0",
-        "justinrainbow/json-schema": "^5.2",
+        "justinrainbow/json-schema": "^5.2.13",
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^1.4",
-        "phpunit/phpunit": "^9.5|^10.4",
+        "phpunit/phpunit": "^9.6|^10.4",
         "symfony/mime": "^6.4|^7.0",
         "symfony/panther": "^2.1.0",
         "symfony/phpunit-bridge": "^6.0|^7.0",
