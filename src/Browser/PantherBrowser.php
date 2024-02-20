@@ -14,7 +14,6 @@ namespace Zenstruck\Browser;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\DomCrawler\Crawler;
-use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Dom\Selector;
 use Zenstruck\Browser\Session\PantherSession;
@@ -50,40 +49,6 @@ class PantherBrowser extends Browser
 
         $this->screenshotDir = $options['screenshot_dir'] ?? null;
         $this->consoleLogDir = $options['console_log_dir'] ?? null;
-    }
-
-    /**
-     * @param SelectorType $selector
-     */
-    public function assertSeeIn(Selector|string|callable $selector, string $expected): self
-    {
-        if ('title' === $selector) {
-            // hack to get the text of the title html element
-            // for this element, WebDriverElement::getText() returns an empty string
-            // the only way to get the value is to get title from the client
-            Assert::that($this->client()->getTitle())->contains($expected);
-
-            return $this;
-        }
-
-        return parent::assertSeeIn($selector, $expected);
-    }
-
-    /**
-     * @param SelectorType $selector
-     */
-    public function assertNotSeeIn(Selector|string|callable $selector, string $expected): self
-    {
-        if ('title' === $selector) {
-            // hack to get the text of the title html element
-            // for this element, WebDriverElement::getText() returns an empty string
-            // the only way to get the value is to get title from the client
-            Assert::that($this->client()->getTitle())->doesNotContain($expected);
-
-            return $this;
-        }
-
-        return parent::assertNotSeeIn($selector, $expected);
     }
 
     /**

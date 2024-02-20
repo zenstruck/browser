@@ -170,7 +170,7 @@ abstract class Browser
      *
      * @return static
      */
-    public function assertSeeIn(Selector|string|callable $selector, string $expected): self
+    final public function assertSeeIn(Selector|string|callable $selector, string $expected): self
     {
         $this->dom()->expect()->containsIn($selector, $expected);
 
@@ -182,7 +182,7 @@ abstract class Browser
      *
      * @return static
      */
-    public function assertNotSeeIn(Selector|string|callable $selector, string $expected): self
+    final public function assertNotSeeIn(Selector|string|callable $selector, string $expected): self
     {
         $this->dom()->expect()->doesNotContainIn($selector, $expected);
 
