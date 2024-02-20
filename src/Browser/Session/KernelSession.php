@@ -19,21 +19,21 @@ use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Form;
-use Zenstruck\Browser\Dom;
-use Zenstruck\Browser\Dom\Exception\RuntimeException;
-use Zenstruck\Browser\Dom\Node;
-use Zenstruck\Browser\Dom\Node\Form\Button;
-use Zenstruck\Browser\Dom\Node\Form\Element;
-use Zenstruck\Browser\Dom\Node\Form\Field;
-use Zenstruck\Browser\Dom\Node\Form\Field\Checkbox;
-use Zenstruck\Browser\Dom\Node\Form\Field\File;
-use Zenstruck\Browser\Dom\Node\Form\Field\Input;
-use Zenstruck\Browser\Dom\Node\Form\Field\Radio;
-use Zenstruck\Browser\Dom\Node\Form\Field\Select\Combobox;
-use Zenstruck\Browser\Dom\Node\Form\Field\Select\Multiselect;
-use Zenstruck\Browser\Dom\Node\Form\Field\Select\Option;
-use Zenstruck\Browser\Dom\Node\Form\Field\Textarea;
 use Zenstruck\Browser\Session;
+use Zenstruck\Dom;
+use Zenstruck\Dom\Exception\RuntimeException;
+use Zenstruck\Dom\Node;
+use Zenstruck\Dom\Node\Form\Button;
+use Zenstruck\Dom\Node\Form\Element;
+use Zenstruck\Dom\Node\Form\Field;
+use Zenstruck\Dom\Node\Form\Field\Checkbox;
+use Zenstruck\Dom\Node\Form\Field\File;
+use Zenstruck\Dom\Node\Form\Field\Input;
+use Zenstruck\Dom\Node\Form\Field\Radio;
+use Zenstruck\Dom\Node\Form\Field\Select\Combobox;
+use Zenstruck\Dom\Node\Form\Field\Select\Multiselect;
+use Zenstruck\Dom\Node\Form\Field\Select\Option;
+use Zenstruck\Dom\Node\Form\Field\Textarea;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

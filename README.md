@@ -354,7 +354,6 @@ previous request didn't perform any security-related operations. Possible soluti
    for all requests removing the need to ever call `->withProfiling()` but can slow down
    your tests.
 
-
 #### HTTP Requests
 
 The _KernelBrowser_ can be used for testing API endpoints. The following http methods are available:
@@ -411,7 +410,7 @@ $browser
 Make assertions about json responses using [JMESPath expressions](https://jmespath.org/)
 See the [JMESPath Tutorials](https://jmespath.org/tutorial.html) to learn more.
 
-> **Note**
+> [!NOTE]
 > `mtdowling/jmespath.php` is required: `composer require --dev mtdowling/jmespath.php`.
 
 ```php
@@ -457,7 +456,7 @@ $json = $browser
 ;
 ```
 
-> **Note**
+> [!NOTE]
 > See the [full `zenstruck/assert` expectation API documentation](https://github.com/zenstruck/assert#expectation-api)
 > to see all the methods available on `Zenstruck\Browser\Json`.
 
@@ -548,10 +547,11 @@ class MyTest extends PantherTestCase
 Any browser method that accepts a `$selector` argument can be one of the following types:
 
 1. `string` - [_auto selector_](#auto-string-selector)
-2. `Zenstruck\Browser\Dom\Selector` - [_selector object_](#selector-object)
+2. `Zenstruck\Dom\Selector` - [_selector object_](#selector-object)
 3. `callable` - [_callable selector_](#callable-selector)
 
-> **Note**: Most [`PantherBrowser`](#pantherbrowser) specific methods that accept a `$selector`
+> [!NOTE]
+> Most [`PantherBrowser`](#pantherbrowser) specific methods that accept a `$selector`
 > argument only accept a string that's specific to the Panther client.
 
 #### Auto (`string`) Selector
@@ -578,7 +578,7 @@ If you are having trouble finding a node using the above _auto_ strategy, you ca
 each of the strategies independently:
 
 ```php
-use Zenstruck\Browser\Dom\Selector;
+use Zenstruck\Dom\Selector;
 
 /** @var \Zenstruck\Browser $browser */
 
@@ -600,7 +600,7 @@ The `Selector` object also allows you to combine multiple strategies into a sing
 These re-arrange the strategy priority of the auto selector:
 
 ```php
-use Zenstruck\Browser\Dom\Selector;
+use Zenstruck\Dom\Selector;
 
 /** @var \Zenstruck\Browser $browser */
 
@@ -615,8 +615,8 @@ $browser
 For a _hard-to-find_ node, you can use a `callable` selector to find the node:
 
 ```php
-use Zenstruck\Browser\Dom;
-use Zenstruck\Browser\Dom\Selector;
+use Zenstruck\Dom;
+use Zenstruck\Dom\Selector;
 
 /** @var \Zenstruck\Browser $browser */
 
@@ -628,8 +628,8 @@ $browser->assertSeeElement(function(Dom $dom) {
 });
 ```
 
-The callable must accept a `Zenstruck\Browser\Dom` instance and return
-`Zenstruck\Browser\Dom\Node|\Zenstruck\Browser\Dom\Node|Symfony\Component\DomCrawler\Crawler|null`.
+The callable must accept a `Zenstruck\Dom` instance and return
+`Zenstruck\Dom\Node|\Zenstruck\Dom\Node|Symfony\Component\DomCrawler\Crawler|null`.
 
 ##### Reusable `callable` Selectors
 
@@ -637,8 +637,8 @@ If you find yourself using a similar [`callable` selector](#callable-selector) i
 you can wrap it up into your own selector object:
 
 ```php
-use Zenstruck\Browser\Dom;
-use Zenstruck\Browser\Dom\Node;
+use Zenstruck\Dom;
+use Zenstruck\Dom\Node;
 
 class ProductLinkSelector
 {
@@ -941,9 +941,10 @@ Then, depending on the implementation you extended from, set the appropriate env
 
 For the example above, you would set `KERNEL_BROWSER_CLASS=App\Tests\AppBrowser`.
 
-**TIP**: Create a base functional test case so all your tests can use your
-custom browser and use the `@method` annotation to ensure your tests can
-autocomplete your custom methods:
+> [!TIP]
+> Create a base functional test case so all your tests can use your
+> custom browser and use the `@method` annotation to ensure your tests can
+> autocomplete your custom methods:
 
 ```php
 namespace App\Tests;

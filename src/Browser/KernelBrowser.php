@@ -19,9 +19,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Dom\Selector;
 use Zenstruck\Browser\Session\KernelSession;
 use Zenstruck\Callback\Parameter;
+use Zenstruck\Dom\Selector;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Proxy;
 

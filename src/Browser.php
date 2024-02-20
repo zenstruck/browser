@@ -18,19 +18,18 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Browser\Assertion\SameUrlAssertion;
 use Zenstruck\Browser\Component;
-use Zenstruck\Browser\Dom;
-use Zenstruck\Browser\Dom\Exception\RuntimeException;
-use Zenstruck\Browser\Dom\Node\Form\Field;
-use Zenstruck\Browser\Dom\Node\Form\Field\Checkbox;
-use Zenstruck\Browser\Dom\Node\Form\Field\File;
-use Zenstruck\Browser\Dom\Node\Form\Field\Input;
-use Zenstruck\Browser\Dom\Node\Form\Field\Radio;
-use Zenstruck\Browser\Dom\Node\Form\Field\Select\Combobox;
-use Zenstruck\Browser\Dom\Node\Form\Field\Select\Multiselect;
-use Zenstruck\Browser\Dom\Node\Form\Field\Textarea;
-use Zenstruck\Browser\Dom\Selector;
 use Zenstruck\Browser\Session;
 use Zenstruck\Callback\Parameter;
+use Zenstruck\Dom\Exception\RuntimeException;
+use Zenstruck\Dom\Node\Form\Field;
+use Zenstruck\Dom\Node\Form\Field\Checkbox;
+use Zenstruck\Dom\Node\Form\Field\File;
+use Zenstruck\Dom\Node\Form\Field\Input;
+use Zenstruck\Dom\Node\Form\Field\Radio;
+use Zenstruck\Dom\Node\Form\Field\Select\Combobox;
+use Zenstruck\Dom\Node\Form\Field\Select\Multiselect;
+use Zenstruck\Dom\Node\Form\Field\Textarea;
+use Zenstruck\Dom\Selector;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -150,7 +149,7 @@ abstract class Browser
      */
     final public function assertSee(string $expected): self
     {
-        $this->dom()->expect()->contains($expected);
+        $this->dom()->assert()->contains($expected);
 
         return $this;
     }
@@ -160,7 +159,7 @@ abstract class Browser
      */
     final public function assertNotSee(string $expected): self
     {
-        $this->dom()->expect()->doesNotContain($expected);
+        $this->dom()->assert()->doesNotContain($expected);
 
         return $this;
     }
@@ -172,7 +171,7 @@ abstract class Browser
      */
     final public function assertSeeIn(Selector|string|callable $selector, string $expected): self
     {
-        $this->dom()->expect()->containsIn($selector, $expected);
+        $this->dom()->assert()->containsIn($selector, $expected);
 
         return $this;
     }
@@ -184,7 +183,7 @@ abstract class Browser
      */
     final public function assertNotSeeIn(Selector|string|callable $selector, string $expected): self
     {
-        $this->dom()->expect()->doesNotContainIn($selector, $expected);
+        $this->dom()->assert()->doesNotContainIn($selector, $expected);
 
         return $this;
     }
@@ -196,7 +195,7 @@ abstract class Browser
      */
     final public function assertSeeElement(Selector|string|callable $selector): self
     {
-        $this->dom()->expect()->hasElement($selector);
+        $this->dom()->assert()->hasElement($selector);
 
         return $this;
     }
@@ -208,7 +207,7 @@ abstract class Browser
      */
     final public function assertNotSeeElement(Selector|string|callable $selector): self
     {
-        $this->dom()->expect()->doesNotHaveElement($selector);
+        $this->dom()->assert()->doesNotHaveElement($selector);
 
         return $this;
     }
@@ -220,7 +219,7 @@ abstract class Browser
      */
     final public function assertElementCount(Selector|string|callable $selector, int $count): self
     {
-        $this->dom()->expect()->hasElementCount($selector, $count);
+        $this->dom()->assert()->hasElementCount($selector, $count);
 
         return $this;
     }
@@ -232,7 +231,7 @@ abstract class Browser
      */
     final public function assertElementAttributeContains(Selector|string|callable $selector, string $attribute, string $expected): self
     {
-        $this->dom()->expect()->attributeContains($selector, $attribute, $expected);
+        $this->dom()->assert()->attributeContains($selector, $attribute, $expected);
 
         return $this;
     }
@@ -244,7 +243,7 @@ abstract class Browser
      */
     final public function assertElementAttributeNotContains(Selector|string|callable $selector, string $attribute, string $expected): self
     {
-        $this->dom()->expect()->attributeDoesNotContain($selector, $attribute, $expected);
+        $this->dom()->assert()->attributeDoesNotContain($selector, $attribute, $expected);
 
         return $this;
     }
@@ -399,7 +398,7 @@ abstract class Browser
      */
     final public function assertFieldEquals(Selector|string|callable $selector, string $expected): self
     {
-        $this->dom()->expect()->fieldEquals($selector, $expected);
+        $this->dom()->assert()->fieldEquals($selector, $expected);
 
         return $this;
     }
@@ -411,7 +410,7 @@ abstract class Browser
      */
     final public function assertFieldNotEquals(Selector|string|callable $selector, string $expected): self
     {
-        $this->dom()->expect()->fieldDoesNotEqual($selector, $expected);
+        $this->dom()->assert()->fieldDoesNotEqual($selector, $expected);
 
         return $this;
     }
@@ -423,7 +422,7 @@ abstract class Browser
      */
     final public function assertSelected(Selector|string|callable $selector, string $expected): self
     {
-        $this->dom()->expect()->fieldSelected($selector, $expected);
+        $this->dom()->assert()->fieldSelected($selector, $expected);
 
         return $this;
     }
@@ -435,7 +434,7 @@ abstract class Browser
      */
     final public function assertNotSelected(Selector|string|callable $selector, string $expected): self
     {
-        $this->dom()->expect()->fieldNotSelected($selector, $expected);
+        $this->dom()->assert()->fieldNotSelected($selector, $expected);
 
         return $this;
     }
@@ -447,7 +446,7 @@ abstract class Browser
      */
     final public function assertChecked(Selector|string|callable $selector): self
     {
-        $this->dom()->expect()->fieldChecked($selector);
+        $this->dom()->assert()->fieldChecked($selector);
 
         return $this;
     }
@@ -459,7 +458,7 @@ abstract class Browser
      */
     final public function assertNotChecked(Selector|string|callable $selector): self
     {
-        $this->dom()->expect()->fieldNotChecked($selector);
+        $this->dom()->assert()->fieldNotChecked($selector);
 
         return $this;
     }

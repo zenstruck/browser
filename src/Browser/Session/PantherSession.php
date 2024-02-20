@@ -22,17 +22,17 @@ use Symfony\Component\Panther\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\Panther\DomCrawler\Field\FileFormField;
 use Symfony\Component\Panther\DomCrawler\Field\InputFormField;
 use Symfony\Component\Panther\DomCrawler\Field\TextareaFormField;
-use Zenstruck\Browser\Dom;
-use Zenstruck\Browser\Dom\Exception\RuntimeException;
-use Zenstruck\Browser\Dom\Node;
-use Zenstruck\Browser\Dom\Node\Form\Field\Checkbox;
-use Zenstruck\Browser\Dom\Node\Form\Field\File;
-use Zenstruck\Browser\Dom\Node\Form\Field\Input;
-use Zenstruck\Browser\Dom\Node\Form\Field\Radio;
-use Zenstruck\Browser\Dom\Node\Form\Field\Select\Multiselect;
-use Zenstruck\Browser\Dom\Node\Form\Field\Select\Option;
-use Zenstruck\Browser\Dom\Node\Form\Field\Textarea;
 use Zenstruck\Browser\Session;
+use Zenstruck\Dom;
+use Zenstruck\Dom\Exception\RuntimeException;
+use Zenstruck\Dom\Node;
+use Zenstruck\Dom\Node\Form\Field\Checkbox;
+use Zenstruck\Dom\Node\Form\Field\File;
+use Zenstruck\Dom\Node\Form\Field\Input;
+use Zenstruck\Dom\Node\Form\Field\Radio;
+use Zenstruck\Dom\Node\Form\Field\Select\Multiselect;
+use Zenstruck\Dom\Node\Form\Field\Select\Option;
+use Zenstruck\Dom\Node\Form\Field\Textarea;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

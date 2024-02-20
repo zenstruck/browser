@@ -20,11 +20,11 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Dom;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
 use Zenstruck\Callback\Exception\UnresolveableArgument;
+use Zenstruck\Dom;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

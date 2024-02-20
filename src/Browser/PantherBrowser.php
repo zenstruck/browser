@@ -15,8 +15,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\DomCrawler\Crawler;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Dom\Selector;
 use Zenstruck\Browser\Session\PantherSession;
+use Zenstruck\Dom\Selector;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -58,7 +58,7 @@ class PantherBrowser extends Browser
      */
     final public function assertVisible(Selector|string|callable $selector): self
     {
-        $this->dom()->expect()->elementIsVisible($selector);
+        $this->dom()->assert()->elementIsVisible($selector);
 
         return $this;
     }
@@ -70,7 +70,7 @@ class PantherBrowser extends Browser
      */
     final public function assertNotVisible(Selector|string|callable $selector): self
     {
-        $this->dom()->expect()->elementIsNotVisible($selector);
+        $this->dom()->assert()->elementIsNotVisible($selector);
 
         return $this;
     }

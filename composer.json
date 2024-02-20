@@ -18,7 +18,8 @@
         "symfony/dom-crawler": "^6.4|^7.0",
         "symfony/framework-bundle": "^6.4|^7.0",
         "zenstruck/assert": "^1.4",
-        "zenstruck/callback": "^1.4.2"
+        "zenstruck/callback": "^1.4.2",
+        "zenstruck/dom": "^1.0"
     },
     "require-dev": {
         "dbrekelmans/bdi": "^1.0",

@@ -15,11 +15,11 @@ use PHPUnit\Framework\AssertionFailedError;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Zenstruck\Assert;
-use Zenstruck\Browser\Dom;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Json;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
+use Zenstruck\Dom;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
