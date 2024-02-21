@@ -226,6 +226,18 @@ trait BrowserTests
     /**
      * @test
      */
+    public function assert_see_in_multiple_elements(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->assertSeeIn('ul li', 'list 2')
+            ->assertNotSeeIn('ul li', 'something')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_response(): void
     {
         $output = self::catchVarDumperOutput(function() {
