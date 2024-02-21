@@ -354,7 +354,6 @@ previous request didn't perform any security-related operations. Possible soluti
    for all requests removing the need to ever call `->withProfiling()` but can slow down
    your tests.
 
-
 #### HTTP Requests
 
 The _KernelBrowser_ can be used for testing API endpoints. The following http methods are available:
@@ -411,7 +410,7 @@ $browser
 Make assertions about json responses using [JMESPath expressions](https://jmespath.org/)
 See the [JMESPath Tutorials](https://jmespath.org/tutorial.html) to learn more.
 
-> **Note**
+> [!NOTE]
 > `mtdowling/jmespath.php` is required: `composer require --dev mtdowling/jmespath.php`.
 
 ```php
@@ -457,7 +456,7 @@ $json = $browser
 ;
 ```
 
-> **Note**
+> [!NOTE]
 > See the [full `zenstruck/assert` expectation API documentation](https://github.com/zenstruck/assert#expectation-api)
 > to see all the methods available on `Zenstruck\Browser\Json`.
 
@@ -541,6 +540,126 @@ class MyTest extends PantherTestCase
         ;
     }
 }
+```
+
+### Advanced DOM Selectors
+
+Any browser method that accepts a `$selector` argument can be one of the following types:
+
+1. `string` - [_auto selector_](#auto-string-selector)
+2. `Zenstruck\Dom\Selector` - [_selector object_](#selector-object)
+3. `callable` - [_callable selector_](#callable-selector)
+
+> [!NOTE]
+> Most [`PantherBrowser`](#pantherbrowser) specific methods that accept a `$selector`
+> argument only accept a string that's specific to the Panther client.
+
+#### Auto (`string`) Selector
+
+A `string` is considered an auto selector and tries to find the DOM node using the following
+strategies in order (first strategy to find a node wins):
+
+1. **CSS**: Try to find _any node_ using `$selector` as CSS selector string.
+2. **Button**: Try to find `<button>` tag with value (or image button `alt` value) matching `$selector`.
+3. **Link**: Try to find `<a>` tag with value (or `title`, or image link `alt` value) matching `$selector`.
+4. **Image**: Try to find `<img>` tag with `alt` attribute matching `$selector`.
+5. **ID**: Try to find _any node_ using `$selector` as node id.
+6. **Field by Name**: Try to find _form field_ using `$selector` as name.
+7. **Field by Label**: Try to find _form field_ using `$selector` as `<label>` name.
+8. _(fail)_
+
+The auto selector is the most flexible but can return a node you don't expect. In this case,
+you can use the [`Selector` object](#selector-object) or [`callable` selector](#callable-selector)
+to be more specific.
+
+#### `Selector` Object
+
+If you are having trouble finding a node using the above _auto_ strategy, you can use
+each of the strategies independently:
+
+```php
+use Zenstruck\Dom\Selector;
+
+/** @var \Zenstruck\Browser $browser */
+
+$browser
+    ->assertSeeElement(Selector::css('.foo')) // "CSS" strategy
+    ->assertSeeElement(Selector::link('foo')) // "Link" strategy
+    ->assertSeeElement(Selector::button('foo')) // "Button" strategy
+    ->assertSeeElement(Selector::image('foo')) // "Image" strategy
+    ->assertSeeElement(Selector::id('foo')) // "ID" strategy
+    ->assertSeeElement(Selector::fieldForName('foo')) // "Field for Name" strategy
+    ->assertSeeElement(Selector::fieldForLabel('foo')) // "Field for Label" strategy
+    ->assertSeeElement(Selector::xpath('descendant-or-self::body/foo')) // "XPath" strategy
+;
+```
+
+##### Compound Selectors
+
+The `Selector` object also allows you to combine multiple strategies into a single selector.
+These re-arrange the strategy priority of the auto selector:
+
+```php
+use Zenstruck\Dom\Selector;
+
+/** @var \Zenstruck\Browser $browser */
+
+$browser
+    ->assertSeeElement(Selector::clickable('foo')) // "Button", "Link", "ID", "CSS", "Image", "Field by Name", "Field by Label" strategy order
+    ->assertSeeElement(Selector::formField('foo')) // "Field by Name", "Field by Label", "ID", "CSS" strategy order
+;
+```
+
+#### `callable` Selector
+
+For a _hard-to-find_ node, you can use a `callable` selector to find the node:
+
+```php
+use Zenstruck\Dom;
+use Zenstruck\Dom\Selector;
+
+/** @var \Zenstruck\Browser $browser */
+
+$browser->assertSeeElement(function(Dom $dom) {
+    return $dom->find('.product-table td:contains("Product 1")')
+        ->ancestor('tr')
+        ->descendant(Selector::link('Edit')) // can nest selectors
+    ;
+});
+```
+
+The callable must accept a `Zenstruck\Dom` instance and return
+`Zenstruck\Dom\Node|\Zenstruck\Dom\Node|Symfony\Component\DomCrawler\Crawler|null`.
+
+##### Reusable `callable` Selectors
+
+If you find yourself using a similar [`callable` selector](#callable-selector) in multiple places,
+you can wrap it up into your own selector object:
+
+```php
+use Zenstruck\Dom;
+use Zenstruck\Dom\Node;
+
+class ProductLinkSelector
+{
+    public function __construct(private string $productName, private string $linkName)
+    {
+    }
+
+    public function __invoke(Dom $dom): ?Node
+    {
+        return $dom->find(\sprintf('.product-table td:contains("%s")', $this->productName))
+            ->ancestor('tr')
+            ?->descendant(Selector::link($this->linkName))
+        ;
+    }
+}
+
+// ...
+
+/** @var \Zenstruck\Browser $browser */
+
+$browser->assertSeeElement(ProductLinkSelector('Product 1', 'Edit'));
 ```
 
 ## Configuration
@@ -822,9 +941,10 @@ Then, depending on the implementation you extended from, set the appropriate env
 
 For the example above, you would set `KERNEL_BROWSER_CLASS=App\Tests\AppBrowser`.
 
-**TIP**: Create a base functional test case so all your tests can use your
-custom browser and use the `@method` annotation to ensure your tests can
-autocomplete your custom methods:
+> [!TIP]
+> Create a base functional test case so all your tests can use your
+> custom browser and use the `@method` annotation to ensure your tests can
+> autocomplete your custom methods:
 
 ```php
 namespace App\Tests;

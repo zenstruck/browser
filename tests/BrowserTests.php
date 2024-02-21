@@ -24,6 +24,7 @@ use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
 use Zenstruck\Callback\Exception\UnresolveableArgument;
+use Zenstruck\Dom;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -217,6 +218,7 @@ trait BrowserTests
         $this->browser()
             ->visit('/page1')
             ->assertContains('h1 title')
+            ->assertContains('h1 TITle')
             ->assertNotContains('invalid text')
         ;
     }
@@ -284,8 +286,10 @@ trait BrowserTests
         $this->browser()
             ->visit('/page1')
             ->assertSee('h1 title')
+            ->assertSee('h1 Title')
             ->assertNotSee('invalid text')
             ->assertSeeIn('h1', 'title')
+            ->assertSeeIn('h1', 'Title')
             ->assertNotSeeIn('h1', 'invalid text')
             ->assertSeeElement('h1')
             ->assertNotSeeElement('h2')
@@ -302,6 +306,7 @@ trait BrowserTests
             ->visit('/page1')
             ->assertSeeIn('title', 'meta title')
             ->assertElementAttributeContains('meta[name="description"]', 'content', 'meta')
+            ->assertElementAttributeContains('meta[name="description"]', 'content', 'Meta')
             ->assertElementAttributeNotContains('meta[name="description"]', 'content', 'invalid')
             ->assertElementAttributeContains('html', 'lang', 'en')
         ;
@@ -315,6 +320,7 @@ trait BrowserTests
         $this->browser()
             ->visit('/page1')
             ->assertFieldEquals('Input 1', 'input 1')
+            ->assertFieldEquals('inpUt 1', 'input 1')
             ->assertFieldEquals('input1', 'input 1')
             ->assertFieldEquals('input_1', 'input 1')
             ->assertFieldNotEquals('Input 1', 'invalid')
@@ -329,6 +335,8 @@ trait BrowserTests
             ->assertSelected('Input 4', 'option 1')
             ->assertSelected('input4', 'option 1')
             ->assertSelected('input_4', 'option 1')
+            ->assertFieldEquals('input_4', 'option 1')
+            ->assertFieldNotEquals('input_4', 'option 2')
             ->assertSelected('Input 7', 'option 1')
             ->assertSelected('input7', 'option 1')
             ->assertSelected('input_7[]', 'option 1')
@@ -349,6 +357,11 @@ trait BrowserTests
             ->assertNotChecked('radio3')
             ->assertChecked('Radio 2')
             ->assertChecked('radio2')
+            ->assertFieldEquals('Title', 'initial title')
+            ->assertFieldEquals('Input 10', 'option 3')
+            ->assertFieldEquals('Input 10', 'Some value')
+            ->assertFieldEquals('Input 11', 'option 1')
+            ->assertFieldEquals('Input 11', 'Some value')
         ;
     }
 
@@ -360,6 +373,12 @@ trait BrowserTests
         $this->browser()
             ->visit('/page1')
             ->click('a link')
+            ->assertOn('/page2')
+            ->visit('/page1')
+            ->click('click here')
+            ->assertOn('/page2')
+            ->visit('/page1')
+            ->click('Click Here')
             ->assertOn('/page2')
         ;
     }
@@ -379,6 +398,22 @@ trait BrowserTests
     /**
      * @test
      */
+    public function click_with_callback_filter(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->click(function(Dom $dom) {
+                return $dom
+                    ->find('a link')
+                ;
+            })
+            ->assertOn('/page2')
+        ;
+    }
+
+    /**
+     * @test
+     */
     public function form_actions_by_field_label(): void
     {
         $this->browser()
@@ -386,11 +421,12 @@ trait BrowserTests
             ->fillField('Input 1', 'Kevin')
             ->checkField('Input 2')
             ->uncheckField('Input 3')
-            ->selectFieldOption('Input 4', 'option 2')
+            ->selectFieldOption('Input 4', 'OPTION 2')
             ->attachFile('Input 5', new \SplFileInfo(__FILE__))
-            ->selectFieldOptions('Input 6', ['option 1', 'option 3'])
+            ->selectFieldOptions('Input 6', ['n 1', 'option 3'])
             ->selectFieldOptions('Input 7', [])
             ->checkField('Radio 3')
+            ->fillField('Title', 'new title')
             ->click('Submit')
             ->assertOn('/submit-form')
             ->assertContains('"input_1":"Kevin"')
@@ -401,6 +437,7 @@ trait BrowserTests
             ->assertContains('"input_6":["option 1","option 3"]')
             ->assertNotContains('"input_7')
             ->assertContains('"input_8":"option 3"')
+            ->assertContains('"title":"new title"')
         ;
     }
 
@@ -414,9 +451,9 @@ trait BrowserTests
             ->fillField('input1', 'Kevin')
             ->checkField('input2')
             ->uncheckField('input3')
-            ->selectFieldOption('input4', 'option 2')
+            ->selectFieldOption('input4', 'Another Option')
             ->attachFile('input5', __FILE__)
-            ->selectFieldOptions('input6', ['option 1', 'option 3'])
+            ->selectFieldOptions('input6', ['option 1', 'Another Option'])
             ->selectFieldOptions('input7', [])
             ->checkField('radio3')
             ->click('Submit')
@@ -490,7 +527,7 @@ trait BrowserTests
             ->visit('/page1')
             ->click('Submit')
             ->assertOn('/submit-form')
-            ->assertContains('"submit_1":"a"')
+            ->assertContains('"submit_1":"Submit"')
             ->assertNotContains('submit_2')
             ->visit('/page1')
             ->click('Submit B')
@@ -526,7 +563,7 @@ trait BrowserTests
             ->click('Submit')
             ->assertOn('/submit-form')
             ->assertContains('"input_1":"Kevin"')
-            ->assertContains('"submit_1":"a"')
+            ->assertContains('"submit_1":"Submit"')
             ->assertNotContains('submit_2')
             ->visit('/page1')
             ->fillField('input_1', 'Kevin')
@@ -548,7 +585,10 @@ trait BrowserTests
             ->assertOn('/submit-form')
             ->assertContains('"input_1":"Kevin"')
             ->assertContains('"submit_2":"d"')
-            ->assertNotContains('submit_1')
+            ->assertNotContains('"Submit"')
+            ->visit('/page1')
+            ->click('Submit Image')
+            ->assertOn('/submit-form')
         ;
     }
 
@@ -604,7 +644,7 @@ trait BrowserTests
         });
 
         $this->assertCount(1, $output);
-        $this->assertSame('<p id="link"><a href="/page2">a link</a> not a link</p>', $output[0]);
+        $this->assertSame('<p id="link"><a href="/page2" title="click here">a link.</a> not a link</p>', $output[0]);
     }
 
     /**

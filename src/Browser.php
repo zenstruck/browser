@@ -11,7 +11,6 @@
 
 namespace Zenstruck;
 
-use Behat\Mink\Element\NodeElement;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
@@ -20,17 +19,29 @@ use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Browser\Assertion\SameUrlAssertion;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Session;
-use Zenstruck\Browser\Session\Driver;
 use Zenstruck\Callback\Parameter;
+use Zenstruck\Dom\Exception\RuntimeException;
+use Zenstruck\Dom\Node\Form\Field;
+use Zenstruck\Dom\Node\Form\Field\Checkbox;
+use Zenstruck\Dom\Node\Form\Field\File;
+use Zenstruck\Dom\Node\Form\Field\Input;
+use Zenstruck\Dom\Node\Form\Field\Radio;
+use Zenstruck\Dom\Node\Form\Field\Select\Combobox;
+use Zenstruck\Dom\Node\Form\Field\Select\Multiselect;
+use Zenstruck\Dom\Node\Form\Field\Textarea;
+use Zenstruck\Dom\Selector;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-import-type SelectorType from Selector
+ * @phpstan-import-type PartsToMatch from SameUrlAssertion
  */
 abstract class Browser
 {
-    private Session $session;
     private ?string $sourceDir;
     private bool $sourceDebug;
+    private Dom $dom;
 
     /** @var string[] */
     private array $savedSources = [];
@@ -40,9 +51,8 @@ abstract class Browser
      *
      * @param array<string,mixed> $options
      */
-    public function __construct(Driver $driver, array $options = [])
+    public function __construct(private Session $session, array $options = [])
     {
-        $this->session = new Session($driver);
         $this->sourceDir = $options['source_dir'] ?? null;
         $this->sourceDebug = $options['source_debug'] ?? false;
     }
@@ -52,36 +62,54 @@ abstract class Browser
         return $this->session->client();
     }
 
+    final public function dom(): Dom
+    {
+        if (isset($this->dom)) {
+            return $this->dom;
+        }
+
+        $dom = $this->session->dom();
+
+        if (!$exceptionClassNode = $dom->find('.trace-details .trace-class')) {
+            return $this->dom = $dom;
+        }
+
+        $messageNode = $dom->find('.exception-message-wrapper .exception-message');
+
+        Assert::fail('The last request threw an exception: %s - %s', [
+            \preg_replace('/\s+/', '', $exceptionClassNode->text()),
+            $messageNode?->text() ?? 'unknown message',
+        ]);
+    }
+
     /**
      * @return static
      */
     final public function visit(string $uri): self
     {
-        $this->session()->request('GET', $uri);
-
-        return $this;
+        return $this->wrapRequest(fn() => $this->client()->request('GET', $uri));
     }
 
     /**
-     * @param array $parts The url parts to check {@see parse_url} (use empty array for "all")
+     * @param PartsToMatch $parts The url parts to check {@see parse_url} (use empty array for "all")
      *
      * @return static
      */
     final public function assertOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        Assert::run(new SameUrlAssertion($this->session()->getCurrentUrl(), $expected, $parts));
+        Assert::run(new SameUrlAssertion($this->session->currentUrl(), $expected, $parts));
 
         return $this;
     }
 
     /**
-     * @param array $parts The url parts to check (@see parse_url)
+     * @param PartsToMatch $parts The url parts to check {@see parse_url} (use empty array for "all")
      *
      * @return static
      */
     final public function assertNotOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
-        Assert::not(new SameUrlAssertion($this->session()->getCurrentUrl(), $expected, $parts));
+        Assert::not(new SameUrlAssertion($this->session->currentUrl(), $expected, $parts));
 
         return $this;
     }
@@ -91,7 +119,7 @@ abstract class Browser
      */
     final public function assertContains(string $expected): self
     {
-        $this->session()->assert()->responseContains($expected);
+        Assert::that($this->content())->contains($expected, strict: false);
 
         return $this;
     }
@@ -101,7 +129,7 @@ abstract class Browser
      */
     final public function assertNotContains(string $expected): self
     {
-        $this->session()->assert()->responseNotContains($expected);
+        Assert::that($this->content())->doesNotContain($expected, strict: false);
 
         return $this;
     }
@@ -113,7 +141,7 @@ abstract class Browser
 
     final public function content(): string
     {
-        return $this->session()->page()->getContent();
+        return $this->session->content();
     }
 
     /**
@@ -121,7 +149,7 @@ abstract class Browser
      */
     final public function assertSee(string $expected): self
     {
-        $this->session()->assert()->pageTextContains($expected);
+        $this->dom()->assert()->contains($expected);
 
         return $this;
     }
@@ -131,115 +159,139 @@ abstract class Browser
      */
     final public function assertNotSee(string $expected): self
     {
-        $this->session()->assert()->pageTextNotContains($expected);
+        $this->dom()->assert()->doesNotContain($expected);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertSeeIn(string $selector, string $expected): self
+    final public function assertSeeIn(Selector|string|callable $selector, string $expected): self
     {
-        $this->session()->assert()->elementTextContains('css', $selector, $expected);
+        $this->dom()->assert()->containsIn($selector, $expected);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertNotSeeIn(string $selector, string $expected): self
+    final public function assertNotSeeIn(Selector|string|callable $selector, string $expected): self
     {
-        $this->session()->assert()->elementTextNotContains('css', $selector, $expected);
+        $this->dom()->assert()->doesNotContainIn($selector, $expected);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertSeeElement(string $selector): self
+    final public function assertSeeElement(Selector|string|callable $selector): self
     {
-        $this->session()->assert()->elementExists('css', $selector);
+        $this->dom()->assert()->hasElement($selector);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertNotSeeElement(string $selector): self
+    final public function assertNotSeeElement(Selector|string|callable $selector): self
     {
-        $this->session()->assert()->elementNotExists('css', $selector);
+        $this->dom()->assert()->doesNotHaveElement($selector);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertElementCount(string $selector, int $count): self
+    final public function assertElementCount(Selector|string|callable $selector, int $count): self
     {
-        $this->session()->assert()->elementsCount('css', $selector, $count);
+        $this->dom()->assert()->hasElementCount($selector, $count);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertElementAttributeContains(string $selector, string $attribute, string $expected): self
+    final public function assertElementAttributeContains(Selector|string|callable $selector, string $attribute, string $expected): self
     {
-        $this->session()->assert()->elementAttributeContains('css', $selector, $attribute, $expected);
+        $this->dom()->assert()->attributeContains($selector, $attribute, $expected);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertElementAttributeNotContains(string $selector, string $attribute, string $expected): self
+    final public function assertElementAttributeNotContains(Selector|string|callable $selector, string $attribute, string $expected): self
     {
-        $this->session()->assert()->elementAttributeNotContains('css', $selector, $attribute, $expected);
+        $this->dom()->assert()->attributeDoesNotContain($selector, $attribute, $expected);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function fillField(string $selector, string $value): self
+    final public function fillField(Selector|string|callable $selector, string $value): self
     {
-        $this->session()->page()->fillField($selector, $value);
+        $field = $this->field($selector);
 
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final public function checkField(string $selector): self
-    {
-        $field = $this->session()->page()->findField($selector);
-
-        if ($field && 'radio' === \mb_strtolower((string) $field->getAttribute('type'))) {
-            $this->session()->page()->selectFieldOption($selector, (string) $field->getAttribute('value'));
-
-            return $this;
+        if (!$field instanceof Input && !$field instanceof Textarea) {
+            throw new RuntimeException(\sprintf('Node with selector "%s" is not a fillable form field.', Selector::wrap($selector)));
         }
 
-        $this->session()->page()->checkField($selector);
+        $field->fill($value);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function uncheckField(string $selector): self
+    final public function checkField(Selector|string|callable $selector): self
     {
-        $this->session()->page()->uncheckField($selector);
+        $field = $this->field($selector);
+
+        match ($field::class) {
+            Radio::class => $field->select(),
+            Checkbox::class => $field->check(),
+            default => throw new RuntimeException(\sprintf('Node with selector "%s" is not a checkable form field.', Selector::wrap($selector))),
+        };
+
+        return $this;
+    }
+
+    /**
+     * @param SelectorType $selector
+     *
+     * @return static
+     */
+    final public function uncheckField(Selector|string|callable $selector): self
+    {
+        $this->field($selector)->ensure(Checkbox::class)->uncheck();
 
         return $this;
     }
@@ -247,68 +299,78 @@ abstract class Browser
     /**
      * Select Radio, check checkbox, select single/multiple values.
      *
-     * @param string|array|null $value null: check radio/checkbox
-     *                                 string: single value
-     *                                 array: multiple values
+     * @param SelectorType         $selector
+     * @param string|string[]|null $value    null: check radio/checkbox
+     *                                       string: single value
+     *                                       array: multiple values
      *
      * @return static
      */
-    final public function selectField(string $selector, $value = null): self
+    final public function selectField(Selector|string|callable $selector, string|array|null $value = null): self
     {
-        if (\is_array($value)) {
-            return $this->selectFieldOptions($selector, $value);
-        }
+        $field = $this->field($selector);
 
-        if (\is_string($value)) {
-            return $this->selectFieldOption($selector, $value);
-        }
-
-        return $this->checkField($selector);
-    }
-
-    /**
-     * @return static
-     */
-    final public function selectFieldOption(string $selector, string $value): self
-    {
-        $this->session()->page()->selectFieldOption($selector, $value);
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final public function selectFieldOptions(string $selector, array $values): self
-    {
-        if (!$values) {
-            $this->session->page()->fillField($selector, $values);
+        if ($field instanceof Checkbox) {
+            $field->check();
 
             return $this;
         }
 
-        foreach ($values as $value) {
-            $this->session()->page()->selectFieldOption($selector, $value, true);
+        if ($field instanceof Radio && !\is_array($value)) {
+            $field->select($value);
+
+            return $this;
         }
+
+        if ($field instanceof Combobox && \is_array($value)) {
+            throw new RuntimeException('Combobox does not support multiple values.');
+        }
+
+        if ($field instanceof Combobox) {
+            $field->select((string) $value);
+
+            return $this;
+        }
+
+        $value = (array) $value;
+        $field = $field->ensure(Multiselect::class);
+
+        $value ? $field->select($value) : $field->deselectAll();
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
+     * @return static
+     */
+    final public function selectFieldOption(Selector|string|callable $selector, string $value): self
+    {
+        return $this->selectField($selector, $value);
+    }
+
+    /**
+     * @param SelectorType $selector
+     * @param string[]     $values
+     *
+     * @return static
+     */
+    final public function selectFieldOptions(Selector|string|callable $selector, array $values): self
+    {
+        return $this->selectField($selector, $values);
+    }
+
+    /**
+     * @param SelectorType    $selector
      * @param string|string[] $filename string: single file
      *                                  array: multiple files
      *
      * @return static
      */
-    final public function attachFile(string $selector, array|string $filename): self
+    final public function attachFile(Selector|string|callable $selector, array|string $filename): self
     {
-        foreach ((array) $filename as $file) {
-            if (!\file_exists($file)) {
-                throw new \InvalidArgumentException(\sprintf('File "%s" does not exist.', $file));
-            }
-
-            $this->session()->page()->attachFileToField($selector, $file);
-        }
+        $this->field($selector)->ensure(File::class)->attach(...(array) $filename);
 
         return $this;
     }
@@ -316,77 +378,87 @@ abstract class Browser
     /**
      * Click on a button, link or any DOM element.
      *
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function click(string $selector): self
+    final public function click(Selector|string|callable $selector): self
     {
-        $element = $this->getClickableElement($selector);
+        $node = $this->dom()->findOrFail(Selector::clickable($selector));
 
-        $element->click();
+        Assert::true($node->isVisible(), 'Clickable element "%s" is not visible.', [$selector]);
+
+        return $this->wrapRequest(fn() => $node->click());
+    }
+
+    /**
+     * @param SelectorType $selector
+     *
+     * @return static
+     */
+    final public function assertFieldEquals(Selector|string|callable $selector, string $expected): self
+    {
+        $this->dom()->assert()->fieldEquals($selector, $expected);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertFieldEquals(string $selector, string $expected): self
+    final public function assertFieldNotEquals(Selector|string|callable $selector, string $expected): self
     {
-        $this->session()->assert()->fieldValueEquals($selector, $expected);
+        $this->dom()->assert()->fieldDoesNotEqual($selector, $expected);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertFieldNotEquals(string $selector, string $expected): self
+    final public function assertSelected(Selector|string|callable $selector, string $expected): self
     {
-        $this->session()->assert()->fieldValueNotEquals($selector, $expected);
+        $this->dom()->assert()->fieldSelected($selector, $expected);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertSelected(string $selector, string $expected): self
+    final public function assertNotSelected(Selector|string|callable $selector, string $expected): self
     {
-        $field = $this->session()->assert()->fieldExists($selector);
-
-        Assert::that((array) $field->getValue())->contains($expected);
+        $this->dom()->assert()->fieldNotSelected($selector, $expected);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertNotSelected(string $selector, string $expected): self
+    final public function assertChecked(Selector|string|callable $selector): self
     {
-        $field = $this->session()->assert()->fieldExists($selector);
-
-        Assert::that((array) $field->getValue())->doesNotContain($expected);
+        $this->dom()->assert()->fieldChecked($selector);
 
         return $this;
     }
 
     /**
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function assertChecked(string $selector): self
+    final public function assertNotChecked(Selector|string|callable $selector): self
     {
-        $this->session()->assert()->checkboxChecked($selector);
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertNotChecked(string $selector): self
-    {
-        $this->session()->assert()->checkboxNotChecked($selector);
+        $this->dom()->assert()->fieldNotChecked($selector);
 
         return $this;
     }
@@ -412,24 +484,24 @@ abstract class Browser
             $filename = \sprintf('%s/%s', \rtrim($this->sourceDir, '/'), \ltrim($filename, '/'));
         }
 
-        (new Filesystem())->dumpFile($this->savedSources[] = $filename, $this->session()->source($this->sourceDebug));
+        (new Filesystem())->dumpFile($this->savedSources[] = $filename, $this->source($this->sourceDebug));
 
         return $this;
     }
 
     /**
+     * @param SelectorType|null $selector
+     *
      * @return static
      */
-    final public function dump(?string $selector = null): self
-    {
-        $this->session()->dump($selector);
+    abstract public function dump(Selector|string|callable|null $selector = null): self;
 
-        return $this;
-    }
-
-    final public function dd(?string $selector = null): void
+    /**
+     * @param SelectorType|null $selector
+     */
+    final public function dd(Selector|string|callable|null $selector = null): void
     {
-        $this->dump($selector)->session()->exit();
+        $this->dump($selector)->exit();
     }
 
     public function saveCurrentState(string $filename): void
@@ -447,44 +519,25 @@ abstract class Browser
         return ['Saved Source Files' => $this->savedSources];
     }
 
-    final protected function getClickableElement(string $selector): NodeElement
+    /**
+     * @internal
+     *
+     * @return static
+     */
+    protected function wrapRequest(callable $callback): self
     {
-        // try button
-        $element = $this->session()->page()->findButton($selector);
+        $callback();
+        unset($this->dom);
 
-        if (!$element) {
-            // try link
-            $element = $this->session()->page()->findLink($selector);
-        }
-
-        if (!$element) {
-            // try by css
-            $element = $this->session()->page()->find('css', $selector);
-        }
-
-        if (!$element) {
-            Assert::fail('Clickable element "%s" not found.', [$selector]);
-        }
-
-        if (!$element->isVisible()) {
-            Assert::fail('Clickable element "%s" is not visible.', [$selector]);
-        }
-
-        if ($button = $this->session()->page()->findButton($selector)) {
-            if (!$button->isVisible()) {
-                Assert::fail('Button "%s" is not visible.', [$selector]);
-            }
-        }
-
-        return $element;
+        return $this;
     }
 
     /**
      * @internal
      */
-    final protected function session(): Session
+    protected function exit(): void
     {
-        return $this->session;
+        exit(1);
     }
 
     /**
@@ -499,9 +552,20 @@ abstract class Browser
             Parameter::typed(self::class, $this),
             Parameter::typed(Component::class, Parameter::factory(fn(string $class) => new $class($this))),
             Parameter::typed(Crawler::class, Parameter::factory(fn() => $this->client()->getCrawler())),
+            Parameter::typed(Dom::class, Parameter::factory(fn() => $this->dom())),
             Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->client()->getCookieJar())),
             Parameter::typed(AbstractBrowser::class, Parameter::factory(fn() => $this->client())),
             Parameter::typed(ContainerInterface::class, Parameter::factory(fn() => \method_exists($this->client(), 'getContainer') ? $this->client()->getContainer() : null))->optional(),
         ];
+    }
+
+    /**
+     * @internal
+     */
+    abstract protected function source(bool $debug): string;
+
+    private function field(Selector|string|callable $selector): Field
+    {
+        return $this->dom()->findOrFail(Selector::field($selector))->ensure(Field::class);
     }
 }

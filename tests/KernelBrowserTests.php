@@ -19,6 +19,7 @@ use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Json;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
+use Zenstruck\Dom;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,6 +27,26 @@ use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
 trait KernelBrowserTests
 {
     use BrowserTests;
+
+    /**
+     * @test
+     */
+    public function click_with_complex_callback_filter(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->click(function(Dom $dom) {
+                return $dom
+                    ->find('input7')
+                    ?->ensure(Dom\Node\Form\Field::class)
+                    ->form()
+                    ?->siblings('#link')
+                    ->first('a link')
+                ;
+            })
+            ->assertOn('/page2')
+        ;
+    }
 
     /**
      * @test
@@ -322,10 +343,10 @@ trait KernelBrowserTests
         $this->browser()
             ->setDefaultHttpOptions(['headers' => ['x-foo' => 'bar']])
             ->post('/http-method')
-            ->assertContains('"x-foo":["Bar"]')
+            ->assertContains('"x-foo":["bar"]')
             ->post('/http-method', ['headers' => ['x-bar' => 'foo']])
-            ->assertContains('"x-bar":["Foo"]')
-            ->assertContains('"x-foo":["Bar"]')
+            ->assertContains('"x-bar":["foo"]')
+            ->assertContains('"x-foo":["bar"]')
         ;
     }
 

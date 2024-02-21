@@ -14,18 +14,21 @@ namespace Zenstruck\Browser;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Session\Driver\BrowserKitDriver;
+use Zenstruck\Browser\Session\KernelSession;
 use Zenstruck\Callback\Parameter;
+use Zenstruck\Dom\Selector;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Proxy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
+ * @phpstan-import-type SelectorType from Selector
  * @phpstan-import-type Options from HttpOptions
  *
  * @method SymfonyKernelBrowser client()
@@ -33,6 +36,11 @@ use Zenstruck\Foundry\Proxy;
 class KernelBrowser extends Browser
 {
     protected ?HttpOptions $defaultHttpOptions = null;
+
+    private KernelSession $session;
+
+    /** @var array{0:class-string|callable,1:string|null}|null */
+    private ?array $expectedException = null;
 
     /**
      * @internal
@@ -42,7 +50,7 @@ class KernelBrowser extends Browser
         $client->followRedirects((bool) ($options['follow_redirects'] ?? true));
         $client->catchExceptions((bool) ($options['catch_exceptions'] ?? true));
 
-        parent::__construct(new BrowserKitDriver($client), $options);
+        parent::__construct($this->session = new KernelSession($client), $options);
     }
 
     /**
@@ -108,9 +116,9 @@ class KernelBrowser extends Browser
      */
     public function expectException($expectedException, ?string $expectedMessage = null): self
     {
-        $this->session()->expectException($expectedException, $expectedMessage);
+        $this->expectedException = [$expectedException, $expectedMessage];
 
-        return $this;
+        return $this->throwExceptions();
     }
 
     /**
@@ -159,7 +167,7 @@ class KernelBrowser extends Browser
     {
         $token = $this->securityToken();
 
-        if (!$token && $this->session()->isStarted() && !($this->session()->getStatusCode() >= 200 && $this->session()->getStatusCode() < 300)) {
+        if (!$token && $this->session->isStarted() && !$this->session->isSuccess()) {
             Assert::fail('The last response was not successful so cannot check authentication.');
         }
 
@@ -187,7 +195,7 @@ class KernelBrowser extends Browser
             throw new \LogicException(\sprintf('%s() requires the "as" user be a string or %s.', __METHOD__, UserInterface::class));
         }
 
-        Assert::that($token->getUserIdentifier())
+        Assert::that($token?->getUserIdentifier())
             ->is($as, 'Expected to be authenticated as "{expected}" but authenticated as "{actual}".')
         ;
 
@@ -234,7 +242,7 @@ class KernelBrowser extends Browser
     {
         $this->client()->followRedirects(true);
 
-        if ($this->session()->isStarted() && $this->session()->isRedirect()) {
+        if ($this->session->isStarted() && $this->session->isRedirect()) {
             $this->followRedirect();
         }
 
@@ -249,7 +257,7 @@ class KernelBrowser extends Browser
     final public function followRedirect(int $max = \PHP_INT_MAX): self
     {
         for ($i = 0; $i < $max; ++$i) {
-            if (!$this->session()->isRedirect()) {
+            if (!$this->session->isRedirect()) {
                 break;
             }
 
@@ -278,7 +286,7 @@ class KernelBrowser extends Browser
      *
      * @return static
      */
-    final public function setDefaultHttpOptions($options): self
+    final public function setDefaultHttpOptions(array|HttpOptions $options): self
     {
         $this->defaultHttpOptions = HttpOptions::create($options);
 
@@ -286,11 +294,11 @@ class KernelBrowser extends Browser
     }
 
     /**
-     * @param HttpOptions|array $options HttpOptions::DEFAULT_OPTIONS
+     * @param HttpOptions|Options $options
      *
      * @return static
      */
-    final public function request(string $method, string $url, $options = []): self
+    final public function request(string $method, string $url, array|HttpOptions $options = []): self
     {
         if ($this->defaultHttpOptions) {
             $options = $this->defaultHttpOptions->merge($options);
@@ -298,7 +306,14 @@ class KernelBrowser extends Browser
 
         $options = HttpOptions::create($options);
 
-        $this->session()->request($method, $options->addQueryToUrl($url), $options);
+        $this->wrapRequest(fn() => $this->client()->request(
+            $method,
+            $options->addQueryToUrl($url),
+            $options->parameters(),
+            $options->files(),
+            $options->server(),
+            $options->body(),
+        ));
 
         return $this;
     }
@@ -306,11 +321,11 @@ class KernelBrowser extends Browser
     /**
      * @see request()
      *
-     * @param HttpOptions|array $options
+     * @param HttpOptions|Options $options
      *
      * @return static
      */
-    public function get(string $url, $options = []): self
+    final public function get(string $url, array|HttpOptions $options = []): self
     {
         return $this->request('GET', $url, $options);
     }
@@ -318,11 +333,11 @@ class KernelBrowser extends Browser
     /**
      * @see request()
      *
-     * @param HttpOptions|array $options
+     * @param HttpOptions|Options $options
      *
      * @return static
      */
-    public function post(string $url, $options = []): self
+    final public function post(string $url, array|HttpOptions $options = []): self
     {
         return $this->request('POST', $url, $options);
     }
@@ -330,11 +345,11 @@ class KernelBrowser extends Browser
     /**
      * @see request()
      *
-     * @param HttpOptions|array $options
+     * @param HttpOptions|Options $options
      *
      * @return static
      */
-    public function put(string $url, $options = []): self
+    final public function put(string $url, array|HttpOptions $options = []): self
     {
         return $this->request('PUT', $url, $options);
     }
@@ -342,11 +357,11 @@ class KernelBrowser extends Browser
     /**
      * @see request()
      *
-     * @param HttpOptions|array $options
+     * @param HttpOptions|Options $options
      *
      * @return static
      */
-    public function delete(string $url, $options = []): self
+    final public function delete(string $url, array|HttpOptions $options = []): self
     {
         return $this->request('DELETE', $url, $options);
     }
@@ -354,11 +369,11 @@ class KernelBrowser extends Browser
     /**
      * @see request()
      *
-     * @param HttpOptions|array $options
+     * @param HttpOptions|Options $options
      *
      * @return static
      */
-    public function patch(string $url, $options = []): self
+    final public function patch(string $url, array|HttpOptions $options = []): self
     {
         return $this->request('PATCH', $url, $options);
     }
@@ -369,9 +384,11 @@ class KernelBrowser extends Browser
      * Useful for submitting a form and making assertions on the
      * redirect response.
      *
+     * @param SelectorType $selector
+     *
      * @return static
      */
-    final public function clickAndIntercept(string $selector): self
+    final public function clickAndIntercept(Selector|string|callable $selector): self
     {
         return $this
             ->interceptRedirects()
@@ -385,7 +402,7 @@ class KernelBrowser extends Browser
      */
     final public function assertStatus(int $expected): self
     {
-        Assert::that($this->session()->getStatusCode())
+        Assert::that($this->session->statusCode())
             ->is($expected, 'Current response status code is {actual}, but {expected} expected.')
         ;
 
@@ -398,9 +415,9 @@ class KernelBrowser extends Browser
     final public function assertSuccessful(): self
     {
         Assert::true(
-            $this->session()->getStatusCode() >= 200 && $this->session()->getStatusCode() < 300,
+            $this->session->isSuccess(),
             'Expected successful status code (2xx) but got {actual}.',
-            ['actual' => $this->session()->getStatusCode()],
+            ['actual' => $this->session->statusCode()],
         );
 
         return $this;
@@ -415,8 +432,8 @@ class KernelBrowser extends Browser
             throw new \RuntimeException('Cannot assert redirected if not intercepting redirects. Call ->interceptRedirects() before making the request.');
         }
 
-        Assert::true($this->session()->isRedirect(), 'Expected redirect status code (3xx) but got {actual}.', [
-            'actual' => $this->session()->getStatusCode(),
+        Assert::true($this->session->isRedirect(), 'Expected redirect status code (3xx) but got {actual}.', [
+            'actual' => $this->session->statusCode(),
         ]);
 
         return $this;
@@ -427,17 +444,9 @@ class KernelBrowser extends Browser
      */
     final public function assertHeaderEquals(string $header, ?string $expected): self
     {
-        if (null === $expected) {
-            Assert::that($this->session()->getResponseHeader($header))
-                ->isNull('Current response header "{header}" is "{actual}", but was not expected.', [
-                    'header' => $header,
-                ])
-            ;
-
-            return $this;
-        }
-
-        $this->session()->assert()->responseHeaderEquals($header, $expected);
+        Assert::that($this->client()->getResponse()->headers->get($header))
+            ->equals($expected, 'Header "{header}" is "{actual}", but "{expected}" expected.', ['header' => $header])
+        ;
 
         return $this;
     }
@@ -447,7 +456,10 @@ class KernelBrowser extends Browser
      */
     final public function assertHeaderContains(string $header, string $expected): self
     {
-        $this->session()->assert()->responseHeaderContains($header, $expected);
+        Assert::that($this->client()->getResponse()->headers->get($header))
+            ->isNotNull('Header "{header}" is not present in the response.', ['header' => $header])
+            ->contains($expected, 'Header "{header}" is "{actual}", but "{expected}" expected.', ['header' => $header])
+        ;
 
         return $this;
     }
@@ -499,7 +511,69 @@ class KernelBrowser extends Browser
 
     final public function json(): Json
     {
-        return $this->assertJson()->session()->json();
+        return new Json($this->assertJson()->content());
+    }
+
+    final public function dump(Selector|string|callable|null $selector = null): self
+    {
+        if (!$selector) {
+            Dumper::dump($this->source(true));
+
+            return $this;
+        }
+
+        $contentType = $this->normalizedContentType();
+
+        match (true) {
+            'json' === $contentType && \is_string($selector) => $this->json()->dump($selector),
+            'dom' === $contentType => $this->dom()->dump($selector),
+            default => $this->dump(),
+        };
+
+        return $this;
+    }
+
+    /**
+     * @internal
+     *
+     * @return static
+     */
+    final protected function wrapRequest(callable $callback): self
+    {
+        if (!$this->expectedException) {
+            return parent::wrapRequest($callback);
+        }
+
+        Assert::that($callback)->throws(...$this->expectedException);
+
+        $this->expectedException = null;
+
+        return $this;
+    }
+
+    /**
+     * @internal
+     */
+    final protected function source(bool $debug): string
+    {
+        $ret = '';
+        $contentType = $this->normalizedContentType();
+
+        // We never want to prepend non-text files with metadata.
+        if ($debug && $contentType) {
+            $ret .= "<!--\n";
+            $ret .= "URL: {$this->session->currentUrl()} ({$this->session->statusCode()})\n\n";
+
+            foreach ($this->client()->getInternalResponse()->getHeaders() as $header => $values) {
+                foreach ((array) $values as $value) {
+                    $ret .= "{$header}: {$value}\n";
+                }
+            }
+
+            $ret .= "-->\n";
+        }
+
+        return $ret.('json' === $contentType ? $this->json() : $this->content());
     }
 
     protected function useParameters(): array
@@ -527,6 +601,26 @@ class KernelBrowser extends Browser
             throw new \LogicException('Security not available/enabled.');
         }
 
-        return $container->get('security.token_storage')->getToken();
+        $storage = $container->get('security.token_storage');
+
+        \assert($storage instanceof TokenStorageInterface);
+
+        return $storage->getToken();
+    }
+
+    /**
+     * @return "dom"|"json"|"text"|null
+     */
+    private function normalizedContentType(): ?string
+    {
+        $contentType = (string) $this->client()->getInternalResponse()->getHeader('Content-Type'); // @phpstan-ignore-line
+
+        return match (true) {
+            \str_contains($contentType, 'json') => 'json',
+            \str_contains($contentType, 'html') => 'dom',
+            \str_contains($contentType, 'xml') => 'dom',
+            \str_contains($contentType, 'text') => 'text',
+            default => null,
+        };
     }
 }

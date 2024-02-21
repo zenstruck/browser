@@ -78,7 +78,7 @@ class HttpOptions
      *
      * @return static
      */
-    final public static function create($options = []): self
+    final public static function create(self|array $options = []): self
     {
         if ($options instanceof static) {
             return $options;

@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>h1 title</h1>
-    <p id="link"><a href="/page2">a link</a> not a link</p>
+    <p id="link"><a href="/page2" title="click here">a link.</a> not a link</p>
     <p><a href="/exception">exception link</a></p>
     <p id="double-click-link"><a onclick="return false" ondblclick="location=this.href" href="/page2">Double Click</a></p>
     <p id="context-menu-link"><a onclick="return false" oncontextmenu="location=this.href" href="/page2">Right Click</a></p>
@@ -16,19 +16,19 @@
         <li>list 2</li>
     </ul>
     <form action="/submit-form" method="post" enctype="multipart/form-data">
-        <label for="input1">Input 1</label>
+        <label for="input1">Input  1</label>
         <input id="input1" name="input_1" type="text" value="input 1" />
 
-        <label for="input2">Input 2</label>
+        <label for="input2"><span>Input 2</span></label>
         <input id="input2" name="input_2" type="checkbox">
 
-        <label for="input3">Input 3</label>
+        <label for="input3">Input 3 Input 4</label>
         <input id="input3" name="input_3" type="checkbox" checked>
 
         <label for="input4">Input 4</label>
         <select id="input4" name="input_4">
             <option selected>option 1</option>
-            <option>option 2</option>
+            <option value="option 2">Another Option</option>
         </select>
 
         <label for="input5">Input 5</label>
@@ -38,10 +38,10 @@
         <select id="input6" name="input_6[]" multiple>
             <option>option 1</option>
             <option>option 2</option>
-            <option>option 3</option>
+            <option value="option 3">Another Option</option>
         </select>
 
-        <label for="input7">Input 7</label>
+        <label for="input7">Input 7 <span class="required">*</span></label>
         <select id="input7" name="input_7[]" multiple>
             <option selected>option 1</option>
             <option>option 2</option>
@@ -55,15 +55,34 @@
         <label for="radio3">Radio 3</label>
         <input type="radio" id="radio3" name="input_8" value="option 3">
 
-        <label for="input9">Input 9</label>
-        <input id="input9" name="input_9[]" type="file" multiple>
+        <label>
+            Input 9
+            <input id="input9" name="input_9[]" type="file" multiple>
+        </label>
 
-        <button type="submit" name="submit_1" value="a">Submit</button>
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" value="initial title">
+
+        <label for="input10">Input 10</label>
+        <select id="input10" name="input_10">
+            <option>option 1</option>
+            <option>option 2</option>
+            <option selected value="option 3">Some value</option>
+        </select>
+
+        <label for="input11">Input 11</label>
+        <select id="input11" name="input_11">
+            <option value="option 1">Some value</option>
+            <option>option 2</option>
+        </select>
+
+        <input type="submit" name="submit_1" value="Submit" />
         <button type="submit" name="submit_1" value="b">Submit B</button>
         <button type="submit" name="submit_2" value="c">Submit C</button>
         <button name="submit_2" value="d">Submit D</button>
         <button name="submit_1" value="e">Submit Exception</button>
         <button name="submit_1" value="r">Submit Redirect</button>
+        <input type="image" alt="Submit Image" src="https://placehold.co/10x10" />
     </form>
 </body>
 </html>

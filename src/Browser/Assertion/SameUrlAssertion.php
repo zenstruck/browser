@@ -18,18 +18,16 @@ use Zenstruck\Assert\AssertionFailed;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
+ *
+ * @phpstan-type PartsToMatch list<"scheme"|"host"|"port"|"user"|"pass"|"path"|"query"|"fragment">
  */
 final class SameUrlAssertion implements Negatable
 {
-    private string $current;
-    private string $expected;
-    private array $partsToMatch;
-
-    public function __construct(string $current, string $expected, array $partsToMatch = [])
+    /**
+     * @param PartsToMatch $partsToMatch
+     */
+    public function __construct(private string $current, private string $expected, private array $partsToMatch = [])
     {
-        $this->current = $current;
-        $this->expected = $expected;
-        $this->partsToMatch = $partsToMatch;
     }
 
     public function __invoke(): void
@@ -58,6 +56,9 @@ final class SameUrlAssertion implements Negatable
         );
     }
 
+    /**
+     * @return array<string,string>
+     */
     private function context(): array
     {
         return [
@@ -67,11 +68,22 @@ final class SameUrlAssertion implements Negatable
         ];
     }
 
+    /**
+     * @return array{
+     *      scheme?: string,
+     *      host?: string,
+     *      port?: int<0,65535>,
+     *      user?: string,
+     *      pass?: string,
+     *      path?: string,
+     *      query?: string,
+     *      fragment?: string,
+     *  }
+     */
     private function parseUrl(string $url): array
     {
-        $parts = \parse_url(\urldecode($url));
-
-        if (empty($this->partsToMatch)) {
+        $parts = \parse_url(\urldecode($url)) ?: throw new \RuntimeException(\sprintf('Failed to parse URL: "%s".', $url));
+        if (!$this->partsToMatch) {
             return $parts;
         }
 
