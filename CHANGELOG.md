@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [v1.8.1](https://github.com/zenstruck/browser/releases/tag/v1.8.1)
+
+February 21st, 2024 - [v1.8.0...v1.8.1](https://github.com/zenstruck/browser/compare/v1.8.0...v1.8.1)
+
+* d933d4e minor: set KernelBrowser:: protected (#146) by @nikophil
+* c1add1b fix: deprecation warning from PHPUnit (#145) by @Chris53897, @Chris8934
+* 66188ad chore: update ci (#144) by @kbond
+
 ## [v1.8.0](https://github.com/zenstruck/browser/releases/tag/v1.8.0)
 
 February 7th, 2024 - [v1.7.0...v1.8.0](https://github.com/zenstruck/browser/compare/v1.7.0...v1.8.0)
