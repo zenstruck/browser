@@ -622,7 +622,7 @@ use Zenstruck\Dom\Selector;
 
 $browser->assertSeeElement(function(Dom $dom) {
     return $dom->find('.product-table td:contains("Product 1")')
-        ->ancestor('tr')
+        ->closest('tr')
         ->descendant(Selector::link('Edit')) // can nest selectors
     ;
 });
