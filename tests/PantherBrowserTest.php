@@ -170,6 +170,22 @@ final class PantherBrowserTest extends TestCase
     /**
      * @test
      */
+    public function can_dump_console_log_with_console_log(): void
+    {
+        $output = self::catchVarDumperOutput(function() {
+            $this->browser()
+                ->visit('/javascript')
+                ->click('log')
+                ->dumpConsoleLog()
+            ;
+        });
+
+        $this->assertStringContainsString('console.log message', \json_encode($output, JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * @test
+     */
     public function can_dump_console_log_with_throw_error(): void
     {
         $output = self::catchVarDumperOutput(function() {
