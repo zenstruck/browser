@@ -89,8 +89,8 @@ final class NormalizationTest extends TestCase
         ];
         yield 'escaped simple quote' => [
             'test name' => __METHOD__.' with data set "te{{\'/etc/passwd\'|file_excerpt(1,30)}}st"',
-             'expected output' => $baseTemplate.'te-etc-passwd-file_excerpt-1-30-st__0',
-         ];
+            'expected output' => $baseTemplate.'te-etc-passwd-file_excerpt-1-30-st__0',
+        ];
         yield 'single quote for array index access' => [
             'test name' => __METHOD__.' with data set "te{{[\'id\']|filter(\'system\')}}st"',
             'expected output' => $baseTemplate.'te-id-filter-system-st__0',
