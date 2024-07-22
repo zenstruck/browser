@@ -238,6 +238,9 @@ class PantherBrowser extends Browser
         return $this->consoleLogDir;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getSavedScreenshots(): array
     {
         return $this->savedScreenshots;
