@@ -44,10 +44,10 @@ final class PantherBrowserTest extends TestCase
     public function can_configure_directories(): void
     {
         $this->browser()->setScreenshotDir($screenshotDir = '/path/to/screenshot');
-        assert($this->browser()->getScreenshotDir() === $screenshotDir);
+        self::assertSame($this->browser()->getScreenshotDir(), $screenshotDir);
 
         $this->browser()->setConsoleLogDir($logDir = '/path/to/consoleLogs');
-        assert($this->browser()->getScreenshotDir() === $logDir);
+        self::assertSame($this->browser()->getScreenshotDir(), $logDir);
     }
 
     /**
