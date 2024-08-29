@@ -41,6 +41,18 @@ final class PantherBrowserTest extends TestCase
     /**
      * @test
      */
+    public function can_configure_directories(): void
+    {
+        $this->browser()->setScreenshotDir($screenshotDir = '/path/to/screenshot');
+        self::assertSame($this->browser()->getScreenshotDir(), $screenshotDir);
+
+        $this->browser()->setConsoleLogDir($logDir = '/path/to/consoleLogs');
+        self::assertSame($this->browser()->getScreenshotDir(), $logDir);
+    }
+
+    /**
+     * @test
+     */
     public function can_take_screenshot(): void
     {
         self::catchFileContents(__DIR__.'/../var/browser/screenshots/screen.png', function() {

@@ -227,4 +227,38 @@ class PantherBrowser extends Browser
 
         return $this;
     }
+
+    public function getScreenshotDir(): ?string
+    {
+        return $this->screenshotDir;
+    }
+
+    public function getConsoleLogDir(): ?string
+    {
+        return $this->consoleLogDir;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getSavedScreenshots(): array
+    {
+        return $this->savedScreenshots;
+    }
+
+    public function getSavedConsoleLogs(): array
+    {
+        return $this->savedConsoleLogs;
+    }
+
+    public function setScreenshotDir(?string $screenshotDir): void
+    {
+        $this->screenshotDir = $screenshotDir;
+    }
+
+    public function setConsoleLogDir(?string $consoleLogDir): void
+    {
+        $this->consoleLogDir = $consoleLogDir;
+    }
+
 }
