@@ -122,7 +122,7 @@ class LegacyExtension
             \preg_match('#^(?<test>[\w:\\\]+) with data set "(?<dataset>.*)"#', $name, $matches);
         }
 
-        $normalized = \strtr($matches['test'], '\\:', '-_');
+        $normalized = \strtr($matches['test'], '\\:', '-_'); // @phpstan-ignore-line
 
         if (isset($matches['dataset'])) {
             $normalized .= '__data-set-'.\preg_replace('/\W+/', '-', $matches['dataset']);
