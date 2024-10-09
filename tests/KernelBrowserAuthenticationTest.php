@@ -17,16 +17,13 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Zenstruck\Browser\Test\HasBrowser;
-use Zenstruck\Foundry\Test\Factories;
-
-use function Zenstruck\Foundry\anonymous;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class KernelBrowserAuthenticationTest extends KernelTestCase
 {
-    use Factories, HasBrowser;
+    use HasBrowser;
 
     /**
      * @test
@@ -44,42 +41,10 @@ final class KernelBrowserAuthenticationTest extends KernelTestCase
     /**
      * @test
      */
-    public function can_act_as_user_with_foundry_factory(): void
-    {
-        $user = anonymous(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
-
-        $this->browser()
-            ->throwExceptions()
-            ->actingAs($user)
-            ->visit('/user')
-            ->assertSee('user: kevin/pass')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function can_act_as_user_with_foundry_proxy(): void
-    {
-        $user = anonymous(InMemoryUser::class)->create(['username' => 'kevin', 'password' => 'pass']);
-
-        $this->browser()
-            ->throwExceptions()
-            ->actingAs($user)
-            ->visit('/user')
-            ->assertSee('user: kevin/pass')
-        ;
-    }
-
-    /**
-     * @test
-     */
     public function can_make_authentication_assertions(): void
     {
         $username = 'kevin';
         $user = new InMemoryUser('kevin', 'pass');
-        $factory = anonymous(InMemoryUser::class, ['username' => 'kevin', 'password' => 'pass']);
-        $proxy = anonymous(InMemoryUser::class)->create(['username' => 'kevin', 'password' => 'pass']);
 
         $this->browser()
             ->assertNotAuthenticated()
@@ -87,8 +52,6 @@ final class KernelBrowserAuthenticationTest extends KernelTestCase
             ->assertAuthenticated()
             ->assertAuthenticated($username)
             ->assertAuthenticated($user)
-            ->assertAuthenticated($factory)
-            ->assertAuthenticated($proxy)
             ->visit('/user')
             ->assertAuthenticated()
             ->assertAuthenticated($username)

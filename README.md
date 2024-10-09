@@ -320,9 +320,6 @@ $browser
     // authenticate a user for subsequent actions
     ->actingAs($user) // \Symfony\Component\Security\Core\User\UserInterface
 
-    // If using zenstruck/foundry, you can pass a factory/proxy
-    ->actingAs(UserFactory::new())
-
     // fail if authenticated
     ->assertNotAuthenticated()
 
@@ -332,8 +329,7 @@ $browser
     // fails if NOT authenticated as "kbond"
     ->assertAuthenticated('kbond')
 
-    // \Symfony\Component\Security\Core\User\UserInterface or, if using
-    // zenstruck/foundry, you can pass a factory/proxy
+    // \Symfony\Component\Security\Core\User\UserInterface
     ->assertAuthenticated($user)
 ;
 ```

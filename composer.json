@@ -23,15 +23,14 @@
     },
     "require-dev": {
         "dbrekelmans/bdi": "^1.0",
-        "justinrainbow/json-schema": "^5.2",
+        "justinrainbow/json-schema": "^5.3",
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^1.4",
-        "phpunit/phpunit": "^9.5|^10.4",
+        "phpunit/phpunit": "^9.6.21|^10.4",
         "symfony/mime": "^5.4|^6.0|^7.0",
         "symfony/panther": "^1.1|^2.0.1",
         "symfony/phpunit-bridge": "^6.0|^7.0",
-        "symfony/security-bundle": "^5.4|^6.0|^7.0",
-        "zenstruck/foundry": "^1.30"
+        "symfony/security-bundle": "^5.4|^6.0|^7.0"
     },
     "suggest": {
         "justinrainbow/json-schema": "Json schema validator. Needed to use Json::assertMatchesSchema().",
