@@ -21,7 +21,8 @@ use Zenstruck\Browser;
 use Zenstruck\Browser\Session\Driver\BrowserKitDriver;
 use Zenstruck\Callback\Parameter;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Proxy As LegacyProxy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -138,9 +139,12 @@ class KernelBrowser extends Browser
             $user = $user->create(); // @phpstan-ignore-line
         }
 
-        if ($user instanceof Proxy) { // @phpstan-ignore-line
-            trigger_deprecation('zenstruck/browser', '1.9', 'Passing a Proxy to actingAs() is deprecated, pass the real object instead.');
+        if ($user instanceof LegacyProxy) { // @phpstan-ignore-line
             $user = $user->object(); // @phpstan-ignore-line
+        }
+
+        if ($user instanceof Proxy) { // @phpstan-ignore-line
+            $user = $user->_real(); // @phpstan-ignore-line
         }
 
         if (!$user instanceof UserInterface) {
@@ -178,9 +182,12 @@ class KernelBrowser extends Browser
             $as = $as->create(); // @phpstan-ignore-line
         }
 
-        if ($as instanceof Proxy) { // @phpstan-ignore-line
-            trigger_deprecation('zenstruck/browser', '1.9', 'Passing a Proxy to assertAuthenticated() is deprecated, pass the real object instead.');
+        if ($as instanceof LegacyProxy) { // @phpstan-ignore-line
             $as = $as->object(); // @phpstan-ignore-line
+        }
+
+        if ($as instanceof Proxy) { // @phpstan-ignore-line
+            $as = $as->_real(); // @phpstan-ignore-line
         }
 
         if ($as instanceof UserInterface) {
