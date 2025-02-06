@@ -64,6 +64,11 @@ trait HasBrowser
             'console_log_dir' => $_SERVER['BROWSER_CONSOLE_LOG_DIR'] ?? './var/browser/console-logs',
         ];
 
+        if ($_SERVER['BROWSER_ALWAYS_START_WEBSERVER'] ?? null) {
+            $_SERVER['PANTHER_APP_ENV'] = $_SERVER['APP_ENV'] ?? 'test'; // use current environment
+            $_SERVER['SYMFONY_PROJECT_DEFAULT_ROUTE_URL'] = ''; // ignore existing server running with Symfony CLI
+        }
+
         if (self::$primaryPantherClient) {
             $browser = new $class(static::createAdditionalPantherClient(), $browserOptions);
         } else {

@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## [v1.9.1](https://github.com/zenstruck/browser/releases/tag/v1.9.1)
+
+November 5th, 2024 - [v1.9.0...v1.9.1](https://github.com/zenstruck/browser/compare/v1.9.0...v1.9.1)
+
+* 53bbc83 minor: unpack Foundry 2 proxies (#160) by @kbond
+
+## [v1.9.0](https://github.com/zenstruck/browser/releases/tag/v1.9.0)
+
+October 20th, 2024 - [v1.8.1...v1.9.0](https://github.com/zenstruck/browser/compare/v1.8.1...v1.9.0)
+
+* 6175462 feat: add `BROWSER_ALWAYS_START_WEBSERVER` env var (#156) by @kbond
+* d3a52e9 feat: deprecate foundry integration (#154) by @kbond
+* 3b4d4a4 minor: fix tests (#154) by @kbond
+* d90bad9 minor: sca (#154) by @kbond
+
 ## [v1.8.1](https://github.com/zenstruck/browser/releases/tag/v1.8.1)
 
 February 21st, 2024 - [v1.8.0...v1.8.1](https://github.com/zenstruck/browser/compare/v1.8.0...v1.8.1)

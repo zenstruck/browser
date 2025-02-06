@@ -196,7 +196,7 @@ final class HttpOptionsTest extends TestCase
      */
     public function create_with_self(): void
     {
-        $options = new class() extends HttpOptions {};
+        $options = new class extends HttpOptions {};
 
         $this->assertSame($options, HttpOptions::create($options));
     }
