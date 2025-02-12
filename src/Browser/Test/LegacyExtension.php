@@ -11,7 +11,14 @@
 
 namespace Zenstruck\Browser\Test;
 
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter as LegacyFileLinkFormatter;
 use Zenstruck\Browser;
+
+if (!class_exists(FileLinkFormatter::class) && class_exists(LegacyFileLinkFormatter::class)) {
+    class_alias(LegacyFileLinkFormatter::class, FileLinkFormatter::class);
+}
+
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -24,6 +31,12 @@ class LegacyExtension
 
     /** @var array<string,array<string,string[]>> */
     private array $savedArtifacts = [];
+    private FileLinkFormatter $fileLinkFormatter;
+
+    public function __construct(FileLinkFormatter|null $fileLinkFormatter = null)
+    {
+        $this->fileLinkFormatter = $fileLinkFormatter ?? new FileLinkFormatter($_ENV['BROWSER_FILE_LINK_FORMAT'] ?? $_SERVER['BROWSER_FILE_LINK_FORMAT'] ?? '');
+    }
 
     /**
      * @internal
@@ -77,7 +90,7 @@ class LegacyExtension
                 echo "\n    {$category}:";
 
                 foreach ($artifacts as $artifact) {
-                    echo "\n      * {$artifact}:";
+                    echo "\n      * \033]8;;{$this->fileLinkFormatter->format(realpath($artifact) ?: '', 1)}\033\\$artifact\033]8;;\033\\";
                 }
             }
         }

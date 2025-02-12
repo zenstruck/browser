@@ -563,6 +563,7 @@ There are several environment variables available to configure:
 | `PANTHER_BROWSER_CLASS`          | `PantherBrowser` class to use.                                                                                         | `Zenstruck\Browser\PantherBrowser` |
 | `PANTHER_NO_HEADLESS`            | Disable headless-mode and allow usage of `PantherBrowser::pause()`.                                                    | `0` _(false)_                      |
 | `BROWSER_ALWAYS_START_WEBSERVER` | Always start a webserver configured for your current test env before running tests (only applies to `PantherBrowser`). | `0` _(false)_                      |
+| `BROWSER_FILE_LINK_FORMAT`       | Turns file paths seen in `Saved Source Files` into links that open those files right inside your browser               | `file://%f#L%l`                    |
 
 ## Extending
 
