@@ -166,7 +166,14 @@ final class Session extends MinkSession
 
         $crawler = $this->client()->getCrawler();
 
-        if (!\count($exceptionClassNode = $crawler->filter('.trace-details .trace-class')->first())) {
+        try {
+            $exceptionClassNode = $crawler->filter('.trace-details .trace-class')->first();
+        } catch (\Throwable) {
+            // for some reason, sometimes, with panther a `Facebook\WebDriver\Exception\StaleElementReferenceException` is thrown here
+            return;
+        }
+
+        if (!\count($exceptionClassNode)) {
             return;
         }
 
