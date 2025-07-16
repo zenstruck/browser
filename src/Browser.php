@@ -409,7 +409,7 @@ abstract class Browser
     final public function saveSource(string $filename): self
     {
         if ($this->sourceDir) {
-            $filename = \sprintf('%s/%s', \rtrim($this->sourceDir, '/'), \ltrim($filename, '/'));
+            $filename = \sprintf('%s/%s', \mb_rtrim($this->sourceDir, '/'), \mb_ltrim($filename, '/'));
         }
 
         (new Filesystem())->dumpFile($this->savedSources[] = $filename, $this->session()->source($this->sourceDebug));
