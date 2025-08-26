@@ -215,7 +215,7 @@ final class BrowserKitDriver extends Driver
 
     public function getText($xpath): string
     {
-        return \mb_trim($this->getFilteredCrawler($xpath)->text(null, true));
+        return mb_trim($this->getFilteredCrawler($xpath)->text(null, true));
     }
 
     public function getHtml($xpath): string

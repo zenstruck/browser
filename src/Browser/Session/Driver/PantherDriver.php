@@ -89,7 +89,7 @@ final class PantherDriver extends Driver
             return $this->client()->getTitle();
         }
 
-        return \mb_trim($crawler->text(null, true));
+        return mb_trim($crawler->text(null, true));
     }
 
     /**
@@ -237,7 +237,7 @@ final class PantherDriver extends Driver
 
     public function evaluateScript($script)
     {
-        if (0 !== \mb_strpos(\mb_trim($script), 'return ')) {
+        if (0 !== \mb_strpos(mb_trim($script), 'return ')) {
             $script = 'return '.$script;
         }
 

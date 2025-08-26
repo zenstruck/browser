@@ -149,7 +149,7 @@ class PantherBrowser extends Browser
     final public function takeScreenshot(string $filename): self
     {
         if ($this->screenshotDir) {
-            $filename = \sprintf('%s/%s', \mb_rtrim($this->screenshotDir, '/'), \mb_ltrim($filename, '/'));
+            $filename = \sprintf('%s/%s', mb_rtrim($this->screenshotDir, '/'), mb_ltrim($filename, '/'));
         }
 
         $this->client()->takeScreenshot($this->savedScreenshots[] = $filename);
@@ -160,7 +160,7 @@ class PantherBrowser extends Browser
     final public function saveConsoleLog(string $filename): self
     {
         if ($this->consoleLogDir) {
-            $filename = \sprintf('%s/%s', \mb_rtrim($this->consoleLogDir, '/'), \mb_ltrim($filename, '/'));
+            $filename = \sprintf('%s/%s', mb_rtrim($this->consoleLogDir, '/'), mb_ltrim($filename, '/'));
         }
 
         $log = $this->client()->manage()->getLog('browser');
