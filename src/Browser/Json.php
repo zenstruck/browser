@@ -59,7 +59,7 @@ final class Json
      */
     public function assertMatches(string $expression, $expected): self
     {
-        Assert::that($this->search($expression))->is($expected);
+        Assert::that($this->search($expression))->equals($expected);
 
         return $this;
     }
