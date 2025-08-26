@@ -188,4 +188,10 @@ class JsonTest extends TestCase
                 JSON,
         );
     }
+
+    /** @test */
+    public function assoc_array_equals()
+    {
+        (new Json('{"foo": "bar", "bar": "baz"}'))->assertMatches('@', ['bar' => 'baz', 'foo' => 'bar']);
+    }
 }
