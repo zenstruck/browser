@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
  * @phpstan-type RequiredOptions = array{
  *     headers: array<string,string>,
  *     query: mixed[],
- *     files: array<string,string>,
+ *     files: array<string,UploadedFile>,
  *     server: array<string,string>,
  *     body: string|mixed[]|null,
  *     json: mixed,
