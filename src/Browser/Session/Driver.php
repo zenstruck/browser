@@ -14,6 +14,8 @@ namespace Zenstruck\Browser\Session;
 use Behat\Mink\Driver\CoreDriver;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Browser\HttpOptions;
 
 /**
@@ -23,14 +25,21 @@ use Zenstruck\Browser\HttpOptions;
  */
 abstract class Driver extends CoreDriver
 {
+    /** @var AbstractBrowser<Request, Response> */
     private AbstractBrowser $client;
     private bool $started = false;
 
+    /**
+     * @param AbstractBrowser<Request, Response> $client
+     */
     public function __construct(AbstractBrowser $client)
     {
         $this->client = $client;
     }
 
+    /**
+     * @return AbstractBrowser<Request, Response>
+     */
     public function client(): AbstractBrowser
     {
         return $this->client;

@@ -239,10 +239,7 @@ final class BrowserKitDriver extends Driver
         return null;
     }
 
-    /**
-     * @return array|bool|string|null
-     */
-    public function getValue($xpath)
+    public function getValue($xpath) // @phpstan-ignore return.unusedType
     {
         if (\in_array($this->getAttribute($xpath, 'type'), ['submit', 'image', 'button'], true)) {
             return $this->getAttribute($xpath, 'value');
@@ -520,6 +517,10 @@ final class BrowserKitDriver extends Driver
         do {
             // use the ancestor form element
             if (null === $formNode = $formNode->parentNode) {
+                throw new DriverException('The selected node does not have a form ancestor.');
+            }
+
+            if (!$formNode instanceof \DOMElement) {
                 throw new DriverException('The selected node does not have a form ancestor.');
             }
         } while ('form' !== $formNode->nodeName);

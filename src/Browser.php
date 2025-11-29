@@ -15,8 +15,10 @@ use Behat\Mink\Element\NodeElement;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Browser\Assertion\SameUrlAssertion;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Session;
@@ -47,6 +49,9 @@ abstract class Browser
         $this->sourceDebug = $options['source_debug'] ?? false;
     }
 
+    /**
+     * @return AbstractBrowser<Request, Response>
+     */
     final public function client(): AbstractBrowser
     {
         return $this->session->client();

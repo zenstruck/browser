@@ -51,7 +51,7 @@ final class PantherDriver extends Driver
 
     public function __construct(Client $client)
     {
-        parent::__construct($client);
+        parent::__construct($client); // @phpstan-ignore argument.type
     }
 
     public function request(string $method, string $url, HttpOptions $options): void
@@ -92,10 +92,7 @@ final class PantherDriver extends Driver
         return mb_trim($crawler->text(null, true));
     }
 
-    /**
-     * @return array|bool|string|null
-     */
-    public function getValue($xpath)
+    public function getValue($xpath) // @phpstan-ignore return.unusedType
     {
         try {
             $formField = $this->formField($xpath);

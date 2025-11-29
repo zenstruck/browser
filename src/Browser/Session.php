@@ -17,7 +17,9 @@ use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Session as MinkSession;
 use Behat\Mink\WebAssert;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Assert as ZenstruckAssert;
 use Zenstruck\Browser\Session\Assert;
 use Zenstruck\Browser\Session\Driver;
@@ -44,6 +46,9 @@ final class Session extends MinkSession
         \function_exists('dump') ? dump($what) : \var_dump($what);
     }
 
+    /**
+     * @return AbstractBrowser<Request, Response>
+     */
     public function client(): AbstractBrowser
     {
         return $this->getDriver()->client();
