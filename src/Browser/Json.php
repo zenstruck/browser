@@ -22,7 +22,7 @@ use function JmesPath\search;
  *
  * @mixin Expectation
  */
-final class Json
+final class Json implements \Stringable
 {
     private string $source;
 
