@@ -43,7 +43,7 @@ class KernelBrowser extends Browser
         $client->followRedirects((bool) ($options['follow_redirects'] ?? true));
         $client->catchExceptions((bool) ($options['catch_exceptions'] ?? true));
 
-        parent::__construct(new BrowserKitDriver($client), $options);
+        parent::__construct(new BrowserKitDriver($client), $options); // @phpstan-ignore argument.type
     }
 
     /**

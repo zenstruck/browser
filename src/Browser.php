@@ -15,8 +15,10 @@ use Behat\Mink\Element\NodeElement;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Browser\Assertion\SameUrlAssertion;
 use Zenstruck\Browser\Component;
 use Zenstruck\Browser\Session;
@@ -47,6 +49,9 @@ abstract class Browser
         $this->sourceDebug = $options['source_debug'] ?? false;
     }
 
+    /**
+     * @return AbstractBrowser<Request, Response>
+     */
     final public function client(): AbstractBrowser
     {
         return $this->session->client();
@@ -409,7 +414,7 @@ abstract class Browser
     final public function saveSource(string $filename): self
     {
         if ($this->sourceDir) {
-            $filename = \sprintf('%s/%s', mb_rtrim($this->sourceDir, '/'), mb_ltrim($filename, '/'));
+            $filename = \sprintf('%s/%s', \rtrim($this->sourceDir, '/'), \ltrim($filename, '/'));
         }
 
         (new Filesystem())->dumpFile($this->savedSources[] = $filename, $this->session()->source($this->sourceDebug));

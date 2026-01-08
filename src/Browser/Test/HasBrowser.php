@@ -70,7 +70,7 @@ trait HasBrowser
         }
 
         if (self::$primaryPantherClient) {
-            $browser = new $class(static::createAdditionalPantherClient(), $browserOptions);
+            $browser = new $class(static::createAdditionalPantherClient(), $browserOptions); // @phpstan-ignore staticMethod.notFound
         } else {
             self::$primaryPantherClient = static::createPantherClient(
                 \array_merge(['browser' => $_SERVER['PANTHER_BROWSER'] ?? PantherTestCase::CHROME], $options),
@@ -111,7 +111,7 @@ trait HasBrowser
         if ($this instanceof WebTestCase) {
             static::ensureKernelShutdown();
 
-            $browser = new $class(static::createClient($options, $server), $browserOptions);
+            $browser = new $class(static::createClient($options, $server), $browserOptions); // @phpstan-ignore staticMethod.notFound
         } else {
             // reboot kernel before starting browser
             static::bootKernel($options);
