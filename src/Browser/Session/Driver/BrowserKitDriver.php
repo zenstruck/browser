@@ -695,8 +695,6 @@ final class BrowserKitDriver extends Driver
             }
 
             $nodeReflection = (new \ReflectionObject($field))->getProperty('node');
-            $nodeReflection->setAccessible(true);
-
             $node = $nodeReflection->getValue($field);
 
             if ('button' === $node->nodeName || \in_array($node->getAttribute('type'), ['submit', 'button', 'image'])) {
