@@ -167,7 +167,7 @@ final class Json
             return $this->decoded;
         }
 
-        if ('' === mb_trim($this->source)) {
+        if ('' === \trim($this->source)) {
             return null;
         }
 
