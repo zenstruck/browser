@@ -70,7 +70,7 @@ final class Kernel extends BaseKernel
         $files = \array_map(
             static function($value) {
                 if (\is_array($value)) {
-                    return \array_map(fn(UploadedFile $file) => $file->getClientOriginalName(), $value);
+                    return \array_map(static fn(UploadedFile $file) => $file->getClientOriginalName(), $value);
                 }
 
                 return $value instanceof UploadedFile ? $value->getClientOriginalName() : null;

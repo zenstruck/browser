@@ -33,7 +33,7 @@ trait KernelBrowserTests
     public function can_use_kernel_browser_as_typehint(): void
     {
         $this->browser()
-            ->use(function(KernelBrowser $browser) {
+            ->use(static function(KernelBrowser $browser) {
                 $browser->visit('/redirect1');
             })
             ->assertOn('/page1')
@@ -519,7 +519,7 @@ trait KernelBrowserTests
         $this->browser()
             ->post('/json', ['json' => ['foo' => 'bar']])
             ->assertSuccessful()
-            ->use(function(Json $json) {
+            ->use(static function(Json $json) {
                 $json->assertMatches('foo', 'bar');
             })
         ;

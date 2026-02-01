@@ -36,7 +36,7 @@ final class PantherBrowserTest extends TestCase
     public function can_use_panther_browser_as_typehint(): void
     {
         $this->browser()
-            ->use(function(PantherBrowser $browser) {
+            ->use(static function(PantherBrowser $browser) {
                 $browser->visit('/page1');
             })
             ->assertOn('/page1')

@@ -124,7 +124,7 @@ trait BrowserTests
     public function can_use_components(): void
     {
         $this->browser()
-            ->use(function(TestComponent1 $component) {
+            ->use(static function(TestComponent1 $component) {
                 $component->assertTitle('h1 title');
             })
             ->assertOn('/page1')
@@ -196,7 +196,7 @@ trait BrowserTests
     {
         $this->expectException(UnresolveableArgument::class);
 
-        $this->browser()->use(function(string $invalidType) {});
+        $this->browser()->use(static function(string $invalidType) {});
     }
 
     /**
@@ -695,7 +695,7 @@ trait BrowserTests
     {
         $output[] = null;
 
-        VarDumper::setHandler(function($var) use (&$output) {
+        VarDumper::setHandler(static function($var) use (&$output) {
             $output[] = $var;
         });
 

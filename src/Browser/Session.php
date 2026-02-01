@@ -152,7 +152,7 @@ final class Session extends MinkSession
             throw new \RuntimeException("Element \"{$selector}\" not found.");
         }
 
-        $elements->each(function(Crawler $node) {
+        $elements->each(static function(Crawler $node) {
             self::varDump($node->outerHtml());
         });
     }
