@@ -12,14 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [8.2, 8.3]
+        php: [8.3, 8.4]
         deps: [highest]
         symfony: [6.4.*, 7.4.*]
         include:
-          - php: 8.1
-            deps: lowest
-            symfony: '*'
-          - php: 8.4
+          - php: 8.5
             symfony: '8.0.*'
 
     steps:
