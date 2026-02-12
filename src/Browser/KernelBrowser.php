@@ -51,7 +51,7 @@ class KernelBrowser extends Browser
         $client->followRedirects((bool) ($options['follow_redirects'] ?? true));
         $client->catchExceptions((bool) ($options['catch_exceptions'] ?? true));
 
-        parent::__construct($this->session = new KernelSession($client), $options); // @phpstan-ignore argument.type
+        parent::__construct($this->session = new KernelSession($client), $options);
     }
 
     /**
@@ -626,7 +626,7 @@ class KernelBrowser extends Browser
      */
     private function normalizedContentType(): ?string
     {
-        $contentType = (string) $this->client()->getInternalResponse()->getHeader('Content-Type'); // @phpstan-ignore-line
+        $contentType = (string) $this->client()->getInternalResponse()->getHeader('Content-Type');
 
         return match (true) {
             \str_contains($contentType, 'json') => 'json',
