@@ -12,6 +12,8 @@
 namespace Zenstruck\Browser;
 
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\Request;
+use Symfony\Component\BrowserKit\Response;
 use Zenstruck\Dom;
 use Zenstruck\Dom\Session as DomSession;
 
@@ -22,10 +24,16 @@ use Zenstruck\Dom\Session as DomSession;
  */
 abstract class Session implements DomSession
 {
+    /**
+     * @param AbstractBrowser<Request, Response> $client
+     */
     public function __construct(private AbstractBrowser $client)
     {
     }
 
+    /**
+     * @return AbstractBrowser<Request, Response>
+     */
     final public function client(): AbstractBrowser
     {
         return $this->client;

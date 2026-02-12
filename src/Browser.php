@@ -14,6 +14,8 @@ namespace Zenstruck;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\Request;
+use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Browser\Assertion\SameUrlAssertion;
@@ -57,6 +59,9 @@ abstract class Browser
         $this->sourceDebug = $options['source_debug'] ?? false;
     }
 
+    /**
+     * @return AbstractBrowser<Request, Response>
+     */
     final public function client(): AbstractBrowser
     {
         return $this->session->client();
