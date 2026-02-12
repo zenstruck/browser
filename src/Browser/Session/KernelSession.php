@@ -226,7 +226,7 @@ final class KernelSession extends Session
         $field = $form->get($name);
 
         if (\is_array($field)) {
-            return $field[$this->fieldPositionFor($node)]; // @phpstan-ignore-line
+            return $field[$this->fieldPositionFor($node)];
         }
 
         return $field;
