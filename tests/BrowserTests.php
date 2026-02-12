@@ -415,7 +415,7 @@ trait BrowserTests
     {
         $this->browser()
             ->visit('/page1')
-            ->click(function(Dom $dom) {
+            ->click(static function(Dom $dom) {
                 return $dom
                     ->find('a link')
                 ;

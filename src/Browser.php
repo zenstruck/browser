@@ -393,7 +393,7 @@ abstract class Browser
 
         Assert::true($node->isVisible(), 'Clickable element "%s" is not visible.', [$selector]);
 
-        return $this->wrapRequest(fn() => $node->click());
+        return $this->wrapRequest(static fn() => $node->click());
     }
 
     /**

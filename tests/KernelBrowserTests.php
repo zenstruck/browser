@@ -35,7 +35,7 @@ trait KernelBrowserTests
     {
         $this->browser()
             ->visit('/page1')
-            ->click(function(Dom $dom) {
+            ->click(static function(Dom $dom) {
                 return $dom
                     ->find('input7')
                     ?->ensure(Dom\Node\Form\Field::class)
