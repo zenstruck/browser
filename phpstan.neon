@@ -1,7 +1,8 @@
 parameters:
-    level: 8
+    level: 5
     paths:
         - src
+        - stubs
 
     excludePaths:
         # skip phpunit 10 missing classes

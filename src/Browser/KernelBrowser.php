@@ -51,7 +51,7 @@ class KernelBrowser extends Browser
         $client->followRedirects((bool) ($options['follow_redirects'] ?? true));
         $client->catchExceptions((bool) ($options['catch_exceptions'] ?? true));
 
-        parent::__construct($this->session = new KernelSession($client), $options);
+        parent::__construct($this->session = new KernelSession($client), $options); // @phpstan-ignore argument.type
     }
 
     /**

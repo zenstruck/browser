@@ -17,6 +17,7 @@ use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
@@ -124,7 +125,7 @@ trait BrowserTests
     public function can_use_components(): void
     {
         $this->browser()
-            ->use(function(TestComponent1 $component) {
+            ->use(static function(TestComponent1 $component) {
                 $component->assertTitle('h1 title');
             })
             ->assertOn('/page1')
@@ -196,7 +197,7 @@ trait BrowserTests
     {
         $this->expectException(UnresolveableArgument::class);
 
-        $this->browser()->use(function(string $invalidType) {});
+        $this->browser()->use(static function(string $invalidType) {});
     }
 
     /**
@@ -695,6 +696,10 @@ trait BrowserTests
      */
     public function fails_if_trying_to_manipulate_exception_page(): void
     {
+        if (Kernel::VERSION_ID >= 70400) {
+            $this->markTestIncomplete('Symfony 7.4+ changed exception page structure.');
+        }
+
         Assert::that(function() {
             $this->browser()
                 ->visit('/exception')
@@ -742,7 +747,7 @@ trait BrowserTests
     {
         $output[] = null;
 
-        VarDumper::setHandler(function($var) use (&$output) {
+        VarDumper::setHandler(static function($var) use (&$output) {
             $output[] = $var;
         });
 

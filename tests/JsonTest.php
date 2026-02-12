@@ -123,10 +123,10 @@ class JsonTest extends TestCase
 
     public static function scalarChildAssertionProvider(): iterable
     {
-        yield ['{"foo":{"bar":"baz"}}', 'noop', function(Json $json) {$json->isNull(); }];
-        yield ['{"foo":{"bar":"baz"}}', 'foo.bar', function(Json $json) {$json->isNotEmpty()->equals('baz'); }];
-        yield ['{"hydra:totalItems":0}', '"hydra:totalItems"', function(Json $json) {$json->is(0); }];
-        yield ['{"hydra":{"totalItems":0}}', 'hydra.totalItems', function(Json $json) {$json->is(0); }];
+        yield ['{"foo":{"bar":"baz"}}', 'noop', static function(Json $json) {$json->isNull(); }];
+        yield ['{"foo":{"bar":"baz"}}', 'foo.bar', static function(Json $json) {$json->isNotEmpty()->equals('baz'); }];
+        yield ['{"hydra:totalItems":0}', '"hydra:totalItems"', static function(Json $json) {$json->is(0); }];
+        yield ['{"hydra":{"totalItems":0}}', 'hydra.totalItems', static function(Json $json) {$json->is(0); }];
     }
 
     /**
@@ -141,8 +141,8 @@ class JsonTest extends TestCase
 
     public static function arrayChildAssertionProvider(): iterable
     {
-        yield ['{"foo":[1, 2]}', 'foo', function(Json $json) {$json->isGreaterThan(0); }];
-        yield ['{"foo":[{"bar": 1}, {"bar": 2}]}', 'foo[*].bar', function(Json $json) {$json->isGreaterThan(0); }];
+        yield ['{"foo":[1, 2]}', 'foo', static function(Json $json) {$json->isGreaterThan(0); }];
+        yield ['{"foo":[{"bar": 1}, {"bar": 2}]}', 'foo[*].bar', static function(Json $json) {$json->isGreaterThan(0); }];
     }
 
     /**
@@ -187,5 +187,11 @@ class JsonTest extends TestCase
                 }
                 JSON,
         );
+    }
+
+    /** @test */
+    public function assoc_array_equals()
+    {
+        (new Json('{"foo": "bar", "bar": "baz"}'))->assertMatches('@', ['bar' => 'baz', 'foo' => 'bar']);
     }
 }

@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [v1.10.0](https://github.com/zenstruck/browser/releases/tag/v1.10.0)
+
+January 8th, 2026 - [v1.9.1...v1.10.0](https://github.com/zenstruck/browser/compare/v1.9.1...v1.10.0)
+
+* 9d7dbe9 chore: support Symfony 8 (#184) by @nikophil, @kbond
+* 1831b54 fix: Remove deprecated `ReflectionProperty::setAccessible()` (#187) by @deluxetom
+* 5105bdb fix: resolve false positive on jsonMatches (#179) by @flohw
+* 8a59547 doc: fix PHP syntax in `README.md` on use functions (#170) by @welcoMattic
+
 ## [v1.9.1](https://github.com/zenstruck/browser/releases/tag/v1.9.1)
 
 November 5th, 2024 - [v1.9.0...v1.9.1](https://github.com/zenstruck/browser/compare/v1.9.0...v1.9.1)
