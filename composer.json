@@ -13,10 +13,10 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/browser-kit": "^6.4|^7.0",
-        "symfony/css-selector": "^6.4|^7.0",
-        "symfony/dom-crawler": "^6.4|^7.0",
-        "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/browser-kit": "^6.4|^7.0|^8.0",
+        "symfony/css-selector": "^6.4|^7.0|^8.0",
+        "symfony/dom-crawler": "^6.4|^7.0|^8.0",
+        "symfony/framework-bundle": "^6.4|^7.0|^8.0",
         "zenstruck/assert": "^1.4",
         "zenstruck/callback": "^1.4.2",
         "zenstruck/dom": "^1.0"
@@ -29,8 +29,8 @@
         "phpunit/phpunit": "^9.6.21|^10.4",
         "symfony/mime": "^6.4|^7.0",
         "symfony/panther": "^2.1.0",
-        "symfony/phpunit-bridge": "^6.0|^7.0",
-        "symfony/security-bundle": "^6.4|^7.0"
+        "symfony/phpunit-bridge": "^6.0|^7.0|^8.0",
+        "symfony/security-bundle": "^6.4|^7.0|^8.0"
     },
     "suggest": {
         "justinrainbow/json-schema": "Json schema validator. Needed to use Json::assertMatchesSchema().",
