@@ -92,7 +92,7 @@ final class PantherDriver extends Driver
         return \trim($crawler->text(null, true));
     }
 
-    public function getValue($xpath) // @phpstan-ignore return.unusedType
+    public function getValue($xpath): string|bool|array|null // @phpstan-ignore return.unusedType
     {
         try {
             $formField = $this->formField($xpath);
