@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v1.10.1](https://github.com/zenstruck/browser/releases/tag/v1.10.1)
+
+May 28th, 2026 - [v1.10.0...v1.10.1](https://github.com/zenstruck/browser/compare/v1.10.0...v1.10.1)
+
+* 1674f9c fix: mink deprecation (#192) by @kbond
+* 0c46516 fix: mink deprecation (#192) by @kbond
+
 ## [v1.10.0](https://github.com/zenstruck/browser/releases/tag/v1.10.0)
 
 January 8th, 2026 - [v1.9.1...v1.10.0](https://github.com/zenstruck/browser/compare/v1.9.1...v1.10.0)
