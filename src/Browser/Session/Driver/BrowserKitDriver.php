@@ -239,7 +239,7 @@ final class BrowserKitDriver extends Driver
         return null;
     }
 
-    public function getValue($xpath) // @phpstan-ignore return.unusedType
+    public function getValue($xpath): string|bool|array|null // @phpstan-ignore return.unusedType
     {
         if (\in_array($this->getAttribute($xpath, 'type'), ['submit', 'image', 'button'], true)) {
             return $this->getAttribute($xpath, 'value');
