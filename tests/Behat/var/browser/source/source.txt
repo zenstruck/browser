@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>meta title</title>
+    <meta name="description" content="meta description">
+</head>
+<body>
+    <h1>h1 title</h1>
+    <p id="link"><a href="/page2">a link</a> not a link</p>
+    <p><a href="/exception">exception link</a></p>
+    <p id="double-click-link"><a onclick="return false" ondblclick="location=this.href" href="/page2">Double Click</a></p>
+    <p id="context-menu-link"><a onclick="return false" oncontextmenu="location=this.href" href="/page2">Right Click</a></p>
+    <ul>
+        <li>list 1</li>
+        <li>list 2</li>
+    </ul>
+    <form action="/submit-form" method="post" enctype="multipart/form-data">
+        <label for="input1">Input 1</label>
+        <input id="input1" name="input_1" type="text" value="input 1" />
+
+        <label for="input2">Input 2</label>
+        <input id="input2" name="input_2" type="checkbox">
+
+        <label for="input3">Input 3</label>
+        <input id="input3" name="input_3" type="checkbox" checked>
+
+        <label for="input4">Input 4</label>
+        <select id="input4" name="input_4">
+            <option selected>option 1</option>
+            <option>option 2</option>
+        </select>
+
+        <label for="input5">Input 5</label>
+        <input id="input5" name="input_5" type="file">
+
+        <label for="input6">Input 6</label>
+        <select id="input6" name="input_6[]" multiple>
+            <option>option 1</option>
+            <option>option 2</option>
+            <option>option 3</option>
+        </select>
+
+        <label for="input7">Input 7</label>
+        <select id="input7" name="input_7[]" multiple>
+            <option selected>option 1</option>
+            <option>option 2</option>
+            <option selected>option 3</option>
+        </select>
+
+        <label for="radio1">Radio 1</label>
+        <input type="radio" id="radio1" name="input_8" value="option 1">
+        <label for="radio2">Radio 2</label>
+        <input type="radio" id="radio2" name="input_8" value="option 2" checked>
+        <label for="radio3">Radio 3</label>
+        <input type="radio" id="radio3" name="input_8" value="option 3">
+
+        <label for="input9">Input 9</label>
+        <input id="input9" name="input_9[]" type="file" multiple>
+
+        <button type="submit" name="submit_1" value="a">Submit</button>
+        <button type="submit" name="submit_1" value="b">Submit B</button>
+        <button type="submit" name="submit_2" value="c">Submit C</button>
+        <button name="submit_2" value="d">Submit D</button>
+        <button name="submit_1" value="e">Submit Exception</button>
+        <button name="submit_1" value="r">Submit Redirect</button>
+    </form>
+</body>
+</html>

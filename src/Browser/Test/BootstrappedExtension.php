@@ -28,11 +28,13 @@ use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use Zenstruck\Browser;
+use Zenstruck\Browser\BrowserRegistry;
 
 class BootstrappedExtension
 {
     public function bootstrap(Configuration $configuration, Facade $facade, ParameterCollection $parameters): void
     {
+        BrowserRegistry::resetDefault();
         $extension = new LegacyExtension();
 
         $facade->registerSubscriber(new class($extension) implements TestRunnerStartedSubscriber {
@@ -133,9 +135,11 @@ class BootstrappedExtension
 
     /**
      * @internal
+     *
+     * @deprecated since 1.10, use {@see BrowserRegistry::default()}->register() instead.
      */
     public static function registerBrowser(Browser $browser): void
     {
-        LegacyExtension::registerBrowser($browser);
+        BrowserRegistry::default()->register($browser);
     }
 }

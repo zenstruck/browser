@@ -22,6 +22,7 @@
         "zenstruck/callback": "^1.4.2"
     },
     "require-dev": {
+        "behat/behat": "^3.13|^4.0@dev",
         "dbrekelmans/bdi": "^1.0",
         "justinrainbow/json-schema": "^5.3",
         "mtdowling/jmespath.php": "^2.6",
@@ -34,6 +35,8 @@
         "symfony/security-bundle": "^6.4|^7.0|^8.0"
     },
     "suggest": {
+        "behat/behat": "To use the Behat bridge under Zenstruck\\Browser\\Bridge\\Behat.",
+        "friends-of-behat/symfony-extension": "To boot the Symfony kernel under Behat via SymfonyExtensionKernelBooter (otherwise the StandaloneKernelBooter is used).",
         "justinrainbow/json-schema": "Json schema validator. Needed to use Json::assertMatchesSchema().",
         "mtdowling/jmespath.php":  "PHP implementation for JMESPath. Needed to use Json assertions."
     },
@@ -45,7 +48,10 @@
         "psr-4": { "Zenstruck\\": "src/" }
     },
     "autoload-dev": {
-        "psr-4": { "Zenstruck\\Browser\\Tests\\": "tests/" }
+        "psr-4": {
+            "Zenstruck\\Browser\\Tests\\": "tests/",
+            "Zenstruck\\Browser\\Tests\\Behat\\": "tests/Behat/"
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true

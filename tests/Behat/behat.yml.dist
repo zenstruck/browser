@@ -1,0 +1,17 @@
+# NOTE: this YAML config is kept only for Behat ^3.x users.
+# Behat 4.x requires behat.dist.php (see the sibling file).
+default:
+    suites:
+        default:
+            paths:
+                - '%paths.base%/features'
+            contexts:
+                - Zenstruck\Browser\Tests\Behat\Context\BrowserContext
+    extensions:
+        Zenstruck\Browser\Bridge\Behat\BrowserExtension:
+            kernel_class: Zenstruck\Browser\Tests\Fixture\Kernel
+            env: test
+            debug: true
+            source_dir: '%paths.base%/../../var/browser/source'
+            screenshot_dir: '%paths.base%/../../var/browser/screenshots'
+            console_log_dir: '%paths.base%/../../var/browser/console-logs'
