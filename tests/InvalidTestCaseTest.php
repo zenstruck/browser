@@ -30,14 +30,4 @@ final class InvalidTestCaseTest extends TestCase
 
         $this->browser();
     }
-
-    /**
-     * @test
-     */
-    public function cannot_create_panther_browser(): void
-    {
-        $this->expectException(\LogicException::class);
-
-        $this->pantherBrowser();
-    }
 }

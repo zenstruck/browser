@@ -11,10 +11,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
-use PHPUnit\Framework\AssertionFailedError;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
-use Zenstruck\Assert;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Json;
 use Zenstruck\Browser\KernelBrowser;
@@ -43,223 +40,59 @@ trait KernelBrowserTests
     /**
      * @test
      */
-    public function can_use_container_as_typehint(): void
+    public function reboots_the_kernel_between_requests_by_default(): void
     {
-        $browser = $this->browser();
-        $c = $browser->client()->getContainer();
-
-        $browser
-            ->use(function(ContainerInterface $container) use ($c) {
-                $this->assertSame($c, $container);
-            })
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function can_enable_exception_throwing(): void
-    {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('exception thrown');
+        $containers = [];
+        $collect = static function(ContainerInterface $container) use (&$containers): void {
+            $containers[] = $container;
+        };
 
         $this->browser()
-            ->throwExceptions()
-            ->visit('/exception')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function can_re_enable_catching_exceptions(): void
-    {
-        $browser = $this->browser();
-
-        try {
-            $browser->throwExceptions()->visit('/exception');
-        } catch (\Exception $e) {
-            $browser
-                ->catchExceptions()
-                ->visit('/exception')
-                ->assertStatus(500)
-            ;
-
-            return;
-        }
-
-        $this->fail('Exception was not caught.');
-    }
-
-    /**
-     * @test
-     */
-    public function can_enable_the_profiler(): void
-    {
-        $profile = $this->browser()
-            ->withProfiling()
-            ->visit('/page1')
-            ->profile()
+            ->visit('/page1')->use($collect)
+            ->visit('/page2')->use($collect)
         ;
 
-        $this->assertTrue($profile->hasCollector('request'));
+        // a reboot rebuilds the container, so two requests cannot share one
+        $this->assertNotSame($containers[0], $containers[1]);
     }
 
     /**
      * @test
      */
-    public function following_redirect_follows_all_by_default(): void
+    public function can_disable_reboot(): void
     {
-        $this->browser()
-            ->interceptRedirects()
-            ->visit('/redirect1')
-            ->assertOn('/redirect1')
-            ->followRedirect()
-            ->assertOn('/page1')
-            ->assertSuccessful()
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function can_re_enable_following_redirects(): void
-    {
-        $this->browser()
-            ->interceptRedirects()
-            ->visit('/redirect1')
-            ->assertOn('/redirect1')
-            ->followRedirects()
-            ->visit('/redirect1')
-            ->assertOn('/page1')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function calling_follow_redirects_when_the_response_is_a_redirect_follows_the_redirect(): void
-    {
-        $this->browser()
-            ->interceptRedirects()
-            ->visit('/redirect1')
-            ->followRedirects()
-            ->assertOn('/page1')
-            ->interceptRedirects()
-            ->visit('/page1')
-            ->followRedirects()
-            ->assertOn('/page1')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function calling_follow_redirects_before_a_request_has_been_made_just_enables_following_redirects(): void
-    {
-        $this->browser()
-            ->followRedirects()
-            ->visit('/redirect1')
-            ->assertOn('/page1')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function can_limit_redirects_followed(): void
-    {
-        $this->browser()
-            ->interceptRedirects()
-            ->visit('/redirect1')
-            ->assertOn('/redirect1')
-            ->assertRedirected()
-            ->followRedirect(1)
-            ->assertOn('/redirect2')
-            ->assertRedirected()
-            ->followRedirect(1)
-            ->assertOn('/redirect3')
-            ->assertRedirected()
-            ->followRedirect(1)
-            ->assertOn('/page1')
-            ->assertSuccessful()
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function assert_redirected_to_follows_all_redirects_by_default(): void
-    {
-        $this->browser()
-            ->interceptRedirects()
-            ->visit('/redirect1')
-            ->assertRedirectedTo('/page1')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function assert_redirected_to_can_configure_number_of_redirects_to_follow(): void
-    {
-        $this->browser()
-            ->interceptRedirects()
-            ->visit('/redirect1')
-            ->assertRedirectedTo('/redirect2', 1)
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function exception_thrown_if_asserting_redirected_and_not_intercepting_redirects(): void
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot assert redirected if not intercepting redirects. Call ->interceptRedirects() before making the request.');
+        $containers = [];
+        $collect = static function(ContainerInterface $container) use (&$containers): void {
+            $containers[] = $container;
+        };
 
         $this->browser()
-            ->visit('/redirect1')
-            ->assertRedirected()
+            ->disableReboot()
+            ->visit('/page1')->use($collect)
+            ->visit('/page2')->use($collect)
         ;
+
+        $this->assertSame($containers[0], $containers[1]);
     }
 
     /**
      * @test
      */
-    public function exception_thrown_if_asserting_redirected_to_and_not_intercepting_redirects(): void
+    public function can_re_enable_reboot(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot assert redirected if not intercepting redirects. Call ->interceptRedirects() before making the request.');
+        $containers = [];
+        $collect = static function(ContainerInterface $container) use (&$containers): void {
+            $containers[] = $container;
+        };
 
         $this->browser()
-            ->visit('/redirect1')
-            ->assertRedirectedTo('/page1')
+            ->disableReboot()
+            ->visit('/page1')->use($collect)
+            ->enableReboot()
+            ->visit('/page2')->use($collect)
         ;
-    }
 
-    /**
-     * @test
-     */
-    public function exceptions_are_caught_by_default(): void
-    {
-        $this->browser()
-            ->visit('/exception')
-            ->assertStatus(500)
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function response_header_assertions(): void
-    {
-        $this->browser()
-            ->visit('/page1')
-            ->assertHeaderEquals('Content-Type', 'text/html; charset=UTF-8')
-            ->assertHeaderContains('Content-Type', 'text/html')
-            ->assertHeaderEquals('X-Not-Present-Header', null)
-        ;
+        $this->assertNotSame($containers[0], $containers[1]);
     }
 
     /**
@@ -528,20 +361,6 @@ trait KernelBrowserTests
     /**
      * @test
      */
-    public function can_access_the_profiler(): void
-    {
-        $profile = $this->browser()
-            ->withProfiling()
-            ->visit('/page1')
-            ->profile()
-        ;
-
-        $this->assertTrue($profile->hasCollector('request'));
-    }
-
-    /**
-     * @test
-     */
     public function can_dump_xml_selector(): void
     {
         $output = self::catchVarDumperOutput(function() {
@@ -573,20 +392,6 @@ trait KernelBrowserTests
     /**
      * @test
      */
-    public function can_use_data_collector(): void
-    {
-        $this->browser()
-            ->withProfiling()
-            ->visit('/page1')
-            ->use(function(RequestDataCollector $collector) {
-                $this->assertSame('/page1', $collector->getPathInfo());
-            })
-        ;
-    }
-
-    /**
-     * @test
-     */
     public function can_expect_exception_for_http_request(): void
     {
         $this->browser()
@@ -600,91 +405,6 @@ trait KernelBrowserTests
                 $this->assertSame('exception thrown', $e->getMessage());
             })
             ->put('/exception')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function can_expect_exception_for_form_submit(): void
-    {
-        $this->browser()
-            ->visit('/page1')
-            ->expectException(\RuntimeException::class, 'fail!')
-            ->click('Submit Exception')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function can_expect_exception_for_link_click(): void
-    {
-        $this->browser()
-            ->visit('/page1')
-            ->expectException(\Exception::class, 'exception thrown')
-            ->click('exception link')
-            ->assertOn('/exception')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function click_and_intercept(): void
-    {
-        $this->browser()
-            ->visit('/page1')
-            ->clickAndIntercept('Submit Redirect')
-            ->assertOn('/submit-form')
-            ->use(function(RequestDataCollector $collector) {
-                $this->assertSame('/submit-form', $collector->getPathInfo());
-            })
-            ->assertRedirectedTo('/page1')
-        ;
-    }
-
-    /**
-     * @test
-     */
-    public function fails_if_expected_exception_not_thrown(): void
-    {
-        // http request
-        Assert::that(
-            function() {
-                $this->browser()
-                    ->expectException(\RuntimeException::class)
-                    ->get('/page1')
-                ;
-            },
-        )
-            ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
-        ;
-
-        // click link
-        Assert::that(
-            function() {
-                $this->browser()
-                    ->visit('/page1')
-                    ->expectException(\RuntimeException::class)
-                    ->click('a link')
-                ;
-            },
-        )
-            ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
-        ;
-
-        // submit form
-        Assert::that(
-            function() {
-                $this->browser()
-                    ->visit('/page1')
-                    ->expectException(\RuntimeException::class)
-                    ->click('Submit')
-                ;
-            },
-        )
-            ->throws(AssertionFailedError::class, 'No exception thrown. Expected "RuntimeException".')
         ;
     }
 

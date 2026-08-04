@@ -22,11 +22,12 @@
         "zenstruck/callback": "^1.4.2"
     },
     "require-dev": {
-        "dbrekelmans/bdi": "^1.0",
         "justinrainbow/json-schema": "^5.3",
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^9.6.21|^10.4",
+        "playwright-php/playwright": "^1.4",
+        "playwright-php/playwright-symfony": "^0.10",
         "symfony/console": "^6.4|^7.0|^8.0",
         "symfony/mime": "^6.4|^7.0|^8.0",
         "symfony/panther": "^1.1|^2.0.1",

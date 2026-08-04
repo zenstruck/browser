@@ -24,7 +24,6 @@ use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
-use Zenstruck\Assert;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Session\Driver;
 
@@ -54,16 +53,6 @@ final class BrowserKitDriver extends Driver
 
     /** @var array<string,string> */
     private array $serverParameters = [];
-
-    /** @var mixed */
-    private $expectedException;
-    private ?string $expectedExceptionMessage = null;
-
-    public function expectException($expectedException, ?string $expectedMessage = null): void
-    {
-        $this->expectedException = $expectedException;
-        $this->expectedExceptionMessage = $expectedMessage;
-    }
 
     public function stop(): void
     {
@@ -402,6 +391,15 @@ final class BrowserKitDriver extends Driver
         return $elements;
     }
 
+    protected function clientCatchExceptions(bool $catch): void
+    {
+        $client = $this->client();
+
+        \assert($client instanceof KernelBrowser);
+
+        $client->catchExceptions($catch);
+    }
+
     private function getResponse(): Response
     {
         try {
@@ -704,25 +702,5 @@ final class BrowserKitDriver extends Driver
         }
 
         return $cached;
-    }
-
-    private function wrapRequest(callable $callback): void
-    {
-        if (!$this->expectedException) {
-            $callback();
-
-            return;
-        }
-
-        $client = $this->client();
-
-        \assert($client instanceof KernelBrowser);
-
-        // todo reset to original value after request
-        $client->catchExceptions(false);
-
-        Assert::that($callback)->throws($this->expectedException, $this->expectedExceptionMessage);
-
-        $this->expectedException = $this->expectedExceptionMessage = null;
     }
 }
