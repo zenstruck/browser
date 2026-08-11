@@ -194,7 +194,7 @@ class HttpOptions
     }
 
     /**
-     * @param array<string, UploadedFile> $files
+     * @param array<string,UploadedFile> $files
      *
      * @return static
      */
