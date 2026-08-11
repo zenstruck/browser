@@ -53,6 +53,10 @@ public function testViewPostAndAddComment()
 composer require zenstruck/browser --dev
 ```
 
+## Security Policy
+
+If you discover a security vulnerability, please do not open a public issue or pull request. Instead, please review this repository's [Security Policy](https://github.com/zenstruck/browser/security) for instructions on how to report it responsibly.
+
 Optionally, enable the provided extension in your `phpunit.xml`:
 
 - PHPUnit 8 or 9 :
