@@ -17,7 +17,6 @@ use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
@@ -644,10 +643,6 @@ trait BrowserTests
      */
     public function fails_if_trying_to_manipulate_exception_page(): void
     {
-        if (Kernel::VERSION_ID >= 70400) {
-            $this->markTestIncomplete('Symfony 7.4+ changed exception page structure.');
-        }
-
         Assert::that(function() {
             $this->browser()
                 ->visit('/exception')

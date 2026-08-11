@@ -169,18 +169,51 @@ final class Session extends MinkSession
             ZenstruckAssert::fail('A request has not yet been made.');
         }
 
-        $crawler = $this->client()->getCrawler();
-
-        if (!\count($exceptionClassNode = $crawler->filter('.trace-details .trace-class')->first())) {
+        // an exception page always carries an error status: this runs before every action and
+        // assertion, so successful responses are never inspected
+        if (!$this->couldBeExceptionPage()) {
             return;
         }
 
-        $messageNode = $crawler->filter('.exception-message-wrapper .exception-message')->first();
+        $crawler = $this->client()->getCrawler();
 
-        ZenstruckAssert::fail('The last request threw an exception: %s - %s', [
-            \preg_replace('/\s+/', '', $exceptionClassNode->text()),
-            \count($messageNode) ? $messageNode->text() : 'unknown message',
-        ]);
+        // Symfony < 7.4 renders an html exception page
+        if (\count($exceptionClassNode = $crawler->filter('.trace-details .trace-class')->first())) {
+            $messageNode = $crawler->filter('.exception-message-wrapper .exception-message')->first();
+
+            $this->failWithException(
+                (string) \preg_replace('/\s+/', '', $exceptionClassNode->text()),
+                \count($messageNode) ? $messageNode->text() : 'unknown message',
+            );
+        }
+
+        // 7.4+ dumps the exception with var-dumper, which is not html when rendered from the cli
+        // not page(), which calls back into here
+        $content = \ltrim($this->getDriver()->getContent());
+
+        if (!\preg_match('/^([A-Za-z_\\\\][\w\\\\]*) \{#\d+/', $content, $exception)) {
+            return;
+        }
+
+        $this->failWithException(
+            $exception[1],
+            \preg_match('/#message: "([^"]*)"/', $content, $message) ? $message[1] : 'unknown message',
+        );
+    }
+
+    private function couldBeExceptionPage(): bool
+    {
+        try {
+            return $this->getStatusCode() >= 400;
+        } catch (DriverException) {
+            // the driver cannot tell us, so fall through to inspecting the response itself
+            return true;
+        }
+    }
+
+    private function failWithException(string $class, string $message): void
+    {
+        ZenstruckAssert::fail('The last request threw an exception: %s - %s', [$class, $message]);
     }
 
     private function isTextContent(): bool
