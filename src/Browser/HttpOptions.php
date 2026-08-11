@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
  * @phpstan-type RequiredOptions = array{
  *     headers: array<string,string>,
  *     query: mixed[],
- *     files: array<string,string>,
+ *     files: array<string,UploadedFile>,
  *     server: array<string,string>,
  *     body: string|mixed[]|null,
  *     json: mixed,
@@ -28,7 +29,7 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
  * @phpstan-type Options = array{
  *     headers?: array<string,string>,
  *     query?: mixed[],
- *     files?: array<string,string>,
+ *     files?: array<string,UploadedFile>,
  *     server?: array<string,string>,
  *     body?: string|mixed[]|null,
  *     json?: mixed,
@@ -193,7 +194,7 @@ class HttpOptions
     }
 
     /**
-     * @param array<string,string> $files
+     * @param array<string,UploadedFile> $files
      *
      * @return static
      */
@@ -280,7 +281,7 @@ class HttpOptions
     /**
      * @internal
      *
-     * @return array<string,string>
+     * @return array<string,UploadedFile>
      */
     final public function files(): array
     {
