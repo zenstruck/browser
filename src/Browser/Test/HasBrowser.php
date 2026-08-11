@@ -12,11 +12,15 @@
 namespace Zenstruck\Browser\Test;
 
 use PHPUnit\Framework\Attributes\After;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Panther\Client as PantherClient;
 use Symfony\Component\Panther\PantherTestCase;
 use Symfony\Component\Panther\PantherTestCaseTrait;
+use Zenstruck\Browser\BrowserFactory;
+use Zenstruck\Browser\BrowserOptions;
+use Zenstruck\Browser\BrowserRegistry;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\PantherBrowser;
 
@@ -25,7 +29,7 @@ use Zenstruck\Browser\PantherBrowser;
  */
 trait HasBrowser
 {
-    private static ?PantherClient $primaryPantherClient = null;
+    private static ?PhpUnitKernelBooter $browserKernelBooter = null;
 
     /**
      * @internal
@@ -35,7 +39,8 @@ trait HasBrowser
     #[After]
     final public static function _resetBrowserClients(): void
     {
-        self::$primaryPantherClient = null;
+        self::$browserKernelBooter?->reset();
+        self::$browserKernelBooter = null;
     }
 
     /**
@@ -51,39 +56,7 @@ trait HasBrowser
             throw new \LogicException(\sprintf('A PantherBrowser can only be created in TestCases that extend "%s" or use "%s".', PantherTestCase::class, PantherTestCaseTrait::class));
         }
 
-        $class = $_SERVER['PANTHER_BROWSER_CLASS'] ?? PantherBrowser::class;
-
-        if (!\is_a($class, PantherBrowser::class, true)) {
-            throw new \LogicException(\sprintf('"PANTHER_BROWSER_CLASS" env variable must reference a class that extends %s.', PantherBrowser::class));
-        }
-
-        $browserOptions = [
-            'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
-            'source_debug' => $_SERVER['BROWSER_SOURCE_DEBUG'] ?? false,
-            'screenshot_dir' => $_SERVER['BROWSER_SCREENSHOT_DIR'] ?? './var/browser/screenshots',
-            'console_log_dir' => $_SERVER['BROWSER_CONSOLE_LOG_DIR'] ?? './var/browser/console-logs',
-        ];
-
-        if ($_SERVER['BROWSER_ALWAYS_START_WEBSERVER'] ?? null) {
-            $_SERVER['PANTHER_APP_ENV'] = $_SERVER['APP_ENV'] ?? 'test'; // use current environment
-            $_SERVER['SYMFONY_PROJECT_DEFAULT_ROUTE_URL'] = ''; // ignore existing server running with Symfony CLI
-        }
-
-        if (self::$primaryPantherClient) {
-            $browser = new $class(static::createAdditionalPantherClient(), $browserOptions); // @phpstan-ignore staticMethod.notFound
-        } else {
-            self::$primaryPantherClient = static::createPantherClient(
-                \array_merge(['browser' => $_SERVER['PANTHER_BROWSER'] ?? PantherTestCase::CHROME], $options),
-                $kernelOptions,
-                $managerOptions,
-            );
-
-            $browser = new $class(self::$primaryPantherClient, $browserOptions);
-        }
-
-        BrowserExtension::registerBrowser($browser);
-
-        return $browser;
+        return $this->browserFactory()->createPantherBrowser($options, $kernelOptions, $managerOptions);
     }
 
     /**
@@ -95,39 +68,41 @@ trait HasBrowser
             throw new \LogicException(\sprintf('A KernelBrowser can only be created in TestCases that extend "%s".', KernelTestCase::class));
         }
 
-        $class = $_SERVER['KERNEL_BROWSER_CLASS'] ?? KernelBrowser::class;
+        return $this->browserFactory()->createKernelBrowser($options, $server);
+    }
 
-        if (!\is_a($class, KernelBrowser::class, true)) {
-            throw new \LogicException(\sprintf('"KERNEL_BROWSER_CLASS" env variable must reference a class that extends %s.', KernelBrowser::class));
-        }
+    private function browserFactory(): BrowserFactory
+    {
+        $booter = self::$browserKernelBooter ??= new PhpUnitKernelBooter(
+            createKernelBrowserClient: function (array $options, array $server): SymfonyKernelBrowser {
+                if ($this instanceof WebTestCase) {
+                    static::ensureKernelShutdown();
 
-        $browserOptions = [
-            'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
-            'source_debug' => $_SERVER['BROWSER_SOURCE_DEBUG'] ?? false,
-            'follow_redirects' => (bool) ($_SERVER['BROWSER_FOLLOW_REDIRECTS'] ?? true),
-            'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
-        ];
+                    return static::createClient($options, $server); // @phpstan-ignore staticMethod.notFound, return.type
+                }
 
-        if ($this instanceof WebTestCase) {
-            static::ensureKernelShutdown();
+                static::bootKernel($options);
 
-            $browser = new $class(static::createClient($options, $server), $browserOptions); // @phpstan-ignore staticMethod.notFound
-        } else {
-            // reboot kernel before starting browser
-            static::bootKernel($options);
+                $container = static::getContainer();
 
-            if (!static::getContainer()->has('test.client')) {
-                throw new \RuntimeException('The Symfony test client is not enabled.');
-            }
+                if (!$container->has('test.client')) {
+                    throw new \RuntimeException('The Symfony test client is not enabled.');
+                }
 
-            $client = static::getContainer()->get('test.client');
-            $client->setServerParameters($server);
+                $client = $container->get('test.client');
+                \assert($client instanceof SymfonyKernelBrowser);
+                $client->setServerParameters($server);
 
-            $browser = new $class($client, $browserOptions);
-        }
+                return $client;
+            },
+            createPantherClient: \method_exists(static::class, 'createPantherClient')
+                ? static fn (array $options, array $kernelOptions, array $managerOptions): PantherClient => static::createPantherClient($options, $kernelOptions, $managerOptions) // @phpstan-ignore staticMethod.notFound
+                : null,
+            createAdditionalPantherClient: \method_exists(static::class, 'createAdditionalPantherClient')
+                ? static fn (): PantherClient => static::createAdditionalPantherClient() // @phpstan-ignore staticMethod.notFound
+                : null,
+        );
 
-        BrowserExtension::registerBrowser($browser);
-
-        return $browser;
+        return new BrowserFactory($booter, BrowserRegistry::default(), BrowserOptions::fromEnv());
     }
 }

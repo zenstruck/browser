@@ -551,6 +551,73 @@ class MyTest extends PantherTestCase
 }
 ```
 
+### Using with Behat
+
+The same fluent browser API is available inside a Behat scenario via the `Zenstruck\Browser\Bridge\Behat\BrowserExtension` and the `BrowserAwareTrait`:
+
+```php
+// features/bootstrap/BrowserContext.php
+namespace App\Tests\Behat;
+
+use Behat\Behat\Context\Context;
+use Behat\Step\When;
+use Behat\Step\Then;
+use Zenstruck\Browser\Bridge\Behat\Context\BrowserAware;
+use Zenstruck\Browser\Bridge\Behat\Context\BrowserAwareTrait;
+
+final class BrowserContext implements Context, BrowserAware
+{
+    use BrowserAwareTrait;
+
+    #[When('I visit :url')]
+    public function iVisit(string $url): void
+    {
+        $this->browser()->visit($url);
+    }
+
+    #[Then('I should see :text')]
+    public function iShouldSee(string $text): void
+    {
+        $this->browser()->assertSee($text);
+    }
+}
+```
+
+Register the extension in `behat.dist.php` (Behat 4) or `behat.yml.dist` (Behat 3):
+
+```php
+// behat.dist.php (Behat 4)
+use Behat\Config\Config;
+use Behat\Config\Extension;
+use Behat\Config\Profile;
+use Behat\Config\Suite;
+
+return (new Config())
+    ->withProfile(
+        (new Profile('default'))
+            ->withSuite(
+                (new Suite('default'))
+                    ->withPaths(__DIR__.'/features')
+                    ->withContexts(App\Tests\Behat\BrowserContext::class),
+            )
+            ->withExtension(new Extension(Zenstruck\Browser\Bridge\Behat\BrowserExtension::class, [
+                'kernel_class' => App\Kernel::class,
+                'env' => 'test',
+                'debug' => true,
+            ]))
+    )
+;
+```
+
+The Behat extension picks its Symfony kernel boot strategy automatically:
+
+- If `friends-of-behat/symfony-extension` is installed and enabled in the same Behat config, the kernel is consumed from that extension (`SymfonyExtensionKernelBooter`).
+- Otherwise the kernel is booted directly from the `kernel_class` config key (`StandaloneKernelBooter`), defaulting to the `KERNEL_CLASS` env var when not provided.
+
+Each scenario starts with a fresh kernel (reboot between scenarios), and the same artifact-capture-on-failure behavior (screenshots, HTML dumps) wired into PHPUnit is also wired into the Behat scenario lifecycle.
+
+> **Note:** Using `PantherBrowser` from Behat additionally requires `symfony/panther`, which itself pulls in `phpunit/phpunit`.
+
 ## Configuration
 
 There are several environment variables available to configure:

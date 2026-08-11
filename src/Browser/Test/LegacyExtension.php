@@ -12,127 +12,64 @@
 namespace Zenstruck\Browser\Test;
 
 use Zenstruck\Browser;
+use Zenstruck\Browser\Artifact\ArtifactCollector;
+use Zenstruck\Browser\Artifact\EchoArtifactSink;
+use Zenstruck\Browser\Artifact\FailureType;
+use Zenstruck\Browser\BrowserRegistry;
 
 /**
+ * Thin PHPUnit (<10) adapter forwarding lifecycle events to the framework-agnostic
+ * {@see ArtifactCollector}. Also forwards the PHPUnit-10 subscribers wired in
+ * {@see BootstrappedExtension}.
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 class LegacyExtension
 {
-    /** @var Browser[] */
-    private static array $registeredBrowsers = [];
-    private static bool $enabled = false;
+    private readonly ArtifactCollector $collector;
 
-    /** @var array<string,array<string,string[]>> */
-    private array $savedArtifacts = [];
+    public function __construct()
+    {
+        $this->collector = new ArtifactCollector(BrowserRegistry::default(), new EchoArtifactSink());
+    }
 
     /**
      * @internal
+     *
+     * @deprecated since 1.10, use {@see BrowserRegistry::default()}->register() instead.
      */
     public static function registerBrowser(Browser $browser): void
     {
-        if (!self::$enabled) {
-            return;
-        }
-
-        self::$registeredBrowsers[] = $browser;
+        BrowserRegistry::default()->register($browser);
     }
 
     public function executeBeforeFirstTest(): void
     {
-        self::$enabled = true;
+        $this->collector->onSuiteStart();
     }
 
     public function executeBeforeTest(string $test): void
     {
-        self::reset();
+        $this->collector->onScenarioStart($test);
     }
 
     public function executeAfterTest(string $test, float $time): void
     {
-        foreach (self::$registeredBrowsers as $browser) {
-            foreach ($browser->savedArtifacts() as $category => $artifacts) {
-                if (!\count($artifacts)) {
-                    continue;
-                }
-
-                $this->savedArtifacts[$test][$category] = $artifacts;
-            }
-        }
-
-        self::reset();
+        $this->collector->onScenarioFinish($test);
     }
 
     public function executeAfterLastTest(): void
     {
-        if (empty($this->savedArtifacts)) {
-            return;
-        }
-
-        echo "\n\nSaved Browser Artifacts:";
-
-        foreach ($this->savedArtifacts as $test => $categories) {
-            echo "\n\n  {$test}";
-
-            foreach ($categories as $category => $artifacts) {
-                echo "\n    {$category}:";
-
-                foreach ($artifacts as $artifact) {
-                    echo "\n      * {$artifact}:";
-                }
-            }
-        }
+        $this->collector->onSuiteFinish();
     }
 
     public function executeAfterTestError(string $test, string $message, float $time): void
     {
-        self::saveBrowserStates($test, 'error');
+        $this->collector->onScenarioFailed($test, FailureType::Error);
     }
 
     public function executeAfterTestFailure(string $test, string $message, float $time): void
     {
-        self::saveBrowserStates($test, 'failure');
-    }
-
-    private static function saveBrowserStates(string $test, string $type): void
-    {
-        if (empty(self::$registeredBrowsers)) {
-            return;
-        }
-
-        $filename = \sprintf('%s_%s', $type, self::normalizeTestName($test));
-
-        foreach (self::$registeredBrowsers as $i => $browser) {
-            try {
-                $browser->saveCurrentState("{$filename}__{$i}");
-            } catch (\Throwable $e) {
-                // noop - swallow exceptions related to dumping the current state so as to not
-                // lose the actual error/failure.
-            }
-        }
-    }
-
-    private static function normalizeTestName(string $name): string
-    {
-        if (!\mb_strstr($name, 'with data set')) {
-            return \strtr($name, '\\:', '-_');
-        }
-
-        // Try to match for a numeric data set index. If it didn't, match for a string one.
-        if (!\preg_match('#^(?<test>[\w:\\\]+) with data set \#(?<dataset>\d+)#', $name, $matches)) {
-            \preg_match('#^(?<test>[\w:\\\]+) with data set "(?<dataset>.*)"#', $name, $matches);
-        }
-
-        $normalized = \strtr($matches['test'], '\\:', '-_');
-
-        if (isset($matches['dataset'])) {
-            $normalized .= '__data-set-'.\preg_replace('/\W+/', '-', $matches['dataset']);
-        }
-
-        return $normalized;
-    }
-
-    private static function reset(): void
-    {
-        self::$registeredBrowsers = [];
+        $this->collector->onScenarioFailed($test, FailureType::Failure);
     }
 }
