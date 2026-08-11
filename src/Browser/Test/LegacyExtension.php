@@ -12,13 +12,7 @@
 namespace Zenstruck\Browser\Test;
 
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter as LegacyFileLinkFormatter;
 use Zenstruck\Browser;
-
-if (!class_exists(FileLinkFormatter::class) && class_exists(LegacyFileLinkFormatter::class)) {
-    class_alias(LegacyFileLinkFormatter::class, FileLinkFormatter::class);
-}
-
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -31,12 +25,7 @@ class LegacyExtension
 
     /** @var array<string,array<string,string[]>> */
     private array $savedArtifacts = [];
-    private FileLinkFormatter $fileLinkFormatter;
-
-    public function __construct(FileLinkFormatter|null $fileLinkFormatter = null)
-    {
-        $this->fileLinkFormatter = $fileLinkFormatter ?? new FileLinkFormatter($_ENV['BROWSER_FILE_LINK_FORMAT'] ?? $_SERVER['BROWSER_FILE_LINK_FORMAT'] ?? '');
-    }
+    private ?FileLinkFormatter $fileLinkFormatter = null;
 
     /**
      * @internal
@@ -90,7 +79,7 @@ class LegacyExtension
                 echo "\n    {$category}:";
 
                 foreach ($artifacts as $artifact) {
-                    echo "\n      * \033]8;;{$this->fileLinkFormatter->format(realpath($artifact) ?: '', 1)}\033\\$artifact\033]8;;\033\\";
+                    echo "\n      * {$this->hyperlink($artifact)}";
                 }
             }
         }
@@ -104,6 +93,26 @@ class LegacyExtension
     public function executeAfterTestFailure(string $test, string $message, float $time): void
     {
         self::saveBrowserStates($test, 'failure');
+    }
+
+    /**
+     * Only a terminal renders OSC 8 hyperlinks - piped output (ci logs, files) must stay plain.
+     */
+    private function hyperlink(string $artifact): string
+    {
+        if (!\stream_isatty(\STDOUT) || false !== \getenv('NO_COLOR')) {
+            return $artifact;
+        }
+
+        $this->fileLinkFormatter ??= new FileLinkFormatter(
+            $_ENV['BROWSER_FILE_LINK_FORMAT'] ?? $_SERVER['BROWSER_FILE_LINK_FORMAT'] ?? 'file://%f#L%l',
+        );
+
+        if (!$link = $this->fileLinkFormatter->format(\realpath($artifact) ?: '', 1)) {
+            return $artifact;
+        }
+
+        return "\033]8;;{$link}\033\\{$artifact}\033]8;;\033\\";
     }
 
     private static function saveBrowserStates(string $test, string $type): void
