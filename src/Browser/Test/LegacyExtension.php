@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Test;
 
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Zenstruck\Browser;
 
 /**
@@ -24,6 +25,7 @@ class LegacyExtension
 
     /** @var array<string,array<string,string[]>> */
     private array $savedArtifacts = [];
+    private ?FileLinkFormatter $fileLinkFormatter = null;
 
     /**
      * @internal
@@ -77,7 +79,7 @@ class LegacyExtension
                 echo "\n    {$category}:";
 
                 foreach ($artifacts as $artifact) {
-                    echo "\n      * {$artifact}:";
+                    echo "\n      * {$this->hyperlink($artifact)}";
                 }
             }
         }
@@ -91,6 +93,26 @@ class LegacyExtension
     public function executeAfterTestFailure(string $test, string $message, float $time): void
     {
         self::saveBrowserStates($test, 'failure');
+    }
+
+    /**
+     * Only a terminal renders OSC 8 hyperlinks - piped output (ci logs, files) must stay plain.
+     */
+    private function hyperlink(string $artifact): string
+    {
+        if (!\stream_isatty(\STDOUT) || false !== \getenv('NO_COLOR')) {
+            return $artifact;
+        }
+
+        $this->fileLinkFormatter ??= new FileLinkFormatter(
+            $_ENV['BROWSER_FILE_LINK_FORMAT'] ?? $_SERVER['BROWSER_FILE_LINK_FORMAT'] ?? 'file://%f#L%l',
+        );
+
+        if (!$link = $this->fileLinkFormatter->format(\realpath($artifact) ?: '', 1)) {
+            return $artifact;
+        }
+
+        return "\033]8;;{$link}\033\\{$artifact}\033]8;;\033\\";
     }
 
     private static function saveBrowserStates(string $test, string $type): void
