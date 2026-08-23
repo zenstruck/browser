@@ -49,6 +49,10 @@ class PlaywrightBrowser extends Browser
     {
         parent::__construct(new PlaywrightDriver($client), $options);
 
+        if (!($options['follow_redirects'] ?? true)) {
+            $this->interceptRedirects();
+        }
+
         if (!($options['catch_exceptions'] ?? true)) {
             $this->throwExceptions();
         }
