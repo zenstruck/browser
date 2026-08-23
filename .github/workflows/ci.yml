@@ -8,10 +8,51 @@ on:
 
 jobs:
   test:
-    uses: zenstruck/.github/.github/workflows/php-test-symfony.yml@main
+    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.2, 8.3, 8.4, 8.5]
+        deps: [highest]
+        symfony: [6.4.*, 7.4.*, 8.0.*, 8.1.*]
+        include:
+          - php: 8.2
+            deps: lowest
+            symfony: '*'
+        exclude:
+          - php: 8.2
+            symfony: 8.0.*
+          - php: 8.3
+            symfony: 8.0.*
+          - php: 8.2
+            symfony: 8.1.*
+          - php: 8.3
+            symfony: 8.1.*
+    steps:
+      - uses: playwright-php/setup-playwright@v1
+        with:
+          browsers: chromium
+          with-deps: false
+
+      - uses: zenstruck/.github/actions/php-test-symfony@main
+        with:
+          php: ${{ matrix.php }}
+          symfony: ${{ matrix.symfony }}
+          deps: ${{ matrix.deps }}
 
   code-coverage:
-    uses: zenstruck/.github/.github/workflows/php-coverage-codecov.yml@main
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: playwright-php/setup-playwright@v1
+        with:
+          browsers: chromium
+          with-deps: false
+
+      - uses: zenstruck/.github/actions/php-coverage-codecov@main
+        with:
+          php: 8.2
 
   composer-validate:
     uses: zenstruck/.github/.github/workflows/php-composer-validate.yml@main

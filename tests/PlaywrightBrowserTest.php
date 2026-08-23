@@ -12,31 +12,26 @@
 namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Panther\PantherTestCaseTrait;
-use Zenstruck\Browser\PantherBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Browser\PlaywrightBrowser;
+use Zenstruck\Browser\Test\HasBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @group panther
+ * @group playwright
  */
-final class PantherBrowserTest extends TestCase
+class PlaywrightBrowserTest extends KernelTestCase
 {
-    use BrowserTests, PantherTestCaseTrait;
-
-    protected function setUp(): void
-    {
-        $this->markTestIncomplete('Disabled for now. Needs investigation.');
-    }
+    use BrowserTests, HasBrowser;
 
     /**
      * @test
      */
-    public function can_use_panther_browser_as_typehint(): void
+    public function can_use_playwright_browser_as_typehint(): void
     {
         $this->browser()
-            ->use(static function(PantherBrowser $browser) {
+            ->use(static function(PlaywrightBrowser $browser) {
                 $browser->visit('/page1');
             })
             ->assertOn('/page1')
@@ -152,7 +147,7 @@ final class PantherBrowserTest extends TestCase
             ;
         });
 
-        $this->assertStringContainsString('        "level": "SEVERE",', $contents);
+        $this->assertStringContainsString('"type": "error"', $contents);
         $this->assertStringContainsString('console.error message', $contents);
     }
 
@@ -177,6 +172,8 @@ final class PantherBrowserTest extends TestCase
      */
     public function can_dump_console_log_with_throw_error(): void
     {
+        $this->markTestSkipped('Uncaught JS errors are a Playwright "pageerror" event, which playwright-php does not expose.');
+
         $output = self::catchVarDumperOutput(function() {
             $this->browser()
                 ->visit('/javascript')
@@ -238,8 +235,8 @@ final class PantherBrowserTest extends TestCase
         ;
     }
 
-    protected function browser(): PantherBrowser
+    protected function browser(): PlaywrightBrowser
     {
-        return $this->pantherBrowser();
+        return $this->playwrightBrowser();
     }
 }

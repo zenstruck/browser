@@ -63,6 +63,11 @@ final class PantherDriver extends Driver
         $this->client()->request('GET', $this->prepareUrl($url));
     }
 
+    public function expectException($expectedException, ?string $expectedMessage = null): void
+    {
+        throw new UnsupportedDriverActionException('%s does not support expecting exceptions.', $this);
+    }
+
     public function quit(): void
     {
         $this->client()->quit();
@@ -260,6 +265,11 @@ final class PantherDriver extends Driver
     public function getAttribute($xpath, $name): ?string
     {
         return $this->crawlerElement($this->filteredCrawler($xpath))->getAttribute($name);
+    }
+
+    protected function clientCatchExceptions(bool $catch): void
+    {
+        throw new UnsupportedDriverActionException('%s does not support catching exceptions.', $this);
     }
 
     protected function findElementXpaths($xpath): array

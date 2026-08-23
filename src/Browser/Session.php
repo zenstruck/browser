@@ -99,6 +99,11 @@ final class Session extends MinkSession
         $this->getDriver()->expectException($expectedException, $expectedMessage);
     }
 
+    public function catchExceptions(bool $catch): void
+    {
+        $this->getDriver()->catchExceptions($catch);
+    }
+
     public function source(bool $sourceDebug = false): string
     {
         $ret = '';
@@ -187,9 +192,10 @@ final class Session extends MinkSession
             );
         }
 
-        // 7.4+ dumps the exception with var-dumper, which is not html when rendered from the cli
-        // not page(), which calls back into here
-        $content = \ltrim($this->getDriver()->getContent());
+        // 7.4+ dumps the exception with var-dumper, which is not html when rendered from the cli.
+        // the raw response is what carries it: a real browser wraps plain text in an html document,
+        // and the match below is anchored at the start. not page(), which calls back into here
+        $content = \ltrim($this->getDriver()->rawContent());
 
         if (!\preg_match('/^([A-Za-z_\\\\][\w\\\\]*) \{#\d+/', $content, $exception)) {
             return;

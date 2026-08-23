@@ -12,17 +12,9 @@
 namespace Zenstruck\Browser;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
-use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
-use Symfony\Component\HttpKernel\Profiler\Profile;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Session\Driver\BrowserKitDriver;
 use Zenstruck\Callback\Parameter;
-use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Proxy as LegacyProxy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -41,9 +33,12 @@ class KernelBrowser extends Browser
     final public function __construct(SymfonyKernelBrowser $client, array $options = [])
     {
         $client->followRedirects((bool) ($options['follow_redirects'] ?? true));
-        $client->catchExceptions((bool) ($options['catch_exceptions'] ?? true));
 
         parent::__construct(new BrowserKitDriver($client), $options); // @phpstan-ignore argument.type
+
+        if (!($options['catch_exceptions'] ?? true)) {
+            $this->throwExceptions();
+        }
     }
 
     /**
@@ -66,220 +61,6 @@ class KernelBrowser extends Browser
     final public function enableReboot(): self
     {
         $this->client()->enableReboot();
-
-        return $this;
-    }
-
-    /**
-     * By default, exceptions made during a request are caught and converted
-     * to responses by Symfony. This disables this behaviour and actually
-     * throws the exception.
-     *
-     * @return static
-     */
-    final public function throwExceptions(): self
-    {
-        $this->client()->catchExceptions(false);
-
-        return $this;
-    }
-
-    /**
-     * Re-enables catching exceptions.
-     *
-     * @return static
-     */
-    final public function catchExceptions(): self
-    {
-        $this->client()->catchExceptions(true);
-
-        return $this;
-    }
-
-    /**
-     * Expect the next request to throw this exception. Fails if not thrown.
-     *
-     * @param class-string|callable $expectedException string: class name of the expected exception
-     *                                                 callable: uses the first argument's type-hint
-     *                                                 to determine the expected exception class. When
-     *                                                 exception is caught, callable is invoked with
-     *                                                 the caught exception
-     * @param string|null           $expectedMessage   Assert the caught exception message "contains"
-     *                                                 this string
-     */
-    public function expectException($expectedException, ?string $expectedMessage = null): self
-    {
-        $this->session()->expectException($expectedException, $expectedMessage);
-
-        return $this;
-    }
-
-    /**
-     * Enable profiling for the next request. Not required if profiling is
-     * globally enabled.
-     *
-     * @return static
-     */
-    final public function withProfiling(): self
-    {
-        $this->client()->enableProfiler();
-
-        return $this;
-    }
-
-    /**
-     * @param UserInterface $user
-     *
-     * @return static
-     */
-    public function actingAs(object $user, ?string $firewall = null): self
-    {
-        if ($user instanceof Factory) { // @phpstan-ignore-line
-            trigger_deprecation('zenstruck/browser', '1.9', 'Passing a Factory to actingAs() is deprecated, pass the created object instead.');
-            $user = $user->create(); // @phpstan-ignore-line
-        }
-
-        if ($user instanceof LegacyProxy) { // @phpstan-ignore-line
-            $user = $user->object(); // @phpstan-ignore-line
-        }
-
-        if ($user instanceof Proxy) { // @phpstan-ignore-line
-            $user = $user->_real(); // @phpstan-ignore-line
-        }
-
-        if (!$user instanceof UserInterface) {
-            throw new \LogicException(\sprintf('%s() requires the user be an instance of %s.', __METHOD__, UserInterface::class));
-        }
-
-        $this->client()->loginUser(...\array_filter([$user, $firewall]));
-
-        return $this;
-    }
-
-    /**
-     * @param string|UserInterface|null $as
-     *
-     * @return static
-     */
-    public function assertAuthenticated($as = null): self
-    {
-        $token = $this->securityToken();
-
-        if (!$token && $this->session()->isStarted() && !($this->session()->getStatusCode() >= 200 && $this->session()->getStatusCode() < 300)) {
-            Assert::fail('The last response was not successful so cannot check authentication.');
-        }
-
-        Assert::that($token)
-            ->isNotNull('Expected to be authenticated but NOT.')
-        ;
-
-        if (!$as) {
-            return $this;
-        }
-
-        if ($as instanceof Factory) { // @phpstan-ignore-line
-            trigger_deprecation('zenstruck/browser', '1.9', 'Passing a Factory to assertAuthenticated() is deprecated, pass the created object instead.');
-            $as = $as->create(); // @phpstan-ignore-line
-        }
-
-        if ($as instanceof LegacyProxy) { // @phpstan-ignore-line
-            $as = $as->object(); // @phpstan-ignore-line
-        }
-
-        if ($as instanceof Proxy) { // @phpstan-ignore-line
-            $as = $as->_real(); // @phpstan-ignore-line
-        }
-
-        if ($as instanceof UserInterface) {
-            $as = $as->getUserIdentifier();
-        }
-
-        if (!\is_string($as)) {
-            throw new \LogicException(\sprintf('%s() requires the "as" user be a string or %s.', __METHOD__, UserInterface::class));
-        }
-
-        Assert::that($token->getUserIdentifier())
-            ->is($as, 'Expected to be authenticated as "{expected}" but authenticated as "{actual}".')
-        ;
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function assertNotAuthenticated(): self
-    {
-        Assert::that($token = $this->securityToken())
-            ->isNull('Expected to NOT be authenticated but authenticated as "{actual}".', [
-                'actual' => $token ? $token->getUserIdentifier() : null,
-            ])
-        ;
-
-        return $this;
-    }
-
-    final public function profile(): Profile
-    {
-        if (!$profile = $this->client()->getProfile()) {
-            throw new \RuntimeException('Profiler not enabled for this request. Try calling ->withProfiling() before the request.');
-        }
-
-        return $profile;
-    }
-
-    /**
-     * @return static
-     */
-    final public function interceptRedirects(): self
-    {
-        $this->client()->followRedirects(false);
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final public function followRedirects(): self
-    {
-        $this->client()->followRedirects(true);
-
-        if ($this->session()->isStarted() && $this->session()->isRedirect()) {
-            $this->followRedirect();
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param int $max The maximum number of redirects to follow (defaults to "infinite")
-     *
-     * @return static
-     */
-    final public function followRedirect(int $max = \PHP_INT_MAX): self
-    {
-        for ($i = 0; $i < $max; ++$i) {
-            if (!$this->session()->isRedirect()) {
-                break;
-            }
-
-            $this->client()->followRedirect();
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param int $max The maximum number of redirects to follow (defaults to "infinite")
-     *
-     * @return static
-     */
-    final public function assertRedirectedTo(string $expected, int $max = \PHP_INT_MAX): self
-    {
-        $this->assertRedirected();
-        $this->followRedirect($max);
-        $this->assertOn($expected);
 
         return $this;
     }
@@ -375,103 +156,6 @@ class KernelBrowser extends Browser
     }
 
     /**
-     * Macro for ->interceptRedirects()->withProfiling()->click().
-     *
-     * Useful for submitting a form and making assertions on the
-     * redirect response.
-     *
-     * @return static
-     */
-    final public function clickAndIntercept(string $selector): self
-    {
-        return $this
-            ->interceptRedirects()
-            ->withProfiling()
-            ->click($selector)
-        ;
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertStatus(int $expected): self
-    {
-        Assert::that($this->session()->getStatusCode())
-            ->is($expected, 'Current response status code is {actual}, but {expected} expected.')
-        ;
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertSuccessful(): self
-    {
-        Assert::true(
-            $this->session()->getStatusCode() >= 200 && $this->session()->getStatusCode() < 300,
-            'Expected successful status code (2xx) but got {actual}.',
-            ['actual' => $this->session()->getStatusCode()],
-        );
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertRedirected(): self
-    {
-        if ($this->client()->isFollowingRedirects()) {
-            throw new \RuntimeException('Cannot assert redirected if not intercepting redirects. Call ->interceptRedirects() before making the request.');
-        }
-
-        Assert::true($this->session()->isRedirect(), 'Expected redirect status code (3xx) but got {actual}.', [
-            'actual' => $this->session()->getStatusCode(),
-        ]);
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertHeaderEquals(string $header, ?string $expected): self
-    {
-        if (null === $expected) {
-            Assert::that($this->session()->getResponseHeader($header))
-                ->isNull('Current response header "{header}" is "{actual}", but was not expected.', [
-                    'header' => $header,
-                ])
-            ;
-
-            return $this;
-        }
-
-        $this->session()->assert()->responseHeaderEquals($header, $expected);
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertHeaderContains(string $header, string $expected): self
-    {
-        $this->session()->assert()->responseHeaderContains($header, $expected);
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertContentType(string $contentType): self
-    {
-        return $this->assertHeaderContains('Content-Type', $contentType);
-    }
-
-    /**
      * @return static
      */
     final public function assertJson(): self
@@ -518,26 +202,6 @@ class KernelBrowser extends Browser
         return [
             ...parent::useParameters(),
             Parameter::typed(Json::class, Parameter::factory(fn() => $this->json())),
-            Parameter::typed(DataCollectorInterface::class, Parameter::factory(function(string $class) {
-                foreach ($this->profile()->getCollectors() as $collector) {
-                    if ($class === $collector::class) {
-                        return $collector;
-                    }
-                }
-
-                Assert::fail('DataCollector %s is not available for this request.', [$class]);
-            })),
         ];
-    }
-
-    private function securityToken(): ?TokenInterface
-    {
-        $container = $this->client()->getContainer();
-
-        if (!$container->has('security.token_storage')) {
-            throw new \LogicException('Security not available/enabled.');
-        }
-
-        return $container->get('security.token_storage')->getToken();
     }
 }

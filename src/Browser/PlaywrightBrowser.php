@@ -11,22 +11,24 @@
 
 namespace Zenstruck\Browser;
 
+use Playwright\Console\ConsoleMessage;
+use Playwright\Page\PageInterface;
+use Playwright\Symfony\Client\PlaywrightKernelClient;
+use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Panther\Client;
-use Symfony\Component\Panther\DomCrawler\Crawler;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Session\Driver\PantherDriver;
+use Zenstruck\Browser\Session\Driver\PlaywrightDriver;
+use Zenstruck\Browser\Session\Playwright\CookieJar as PlaywrightCookieJar;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @deprecated since 1.11, use {@see PlaywrightBrowser} instead
+ * @experimental
  *
- * @method Client  client()
- * @method Crawler crawler()
+ * @method PlaywrightKernelClient client()
  */
-class PantherBrowser extends Browser
+class PlaywrightBrowser extends Browser
 {
     private ?string $screenshotDir;
     private ?string $consoleLogDir;
@@ -37,55 +39,32 @@ class PantherBrowser extends Browser
     /** @var string[] */
     private array $savedConsoleLogs = [];
 
+    /** @var array<array{type:string,text:string,location:array<string,mixed>}> */
+    private array $consoleMessages = [];
+
     /**
      * @internal
      */
-    final public function __construct(Client $client, array $options = [])
+    final public function __construct(PlaywrightKernelClient $client, array $options = [])
     {
-        parent::__construct(new PantherDriver($client), $options);
+        parent::__construct(new PlaywrightDriver($client), $options);
+
+        if (!($options['catch_exceptions'] ?? true)) {
+            $this->throwExceptions();
+        }
 
         $this->screenshotDir = $options['screenshot_dir'] ?? null;
         $this->consoleLogDir = $options['console_log_dir'] ?? null;
-    }
 
-    /**
-     * @return static
-     */
-    final public function assertStatus(int $expected): self
-    {
-        throw self::notSupported(__FUNCTION__);
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertSuccessful(): self
-    {
-        throw self::notSupported(__FUNCTION__);
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertHeaderEquals(string $header, ?string $expected): self
-    {
-        throw self::notSupported(__FUNCTION__);
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertHeaderContains(string $header, string $expected): self
-    {
-        throw self::notSupported(__FUNCTION__);
-    }
-
-    /**
-     * @return static
-     */
-    final public function assertContentType(string $contentType): self
-    {
-        throw self::notSupported(__FUNCTION__);
+        // subscribe before anything is navigated to, or the messages are already gone
+        // @todo also collect uncaught errors once playwright-php exposes the "pageerror" event
+        $this->page()->events()->onConsole(function(ConsoleMessage $message): void {
+            $this->consoleMessages[] = [
+                'type' => $message->type(),
+                'text' => $message->text(),
+                'location' => $message->location(),
+            ];
+        });
     }
 
     /**
@@ -133,7 +112,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilVisible(string $selector): self
     {
-        $this->client()->waitForVisibility($selector);
+        $this->page()->waitForSelector($selector, ['state' => 'visible']);
 
         return $this;
     }
@@ -143,7 +122,7 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilNotVisible(string $selector): self
     {
-        $this->client()->waitForInvisibility($selector);
+        $this->page()->waitForSelector($selector, ['state' => 'hidden']);
 
         return $this;
     }
@@ -153,7 +132,10 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilSeeIn(string $selector, string $expected): self
     {
-        $this->client()->waitForElementToContain($selector, $expected);
+        $this->page()->waitForFunction(
+            '([selector, text]) => { const el = document.querySelector(selector); return null !== el && el.checkVisibility() && el.textContent.includes(text); }',
+            [$selector, $expected],
+        );
 
         return $this;
     }
@@ -163,22 +145,22 @@ class PantherBrowser extends Browser
      */
     final public function waitUntilNotSeeIn(string $selector, string $expected): self
     {
-        $this->client()->waitForElementToNotContain($selector, $expected);
+        $this->page()->waitForFunction(
+            '([selector, text]) => { const el = document.querySelector(selector); return null === el || !el.checkVisibility() || !el.textContent.includes(text); }',
+            [$selector, $expected],
+        );
 
         return $this;
     }
 
     /**
+     * Opens the Playwright Inspector and pauses execution.
+     *
      * @return static
      */
     final public function pause(): self
     {
-        if (!($_SERVER['PANTHER_NO_HEADLESS'] ?? false)) {
-            throw new \RuntimeException('The "PANTHER_NO_HEADLESS" env variable must be set to inspect.');
-        }
-
-        \fwrite(\STDIN, "\n\nInspecting the browser.\n\nPress enter to continue...");
-        \fgets(\STDIN);
+        $this->page()->pause();
 
         return $this;
     }
@@ -192,7 +174,10 @@ class PantherBrowser extends Browser
             $filename = \sprintf('%s/%s', \rtrim($this->screenshotDir, '/'), \ltrim($filename, '/'));
         }
 
-        $this->client()->takeScreenshot($this->savedScreenshots[] = $filename);
+        $this->savedScreenshots[] = $filename;
+
+        // @todo drop once the node server resolves relative paths against PHP's cwd
+        $this->page()->screenshot(\str_starts_with($filename, '/') ? $filename : \getcwd().'/'.$filename);
 
         return $this;
     }
@@ -203,8 +188,7 @@ class PantherBrowser extends Browser
             $filename = \sprintf('%s/%s', \rtrim($this->consoleLogDir, '/'), \ltrim($filename, '/'));
         }
 
-        $log = $this->client()->manage()->getLog('browser');
-        $log = \json_encode($log, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);
+        $log = \json_encode($this->consoleMessages, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);
 
         (new Filesystem())->dumpFile($this->savedConsoleLogs[] = $filename, $log);
 
@@ -213,7 +197,7 @@ class PantherBrowser extends Browser
 
     final public function dumpConsoleLog(): self
     {
-        Session::varDump($this->client()->manage()->getLog('browser'));
+        Session::varDump($this->consoleMessages);
 
         return $this;
     }
@@ -269,10 +253,19 @@ class PantherBrowser extends Browser
     }
 
     /**
-     * The webdriver protocol does not expose the response status code or headers.
+     * @internal
      */
-    private static function notSupported(string $method): \BadMethodCallException
+    protected function cookieJar(): CookieJar
     {
-        return new \BadMethodCallException(\sprintf('"%s()" is not supported by the PantherBrowser.', $method));
+        return new PlaywrightCookieJar($this->page());
+    }
+
+    private function page(): PageInterface
+    {
+        if (!$page = $this->client()->getPage()) {
+            throw new \RuntimeException('The Playwright page is not available.');
+        }
+
+        return $page;
     }
 }

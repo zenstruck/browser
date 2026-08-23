@@ -12,13 +12,21 @@
 namespace Zenstruck\Browser\Test;
 
 use PHPUnit\Framework\Attributes\After;
+use Playwright\Symfony\Client\BrowserRegistry;
+use Playwright\Symfony\Client\BrowserSessionInterface;
+use Playwright\Symfony\Client\PlaywrightKernelClient;
+use Playwright\Symfony\Client\RequestConverter;
+use Playwright\Symfony\Client\ResponseConverter;
+use Playwright\Symfony\Test\PlaywrightTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Panther\Client as PantherClient;
 use Symfony\Component\Panther\PantherTestCase;
 use Symfony\Component\Panther\PantherTestCaseTrait;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\PantherBrowser;
+use Zenstruck\Browser\PlaywrightBrowser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,6 +34,21 @@ use Zenstruck\Browser\PantherBrowser;
 trait HasBrowser
 {
     private static ?PantherClient $primaryPantherClient = null;
+
+    /**
+     * Reused across tests: a fresh session per test gives the isolation, without paying to
+     * relaunch the browser each time.
+     */
+    private static ?BrowserRegistry $sharedPlaywrightBrowser = null;
+
+    /**
+     * The sessions claimed by the running test, each an isolated context on the shared browser.
+     *
+     * @var BrowserSessionInterface[]
+     */
+    private static array $playwrightSessions = [];
+
+    private static ?KernelInterface $playwrightKernel = null;
 
     /**
      * @internal
@@ -36,10 +59,16 @@ trait HasBrowser
     final public static function _resetBrowserClients(): void
     {
         self::$primaryPantherClient = null;
+
+        self::closePlaywrightSessions();
+
+        self::$playwrightKernel = null;
     }
 
     /**
      * @see PantherTestCase::createPantherClient()
+     *
+     * @deprecated since 1.11, use {@see self::playwrightBrowser()} instead
      */
     protected function pantherBrowser(array $options = [], array $kernelOptions = [], array $managerOptions = []): PantherBrowser
     {
@@ -50,6 +79,8 @@ trait HasBrowser
         if (!\method_exists(static::class, 'createPantherClient')) {
             throw new \LogicException(\sprintf('A PantherBrowser can only be created in TestCases that extend "%s" or use "%s".', PantherTestCase::class, PantherTestCaseTrait::class));
         }
+
+        trigger_deprecation('zenstruck/browser', '1.11', 'The PantherBrowser is deprecated, use the PlaywrightBrowser instead.');
 
         $class = $_SERVER['PANTHER_BROWSER_CLASS'] ?? PantherBrowser::class;
 
@@ -129,5 +160,117 @@ trait HasBrowser
         BrowserExtension::registerBrowser($browser);
 
         return $browser;
+    }
+
+    protected function playwrightBrowser(): PlaywrightBrowser
+    {
+        if (!\class_exists(PlaywrightKernelClient::class)) {
+            throw new \LogicException('playwright-php/playwright-symfony must be installed to use the PlaywrightBrowser (composer require --dev playwright-php/playwright-symfony).');
+        }
+
+        if ($this instanceof PlaywrightTestCase) {
+            throw new \LogicException(\sprintf('A PlaywrightBrowser cannot be created in a TestCase that extends "%s": it manages its own browser and sessions, which would conflict with the ones managed here.', PlaywrightTestCase::class));
+        }
+
+        if (!$this instanceof KernelTestCase) {
+            throw new \LogicException(\sprintf('A PlaywrightBrowser can only be created in TestCases that extend "%s".', KernelTestCase::class));
+        }
+
+        $class = $_SERVER['PLAYWRIGHT_BROWSER_CLASS'] ?? PlaywrightBrowser::class;
+
+        if (!\is_a($class, PlaywrightBrowser::class, true)) {
+            throw new \LogicException(\sprintf('"PLAYWRIGHT_BROWSER_CLASS" env variable must reference a class that extends %s.', PlaywrightBrowser::class));
+        }
+
+        $client = $this->playwrightClient();
+
+        $browser = new $class($client, [
+            'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
+            'source_debug' => $_SERVER['BROWSER_SOURCE_DEBUG'] ?? false,
+            'screenshot_dir' => $_SERVER['BROWSER_SCREENSHOT_DIR'] ?? './var/browser/screenshots',
+            'console_log_dir' => $_SERVER['BROWSER_CONSOLE_LOG_DIR'] ?? './var/browser/console-logs',
+            'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
+        ]);
+
+        BrowserExtension::registerBrowser($browser);
+
+        return $browser;
+    }
+
+    private function playwrightClient(): PlaywrightKernelClient
+    {
+        $session = self::claimPlaywrightSession();
+
+        self::$playwrightKernel ??= static::bootKernel();
+
+        return new PlaywrightKernelClient(
+            $session,
+            self::$playwrightKernel,
+            new RequestConverter(),
+            new ResponseConverter(),
+        );
+    }
+
+    private static function claimPlaywrightSession(): BrowserSessionInterface
+    {
+        $requested = BrowserRegistry::fromEnvironment();
+
+        // the environment can differ between test classes, so the shared browser may not match
+        if (self::$sharedPlaywrightBrowser && !self::$sharedPlaywrightBrowser->equals($requested)) {
+            self::stopSharedPlaywrightBrowser();
+        }
+
+        $browser = self::$sharedPlaywrightBrowser ??= $requested;
+
+        return self::$playwrightSessions[] = self::createPlaywrightSession($browser);
+    }
+
+    private static function createPlaywrightSession(BrowserRegistry $browser): BrowserSessionInterface
+    {
+        try {
+            return $browser->createSession();
+        } catch (\Throwable) {
+            // an exception thrown by the app poisons the connection: playwright-php re-throws it on
+            // every subsequent call, so the browser has to be replaced rather than reused
+            self::stopSharedPlaywrightBrowser();
+        }
+
+        $replacement = self::$sharedPlaywrightBrowser = BrowserRegistry::fromEnvironment();
+
+        return $replacement->createSession();
+    }
+
+    private static function closePlaywrightSessions(): void
+    {
+        $sessions = self::$playwrightSessions;
+        self::$playwrightSessions = [];
+
+        foreach ($sessions as $session) {
+            // closing is what surfaces a poisoned connection, so a failure replaces the browser
+            // instead of leaving the next test to inherit it
+            if (!self::closePlaywrightSession($session)) {
+                return;
+            }
+        }
+    }
+
+    private static function closePlaywrightSession(BrowserSessionInterface $session): bool
+    {
+        try {
+            self::$sharedPlaywrightBrowser?->closeSession($session);
+        } catch (\Throwable) {
+            self::stopSharedPlaywrightBrowser();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private static function stopSharedPlaywrightBrowser(): void
+    {
+        self::$playwrightSessions = [];
+        self::$sharedPlaywrightBrowser?->stop();
+        self::$sharedPlaywrightBrowser = null;
     }
 }
