@@ -293,7 +293,7 @@ final class PlaywrightDriver extends Driver
         $this->page()->evaluate(\sprintf('() => { %s }', \rtrim(\trim($script), ';').';'));
     }
 
-    public function evaluateScript($script)
+    public function evaluateScript($script): mixed
     {
         $script = \trim($script);
 
