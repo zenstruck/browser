@@ -297,6 +297,63 @@ $browser
 ;
 ```
 
+### Redirects
+
+By default, redirects are followed. Both the `KernelBrowser` and `PlaywrightBrowser` can stop on
+them instead:
+
+```php
+/** @var \Zenstruck\Browser $browser **/
+
+$browser
+    // stop on redirect responses instead of following them
+    // use the BROWSER_FOLLOW_REDIRECTS environment variable to change the default
+    ->interceptRedirects()
+
+    // follow again, and follow the current response if it is a redirect
+    ->followRedirects()
+
+    ->assertRedirected() // 3xx status code
+
+    // follow a redirect that was intercepted
+    ->followRedirect() // follows all redirects by default
+    ->followRedirect(1) // just follow 1 redirect
+
+    // combination of assertRedirected(), followRedirect(), assertOn()
+    ->assertRedirectedTo('/some/page') // follows all redirects by default
+    ->assertRedirectedTo('/some/page', 1) // just follow 1 redirect
+
+    // combination of interceptRedirects(), withProfiling(), click()
+    // useful for submitting forms and making assertions on the "redirect response"
+    ->clickAndIntercept('button')
+;
+```
+
+> [!NOTE]
+> While intercepting, the `PlaywrightBrowser` parks the real browser on the url that redirected and
+> renders nothing, since no response is delivered to it. The status and `Location` are still
+> available for assertions.
+
+### Profiling
+
+The Symfony profiler is available to both browsers:
+
+```php
+/** @var \Zenstruck\Browser $browser **/
+
+// enable the profiler for the next request (not required if profiling is globally enabled)
+$queryCount = $browser
+    ->withProfiling()
+    ->visit('/my/page')
+    ->profile()->getCollector('db')->getQueryCount()
+;
+
+// "use" a specific data collector from the last request
+$browser->use(function(\Symfony\Component\HttpKernel\DataCollector\RequestDataCollector $collector) {
+    // ...
+});
+```
+
 ### KernelBrowser
 
 This browser has the following methods:
@@ -305,9 +362,6 @@ This browser has the following methods:
 /** @var \Zenstruck\Browser\KernelBrowser $browser **/
 
 $browser
-    // response assertions
-    ->assertRedirected() // 3xx status code
-
     // helpers for quickly checking the content type
     ->assertJson()
     ->assertXml()
@@ -320,45 +374,10 @@ $browser
     // re-enable rebooting between requests if previously disabled
     ->enableReboot()
 
-    // enable the profiler for the next request (if not globally enabled)
-    ->withProfiling()
-
-    // by default, redirects are followed, this disables that behaviour
-    // use the BROWSER_FOLLOW_REDIRECTS environment variable to change default
-    ->interceptRedirects()
-
-    // enable following redirects
-    // if currently on a redirect response, follows
-    ->followRedirects()
-
-    // Follows a redirect if ->interceptRedirects() has been turned on
-    ->followRedirect() // follows all redirects by default
-    ->followRedirect(1) // just follow 1 redirect
-
-    // combination of assertRedirected(), followRedirect(), assertOn()
-    ->assertRedirectedTo('/some/page') // follows all redirects by default
-    ->assertRedirectedTo('/some/page', 1) // just follow 1 redirect
-
-    // combination of interceptRedirects(), withProfiling(), click()
-    // useful for submitting forms and making assertions on the "redirect response"
-    ->clickAndIntercept('button')
-
-    // exception assertions for the "next request"
+    // exception assertions also work for the http methods below
     ->expectException(MyException::class, 'the message')
     ->post('/url/that/throws/exception') // fails if above exception not thrown
 ;
-
-// Access the Symfony Profiler for the last request
-$queryCount = $browser
-    // If profiling is not globally enabled for tests, ->withProfiling()
-    // must be called before the request.
-    ->profile()->getCollector('db')->getQueryCount()
-;
-
-// "use" a specific data collector
-$browser->use(function(\Symfony\Component\HttpKernel\DataCollector\RequestDataCollector $collector) {
-    // ...
-})
 ```
 
 #### HTTP Requests
@@ -550,9 +569,6 @@ $browser
     ->doubleClick('Link')
     ->rightClick('Link')
 
-    // enable the profiler for the next request (if not globally enabled)
-    ->withProfiling()
-
     // dump() the browser's console log
     ->dumpConsoleLog()
 
@@ -563,9 +579,6 @@ $browser
     ->ddScreenshot()
 ;
 ```
-
-The profiler for the last request is available via `->profile()`, just as with the
-[`KernelBrowser`](#kernelbrowser).
 
 > [!NOTE]
 > Uncaught javascript errors are not included in the console log: Playwright reports these as a
@@ -602,9 +615,9 @@ class MyTest extends KernelTestCase
 }
 ```
 
-This works the same way with `playwrightBrowser()`: each call gets its own browser, but they all
-share the kernel booted for the test, so they see the same application state - just as separate
-browsers hitting one webserver would.
+Each `playwrightBrowser()` call gets its own browser context, isolated from the others in cookies
+and storage, while sharing one browser process. They also share the kernel booted for the test, so
+they see the same application state, just as separate browsers hitting one webserver would.
 
 ## Configuration
 
@@ -615,7 +628,7 @@ There are several environment variables available to configure:
 | `BROWSER_SOURCE_DIR`       | Directory to save source files to.                                                              | `./var/browser/source`                |
 | `BROWSER_SCREENSHOT_DIR`   | Directory to save screenshots to (only applies to `PlaywrightBrowser`).                         | `./var/browser/screenshots`           |
 | `BROWSER_CONSOLE_LOG_DIR`  | Directory to save javascript console logs to (only applies to `PlaywrightBrowser`).             | `./var/browser/console-logs`          |
-| `BROWSER_FOLLOW_REDIRECTS` | Whether to follow redirects by default (only applies to `KernelBrowser`).                       | `1` _(true)_                          |
+| `BROWSER_FOLLOW_REDIRECTS` | Whether to follow redirects by default.                                                         | `1` _(true)_                          |
 | `BROWSER_CATCH_EXCEPTIONS` | Whether to catch exceptions by default.                                                         | `1` _(true)_                          |
 | `BROWSER_SOURCE_DEBUG`     | Whether to add request metadata to written source files (only applies to `KernelBrowser`).      | `0` _(false)_                         |
 | `KERNEL_BROWSER_CLASS`     | `KernelBrowser` class to use.                                                                   | `Zenstruck\Browser\KernelBrowser`     |
@@ -883,6 +896,7 @@ class AppBrowser extends KernelBrowser
 Then, depending on the implementation you extended from, set the appropriate env variable:
 
 * `KernelBrowser`: `KERNEL_BROWSER_CLASS`
+* `PlaywrightBrowser`: `PLAYWRIGHT_BROWSER_CLASS`
 
 For the example above, you would set `KERNEL_BROWSER_CLASS=App\Tests\AppBrowser`.
 
