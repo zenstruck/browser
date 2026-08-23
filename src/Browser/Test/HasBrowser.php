@@ -189,6 +189,7 @@ trait HasBrowser
             'source_debug' => $_SERVER['BROWSER_SOURCE_DEBUG'] ?? false,
             'screenshot_dir' => $_SERVER['BROWSER_SCREENSHOT_DIR'] ?? './var/browser/screenshots',
             'console_log_dir' => $_SERVER['BROWSER_CONSOLE_LOG_DIR'] ?? './var/browser/console-logs',
+            'follow_redirects' => (bool) ($_SERVER['BROWSER_FOLLOW_REDIRECTS'] ?? true),
             'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
         ]);
 
