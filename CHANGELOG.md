@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## [v1.11.0](https://github.com/zenstruck/browser/releases/tag/v1.11.0)
+
+August 23rd, 2026 - [v1.10.1...v1.11.0](https://github.com/zenstruck/browser/compare/v1.10.1...v1.11.0)
+
+* bc55af1 docs: document the shared redirect and profiling api (#198) by @kbond
+* 8cd15fe fix: honor `BROWSER_FOLLOW_REDIRECTS` in the `PlaywrightBrowser` (#198) by @kbond
+* 8be888f feat: Add `PlaywrightBrowser` (#195) by @kbond
+* fc18b96 fix: phpstan doc comment (#178) by @flohw
+* a3d56cc feat: make saved artifact paths clickable (#165) by @aaa2000, LDA
+* 9394362 fix: detect Symfony 7.4+ exception pages (#197) by @kbond
+* 88dfebd doc: Standardize `README` security policy section (#193) by @Copilot
+* 7566f2e chore!: bump minimum PHP version to 8.2 (#196) by @kbond
+
 ## [v1.10.1](https://github.com/zenstruck/browser/releases/tag/v1.10.1)
 
 May 28th, 2026 - [v1.10.0...v1.10.1](https://github.com/zenstruck/browser/compare/v1.10.0...v1.10.1)
