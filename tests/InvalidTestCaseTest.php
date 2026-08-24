@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Browser\Test\HasBrowser;
 
@@ -24,6 +25,7 @@ final class InvalidTestCaseTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function cannot_create_browser(): void
     {
         $this->expectException(\LogicException::class);

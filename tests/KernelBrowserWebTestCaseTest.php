@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -23,6 +24,7 @@ final class KernelBrowserWebTestCaseTest extends WebTestCase
     /**
      * @test
      */
+    #[Test]
     public function calling_browser_ensures_kernel_is_shutdown(): void
     {
         static::bootKernel();
@@ -36,6 +38,7 @@ final class KernelBrowserWebTestCaseTest extends WebTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_use_native_web_test_case_assertions(): void
     {
         $this->browser()
