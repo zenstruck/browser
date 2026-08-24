@@ -120,7 +120,7 @@ class MyTest extends TestCase
 }
 ```
 
-All browsers have the following methods:
+Both browsers have the following methods:
 
 ```php
 /** @var \Zenstruck\Browser $browser **/
@@ -235,7 +235,7 @@ $browser
 
 ### Authentication
 
-All browsers have helpers and assertions for authentication:
+Both browsers have helpers and assertions for authentication:
 
 ```php
 /** @var \Zenstruck\Browser $browser **/
@@ -277,7 +277,7 @@ previous request didn't perform any security-related operations. Possible soluti
 ### Exceptions
 
 Exceptions thrown while handling a request are caught and converted to a response, as they are in
-production. The `KernelBrowser` and `PlaywrightBrowser` can both turn this off:
+production. Both browsers can turn this off:
 
 ```php
 /** @var \Zenstruck\Browser $browser **/
@@ -299,8 +299,7 @@ $browser
 
 ### Redirects
 
-By default, redirects are followed. Both the `KernelBrowser` and `PlaywrightBrowser` can stop on
-them instead:
+By default, redirects are followed. Both browsers can stop on them instead:
 
 ```php
 /** @var \Zenstruck\Browser $browser **/
@@ -336,7 +335,7 @@ $browser
 
 ### Profiling
 
-The Symfony profiler is available to both browsers:
+Both browsers expose the Symfony profiler:
 
 ```php
 /** @var \Zenstruck\Browser $browser **/
@@ -618,6 +617,18 @@ class MyTest extends KernelTestCase
 Each `playwrightBrowser()` call gets its own browser context, isolated from the others in cookies
 and storage, while sharing one browser process. They also share the kernel booted for the test, so
 they see the same application state, just as separate browsers hitting one webserver would.
+
+### Parallel Testing
+
+Both browsers work with [ParaTest](https://github.com/paratestphp/paratest). Each worker is a
+separate PHP process with its own browser, launched only if that worker runs a test needing one.
+
+Saved artifacts work as usual: each worker writes to the configured directories, and a failure
+still saves the source, screenshot and console log.
+
+> [!NOTE]
+> Expect one browser per worker: `--processes 8` means up to eight browsers, each with its own Node
+> process, so pick a number your machine and CI runner can carry.
 
 ## Configuration
 

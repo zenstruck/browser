@@ -216,7 +216,7 @@ class PlaywrightBrowserTest extends KernelTestCase
      * @test
      */
     #[Test]
-    public function double_click_on_element(): void
+    public function can_double_click_an_element(): void
     {
         $this->browser()
             ->visit('/page1')

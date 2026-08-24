@@ -22,6 +22,7 @@
         "zenstruck/callback": "^1.4.2"
     },
     "require-dev": {
+        "brianium/paratest": "^6.11|^7.0",
         "justinrainbow/json-schema": "^5.3",
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^2.0",

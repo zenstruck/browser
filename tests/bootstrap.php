@@ -13,4 +13,11 @@ use Symfony\Component\Filesystem\Filesystem;
 
 require __DIR__.'/../vendor/autoload.php';
 
-(new Filesystem())->remove(__DIR__.'/../var');
+// paratest includes this bootstrap in every worker: only the parent process cleans up, and the
+// cache dir is created up front so booting kernels do not race to create it. PARATEST is set for
+// every worker, TEST_TOKEN only when tokens are enabled
+if (!isset($_SERVER['PARATEST'])) {
+    (new Filesystem())->remove(__DIR__.'/../var');
+}
+
+@\mkdir(__DIR__.'/../var/cache/'.($_SERVER['APP_ENV'] ?? 'test'), 0777, true);
