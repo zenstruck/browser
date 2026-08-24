@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Test\HasBrowser;
+use Zenstruck\Browser\Test\LegacyExtension;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -40,6 +41,25 @@ class PlaywrightBrowserTest extends KernelTestCase
             })
             ->assertOn('/page1')
         ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function extension_saves_a_screenshot_and_console_log_when_a_test_fails(): void
+    {
+        $extension = new LegacyExtension();
+        $extension->executeBeforeFirstTest();
+        $extension->executeBeforeTest('X::y');
+
+        $this->browser()->visit('/javascript');
+
+        $extension->executeAfterTestError('X::y', 'the error message', 0.0);
+
+        $this->assertFileExists(__DIR__.'/../var/browser/source/error_X__y__0.html');
+        $this->assertFileExists(__DIR__.'/../var/browser/screenshots/error_X__y__0.png');
+        $this->assertFileExists(__DIR__.'/../var/browser/console-logs/error_X__y__0.log');
     }
 
     /**

@@ -624,7 +624,8 @@ Both browsers work with [ParaTest](https://github.com/paratestphp/paratest). Eac
 separate PHP process with its own browser, launched only if that worker runs a test needing one.
 
 Saved artifacts work as usual: each worker writes to the configured directories, and a failure
-still saves the source, screenshot and console log.
+still saves the source, screenshot and console log. The summary printed at the end of a serial run
+is not shown, as ParaTest does not surface worker output by then.
 
 > [!NOTE]
 > Expect one browser per worker: `--processes 8` means up to eight browsers, each with its own Node

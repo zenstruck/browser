@@ -28,6 +28,7 @@ use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Test\HasBrowser;
+use Zenstruck\Browser\Test\LegacyExtension;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
 use Zenstruck\Callback\Exception\UnresolveableArgument;
@@ -715,6 +716,25 @@ trait BrowserTests
         ;
 
         $this->assertTrue($profile->hasCollector('request'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function extension_saves_the_browser_state_when_a_test_fails(): void
+    {
+        // drives the hooks phpunit calls: saveBrowserStates() swallows its exceptions, so a
+        // regression there is invisible without asserting the artifacts land
+        $extension = new LegacyExtension();
+        $extension->executeBeforeFirstTest();
+        $extension->executeBeforeTest('X::y');
+
+        $this->browser()->visit('/page1');
+
+        $extension->executeAfterTestFailure('X::y', 'the failure message', 0.0);
+
+        $this->assertFileExists(__DIR__.'/../var/browser/source/failure_X__y__0.html');
     }
 
     /**
