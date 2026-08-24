@@ -12,6 +12,8 @@
 namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Test\HasBrowser;
@@ -21,6 +23,7 @@ use Zenstruck\Browser\Test\HasBrowser;
  *
  * @group playwright
  */
+#[Group('playwright')]
 class PlaywrightBrowserTest extends KernelTestCase
 {
     use BrowserTests, HasBrowser;
@@ -28,6 +31,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_use_playwright_browser_as_typehint(): void
     {
         $this->browser()
@@ -41,6 +45,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_take_screenshot(): void
     {
         self::catchFileContents(__DIR__.'/../var/browser/screenshots/screen.png', function() {
@@ -54,6 +59,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_wait(): void
     {
         $this->browser()
@@ -67,6 +73,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_wait_until_visible_and_not_visible(): void
     {
         $this->browser()
@@ -95,6 +102,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_wait_until_see_in_and_not_see_in(): void
     {
         $this->browser()
@@ -124,6 +132,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_check_if_element_is_visible_and_not_visible(): void
     {
         $this->browser()
@@ -137,6 +146,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_save_console_log(): void
     {
         $contents = self::catchFileContents(__DIR__.'/../var/browser/console-logs/console.log', function() {
@@ -154,6 +164,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_dump_console_log_with_console_error(): void
     {
         $output = self::catchVarDumperOutput(function() {
@@ -170,6 +181,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_dump_console_log_with_throw_error(): void
     {
         $this->markTestSkipped('Uncaught JS errors are a Playwright "pageerror" event, which playwright-php does not expose.');
@@ -188,6 +200,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function cannot_follow_invisible_link(): void
     {
         $this->expectException(AssertionFailedError::class);
@@ -202,6 +215,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function double_click_on_element(): void
     {
         $this->browser()
@@ -220,6 +234,7 @@ class PlaywrightBrowserTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function context_menu_on_element(): void
     {
         $this->browser()

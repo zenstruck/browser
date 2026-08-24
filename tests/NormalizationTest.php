@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Test\LegacyExtension;
@@ -22,6 +24,9 @@ final class NormalizationTest extends TestCase
      * @dataProvider namesProvider
      * @dataProvider edgeCaseTestNames
      */
+    #[Test]
+    #[DataProvider('namesProvider')]
+    #[DataProvider('edgeCaseTestNames')]
     public function can_normalize_test_names(string $testName, string $expectedOutput): void
     {
         $browser = $this->createMock(Browser::class);

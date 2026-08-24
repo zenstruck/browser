@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Browser\HttpOptions;
 
@@ -22,6 +23,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function defaults(): void
     {
         $options = new HttpOptions();
@@ -35,6 +37,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_configure_with_constructor_array(): void
     {
         $options = new HttpOptions([
@@ -56,6 +59,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_configure_via_withers(): void
     {
         $options = (new HttpOptions())
@@ -83,6 +87,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_configure_json_and_ajax_with_constructor_array(): void
     {
         $options = new HttpOptions([
@@ -108,6 +113,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function ajax_constructor(): void
     {
         $options = HttpOptions::ajax();
@@ -124,6 +130,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function json_constructor_with_value(): void
     {
         $options = HttpOptions::json('value');
@@ -141,6 +148,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function json_constructor_with_no_value(): void
     {
         $options = HttpOptions::json();
@@ -158,6 +166,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function json_ajax_constructor_with_value(): void
     {
         $options = HttpOptions::jsonAjax('value');
@@ -176,6 +185,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function json_ajax_constructor_with_no_value(): void
     {
         $options = HttpOptions::jsonAjax();
@@ -194,6 +204,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function create_with_self(): void
     {
         $options = new class extends HttpOptions {};
@@ -204,6 +215,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_merge_with_array(): void
     {
         $options = HttpOptions::create([
@@ -239,6 +251,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_merge_with_http_options_object(): void
     {
         $options = HttpOptions::create([
@@ -269,6 +282,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_override_json_and_ajax_headers(): void
     {
         $options = HttpOptions::jsonAjax()
@@ -291,6 +305,7 @@ final class HttpOptionsTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function dots_in_query_string_are_preserved(): void
     {
         $this->assertSame('/?nested.param=value&deeper.nested.param=y', (new HttpOptions())->addQueryToUrl('/?nested.param=value&deeper.nested.param=y'));

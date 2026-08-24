@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Browser\Tests\Session\Playwright;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Playwright\Page\PageInterface;
 use Symfony\Component\BrowserKit\Response;
@@ -26,12 +28,14 @@ final class CookieJarTest extends TestCase
      *
      * @dataProvider unsupportedMethodProvider
      */
+    #[Test]
+    #[DataProvider('unsupportedMethodProvider')]
     public function methods_the_browser_cannot_back_throw(string $method, callable $call): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage($method.'() is not supported by the real browser.');
 
-        $call(new CookieJar($this->createMock(PageInterface::class)));
+        $call(new CookieJar($this->createStub(PageInterface::class)));
     }
 
     public static function unsupportedMethodProvider(): iterable

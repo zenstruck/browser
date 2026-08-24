@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Container\ContainerInterface;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Json;
@@ -27,6 +28,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_use_kernel_browser_as_typehint(): void
     {
         $this->browser()
@@ -40,6 +42,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function reboots_the_kernel_between_requests_by_default(): void
     {
         $containers = [];
@@ -59,6 +62,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_disable_reboot(): void
     {
         $containers = [];
@@ -78,6 +82,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_re_enable_reboot(): void
     {
         $containers = [];
@@ -98,6 +103,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function http_method_actions(): void
     {
         $this->browser()
@@ -150,6 +156,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_set_default_http_options(): void
     {
         $this->browser()
@@ -165,6 +172,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_handle_any_content_type(): void
     {
         $this->browser()
@@ -179,6 +187,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_assert_json_matches(): void
     {
         $this->browser()
@@ -201,6 +210,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function assert_content_types(): void
     {
         $this->browser()
@@ -219,6 +229,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_dump_empty_json_request(): void
     {
         $output = self::catchVarDumperOutput(function() {
@@ -234,6 +245,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_dump_json_response_as_array(): void
     {
         $output = self::catchVarDumperOutput(function() {
@@ -249,6 +261,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function dump_includes_headers_and_status(): void
     {
         $output = self::catchVarDumperOutput(function() {
@@ -265,6 +278,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_dump_json_array_key(): void
     {
         $output = self::catchVarDumperOutput(function() {
@@ -280,6 +294,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_dump_json_path_expression(): void
     {
         $output = self::catchVarDumperOutput(function() {
@@ -301,6 +316,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_save_formatted_json_source(): void
     {
         $contents = self::catchFileContents(__DIR__.'/../var/browser/source/source.txt', function() {
@@ -317,6 +333,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_save_source_when_exception(): void
     {
         $contents = self::catchFileContents(__DIR__.'/../var/browser/source/source.txt', function() {
@@ -333,6 +350,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_access_json_object(): void
     {
         $json = $this->browser()
@@ -347,6 +365,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_use_json_object(): void
     {
         $this->browser()
@@ -361,6 +380,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_dump_xml_selector(): void
     {
         $output = self::catchVarDumperOutput(function() {
@@ -378,6 +398,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_access_the_xml_crawler(): void
     {
         $crawler = $this->browser()
@@ -392,6 +413,7 @@ trait KernelBrowserTests
     /**
      * @test
      */
+    #[Test]
     public function can_expect_exception_for_http_request(): void
     {
         $this->browser()

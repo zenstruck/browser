@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Browser\Json;
 
@@ -24,6 +26,8 @@ class JsonTest extends TestCase
      *
      * @dataProvider selectorExistsProvider
      */
+    #[Test]
+    #[DataProvider('selectorExistsProvider')]
     public function assert_has_passes_if_selector_exists(string $json, string $selector): void
     {
         (new Json($json))->assertHas($selector);
@@ -34,6 +38,8 @@ class JsonTest extends TestCase
      *
      * @dataProvider selectorDoesNotExistProvider
      */
+    #[Test]
+    #[DataProvider('selectorDoesNotExistProvider')]
     public function assert_has_fails_if_selector_does_not_exist(string $json, string $selector): void
     {
         $this->expectException(AssertionFailedError::class);
@@ -47,6 +53,8 @@ class JsonTest extends TestCase
      *
      * @dataProvider selectorDoesNotExistProvider
      */
+    #[Test]
+    #[DataProvider('selectorDoesNotExistProvider')]
     public function assert_missing_passes_if_selector_does_not_exist(string $json, string $selector): void
     {
         (new Json($json))->assertMissing($selector);
@@ -57,6 +65,8 @@ class JsonTest extends TestCase
      *
      * @dataProvider selectorExistsProvider
      */
+    #[Test]
+    #[DataProvider('selectorExistsProvider')]
     public function assert_missing_fails_if_selector_exists(string $json, string $selector): void
     {
         $this->expectException(AssertionFailedError::class);
@@ -92,6 +102,8 @@ class JsonTest extends TestCase
      *
      * @dataProvider selectHasCountProvider
      */
+    #[Test]
+    #[DataProvider('selectHasCountProvider')]
     public function can_assert_a_selector_has_count(string $json, int $expectedCount): void
     {
         (new Json($json))->hasCount($expectedCount);
@@ -106,6 +118,7 @@ class JsonTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_perform_assertions_on_itself(): void
     {
         (new Json('["foo","bar"]'))->contains('bar')->doesNotContain('food');
@@ -116,6 +129,8 @@ class JsonTest extends TestCase
      *
      * @dataProvider scalarChildAssertionProvider
      */
+    #[Test]
+    #[DataProvider('scalarChildAssertionProvider')]
     public function can_perform_assertion_on_scalar_child(string $json, string $selector, callable $asserter): void
     {
         (new Json($json))->assertThat($selector, $asserter);
@@ -134,6 +149,8 @@ class JsonTest extends TestCase
      *
      * @dataProvider arrayChildAssertionProvider
      */
+    #[Test]
+    #[DataProvider('arrayChildAssertionProvider')]
     public function can_perform_assertion_on_array_child(string $json, string $selector, callable $asserter): void
     {
         (new Json($json))->assertThatEach($selector, $asserter);
@@ -150,6 +167,8 @@ class JsonTest extends TestCase
      *
      * @dataProvider invalidArrayChildAssertionProvider
      */
+    #[Test]
+    #[DataProvider('invalidArrayChildAssertionProvider')]
     public function assert_that_each_throws_if_invalid_array_given(string $json, string $selector, callable $asserter): void
     {
         $this->expectException(AssertionFailedError::class);
@@ -165,6 +184,7 @@ class JsonTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function can_match_json_schema(): void
     {
         (new Json('{"foo1": "bar", "foo2": [1, 2], "foo3": {"bar": "baz"}, "foo4": [{"bar": "baz"}]}'))->assertMatchesSchema(
@@ -190,6 +210,7 @@ class JsonTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function assoc_array_equals()
     {
         (new Json('{"foo": "bar", "bar": "baz"}'))->assertMatches('@', ['bar' => 'baz', 'foo' => 'bar']);

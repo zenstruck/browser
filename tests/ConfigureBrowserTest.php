@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Test\HasBrowser;
@@ -25,6 +26,7 @@ final class ConfigureBrowserTest extends WebTestCase
     /**
      * @test
      */
+    #[Test]
     public function browser_has_been_configured(): void
     {
         $this->page1Browser()->assertOn('/page1');
