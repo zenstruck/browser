@@ -14,6 +14,7 @@ namespace Zenstruck\Browser\Test;
 use PHPUnit\Framework\Attributes\After;
 use Playwright\Symfony\Client\BrowserRegistry;
 use Playwright\Symfony\Client\BrowserSessionInterface;
+use Playwright\Symfony\Client\Interception\AssetServer;
 use Playwright\Symfony\Client\PlaywrightKernelClient;
 use Playwright\Symfony\Client\RequestConverter;
 use Playwright\Symfony\Client\ResponseConverter;
@@ -204,11 +205,24 @@ trait HasBrowser
 
         self::$playwrightKernel ??= static::bootKernel();
 
+        // the bundle is optional: its configuration is used when available. A disabled bundle
+        // registers no services or parameters at all, so this covers both
+        $container = self::$playwrightKernel->getContainer();
+        $hosts = $container->hasParameter('playwright.intercepted_hosts') ? $container->getParameter('playwright.intercepted_hosts') : null;
+
+        // the configured default is an env placeholder, so it is null unless PLAYWRIGHT_BASE_URL is set
+        $baseUrl = $container->hasParameter('playwright.base_url') ? $container->getParameter('playwright.base_url') : null;
+
         return new PlaywrightKernelClient(
             $session,
             self::$playwrightKernel,
             new RequestConverter(),
             new ResponseConverter(),
+            [],
+            \is_array($hosts) ? $hosts : null,
+            null,
+            $container->has(AssetServer::class) ? $container->get(AssetServer::class) : null,
+            \is_string($baseUrl) && '' !== $baseUrl ? $baseUrl : 'http://localhost',
         );
     }
 

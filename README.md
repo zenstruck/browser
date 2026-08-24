@@ -503,6 +503,10 @@ composer require --dev playwright-php/playwright-symfony
 vendor/bin/playwright-install --browsers
 ```
 
+> [!NOTE]
+> If `PlaywrightSymfonyBundle` is registered and enabled, its configuration (base url, intercepted
+> hosts, asset server) is used.
+
 It requires your test to extend `KernelTestCase` (or `WebTestCase`):
 
 ```php

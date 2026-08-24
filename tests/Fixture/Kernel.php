@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Tests\Fixture;
 
+use Playwright\Symfony\PlaywrightSymfonyBundle;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -172,6 +173,7 @@ final class Kernel extends BaseKernel
     {
         yield new FrameworkBundle();
         yield new SecurityBundle();
+        yield new PlaywrightSymfonyBundle();
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
