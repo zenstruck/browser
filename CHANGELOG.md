@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## [v1.12.0](https://github.com/zenstruck/browser/releases/tag/v1.12.0)
+
+August 24th, 2026 - [v1.11.0...v1.12.0](https://github.com/zenstruck/browser/compare/v1.11.0...v1.12.0)
+
+* 3716980 feat(playwright): use the playwright bundle configuration when registered (#206) by @kbond
+* 610be4f test: support phpunit 11, 12 and 13, and run the suite with paratest (#205) by @kbond
+* f7df9e3 chore: drop EOL Symfony 8.0 from the ci matrix (#205) by @kbond
+* f59df24 test: enable and cover the browser extension (#205) by @kbond
+* 00cb74a chore: remove stray `attachment.zip` from the project root (#205) by @kbond
+* e0d7b34 test: run the suite with paratest (#205) by @kbond
+* 2bccfee test: support phpunit 11, 12 and 13 (#205) by @kbond
+* 284ac22 fix: Mink deprecation (#203) by @kbond
+
 ## [v1.11.0](https://github.com/zenstruck/browser/releases/tag/v1.11.0)
 
 August 23rd, 2026 - [v1.10.1...v1.11.0](https://github.com/zenstruck/browser/compare/v1.10.1...v1.11.0)
