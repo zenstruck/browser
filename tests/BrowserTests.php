@@ -884,10 +884,11 @@ trait BrowserTests
     #[Test]
     public function can_save_source(): void
     {
-        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/source.txt', function() {
+        $file = self::uniqueFilename('source.txt');
+        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/'.$file, function() use ($file) {
             $this->browser()
                 ->visit('/page1')
-                ->saveSource('source.txt')
+                ->saveSource($file)
             ;
         });
 
@@ -901,15 +902,16 @@ trait BrowserTests
     #[Test]
     public function can_save_source_as_zip(): void
     {
-        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/attachment.zip', function() {
+        $file = self::uniqueFilename('attachment.zip');
+        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/'.$file, function() use ($file) {
             $this->browser()
                 ->visit('/zip')
-                ->saveSource('attachment.zip')
+                ->saveSource($file)
             ;
         });
 
         $this->assertEquals(
-            \file_get_contents(__DIR__.'/../var/browser/source/attachment.zip'),
+            \file_get_contents(__DIR__.'/../var/browser/source/'.$file),
             $contents,
         );
     }
@@ -1313,6 +1315,15 @@ trait BrowserTests
         $content = $this->browser()->visit('/exception')->content();
 
         $this->assertStringContainsString('exception thrown', $content);
+    }
+
+    /**
+     * Tests run concurrently (paratest --functional) and save into the same directories: a
+     * unique filename per save keeps them from reading each other's files.
+     */
+    protected static function uniqueFilename(string $filename): string
+    {
+        return \sprintf('%s-%s', \bin2hex(\random_bytes(4)), $filename);
     }
 
     protected static function catchFileContents(string $expectedFile, callable $callback): string
