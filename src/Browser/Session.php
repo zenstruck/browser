@@ -174,6 +174,10 @@ final class Session extends MinkSession
             ZenstruckAssert::fail('A request has not yet been made.');
         }
 
+        if ($this->getDriver()->lastRequestThrewExpectedException()) {
+            ZenstruckAssert::fail('The last request threw the expected exception: make another request before continuing.');
+        }
+
         // an exception page always carries an error status: this runs before every action and
         // assertion, so successful responses are never inspected
         if (!$this->couldBeExceptionPage()) {

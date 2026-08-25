@@ -197,6 +197,40 @@ trait BrowserTests
      * @test
      */
     #[Test]
+    public function fails_if_acting_after_an_expected_exception(): void
+    {
+        // the throwing request never produced a response, the previous page is still loaded
+        Assert::that(function() {
+            $this->browser()
+                ->visit('/page1')
+                ->expectException(\Exception::class, 'exception thrown')
+                ->visit('/exception')
+                ->assertSee('h1 title')
+            ;
+        })->throws(AssertionFailedError::class, 'The last request threw the expected exception: make another request before continuing.');
+
+        // without a previous request there is no page at all
+        Assert::that(function() {
+            $this->browser()
+                ->expectException(\Exception::class, 'exception thrown')
+                ->visit('/exception')
+                ->click('a link')
+            ;
+        })->throws(AssertionFailedError::class, 'The last request threw the expected exception: make another request before continuing.');
+
+        // a new request makes the browser usable again
+        $this->browser()
+            ->expectException(\Exception::class, 'exception thrown')
+            ->visit('/exception')
+            ->visit('/page1')
+            ->assertSee('h1 title')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function multiple_browsers(): void
     {
         $browser1 = $this->browser()

@@ -33,6 +33,7 @@ abstract class Driver extends CoreDriver
     private $expectedException;
     private ?string $expectedExceptionMessage = null;
     private bool $catchExceptionsEnabled = true;
+    private bool $lastRequestThrewExpectedException = false;
 
     /**
      * @param AbstractBrowser<Request, Response> $client
@@ -68,6 +69,8 @@ abstract class Driver extends CoreDriver
     public function reset(): void
     {
         $this->client()->restart();
+
+        $this->lastRequestThrewExpectedException = false;
     }
 
     public function quit(): void
@@ -101,12 +104,23 @@ abstract class Driver extends CoreDriver
     abstract public function request(string $method, string $url, HttpOptions $options): void;
 
     /**
+     * Whether the last request threw the exception expected by expectException(): its response
+     * never existed, so whatever the client holds belongs to an earlier request.
+     */
+    public function lastRequestThrewExpectedException(): bool
+    {
+        return $this->lastRequestThrewExpectedException;
+    }
+
+    /**
      * Tell the client to stop, or resume, converting kernel exceptions into responses.
      */
     abstract protected function clientCatchExceptions(bool $catch): void;
 
     final protected function wrapRequest(callable $callback): void
     {
+        $this->lastRequestThrewExpectedException = false;
+
         if (!$this->expectedException) {
             $callback();
 
@@ -117,6 +131,8 @@ abstract class Driver extends CoreDriver
 
         try {
             Assert::that($callback)->throws($this->expectedException, $this->expectedExceptionMessage);
+
+            $this->lastRequestThrewExpectedException = true;
         } finally {
             // a request the browser has not finished can be handled after this one returns, so
             // leaving catching disabled would throw the same exception again, out of a later call
