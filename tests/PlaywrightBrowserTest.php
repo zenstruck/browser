@@ -14,6 +14,7 @@ namespace Zenstruck\Browser\Tests;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Playwright\Exception\PlaywrightException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Test\HasBrowser;
@@ -161,6 +162,51 @@ class PlaywrightBrowserTest extends KernelTestCase
             ->assertNotVisible('#show-box')
             ->assertNotVisible('#invalid-element')
         ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function visibility_assertions_retry_until_the_element_settles(): void
+    {
+        // #timeout-box only becomes visible 500ms after the page loads, #hide-box
+        // is hidden on click without a delay
+        $this->browser()
+            ->visit('/javascript')
+            ->assertVisible('#timeout-box')
+            ->click('hide')
+            ->assertNotVisible('#hide-box')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_configure_the_default_timeout(): void
+    {
+        $_SERVER['BROWSER_DEFAULT_TIMEOUT'] = '250';
+
+        try {
+            $start = \hrtime(true);
+
+            try {
+                $this->browser()
+                    ->visit('/javascript')
+                    ->waitUntilVisible('#invalid-element')
+                ;
+
+                $this->fail('The wait should have timed out.');
+            } catch (PlaywrightException) {
+            }
+
+            // Playwright's own default is 30 seconds: timing out well before that
+            // proves the configured value was applied
+            $this->assertLessThan(10.0, (\hrtime(true) - $start) / 1e9);
+        } finally {
+            unset($_SERVER['BROWSER_DEFAULT_TIMEOUT']);
+        }
     }
 
     /**

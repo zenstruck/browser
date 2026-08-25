@@ -11,9 +11,11 @@
 
 namespace Zenstruck\Browser;
 
+use Playwright\Assertions\Failure\AssertionException;
 use Playwright\Console\ConsoleMessage;
 use Playwright\Page\PageInterface;
 use Playwright\Symfony\Client\PlaywrightKernelClient;
+use Playwright\Testing\Expect;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Assert;
@@ -60,6 +62,10 @@ class PlaywrightBrowser extends Browser
         $this->screenshotDir = $options['screenshot_dir'] ?? null;
         $this->consoleLogDir = $options['console_log_dir'] ?? null;
 
+        if (null !== ($timeout = $options['default_timeout'] ?? null)) {
+            $this->page()->setDefaultTimeout((int) $timeout);
+        }
+
         // subscribe before anything is navigated to, or the messages are already gone
         // @todo also collect uncaught errors once playwright-php exposes the "pageerror" event
         $this->page()->events()->onConsole(function(ConsoleMessage $message): void {
@@ -76,9 +82,15 @@ class PlaywrightBrowser extends Browser
      */
     final public function assertVisible(string $selector): self
     {
-        $element = $this->session()->assert()->elementExists('css', $selector);
+        $this->session()->assert();
 
-        Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
+        try {
+            (new Expect($this->page()->locator($selector)))->toBeVisible();
+
+            Assert::pass();
+        } catch (AssertionException) {
+            Assert::fail('Expected element "%s" to be visible but it isn\'t.', [$selector]);
+        }
 
         return $this;
     }
@@ -88,15 +100,15 @@ class PlaywrightBrowser extends Browser
      */
     final public function assertNotVisible(string $selector): self
     {
-        $element = $this->session()->page()->find('css', $selector);
+        $this->session()->assert();
 
-        if (!$element) {
+        try {
+            (new Expect($this->page()->locator($selector)))->toBeHidden();
+
             Assert::pass();
-
-            return $this;
+        } catch (AssertionException) {
+            Assert::fail('Expected element "%s" to not be visible but it is.', [$selector]);
         }
-
-        Assert::false($element->isVisible(), 'Expected element "%s" to not be visible but it is.', [$selector]);
 
         return $this;
     }
