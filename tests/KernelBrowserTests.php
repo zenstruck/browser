@@ -173,6 +173,21 @@ trait KernelBrowserTests
      * @test
      */
     #[Test]
+    public function default_http_options_are_not_mutated_by_request_options(): void
+    {
+        $this->browser()
+            ->setDefaultHttpOptions(['headers' => ['x-foo' => 'bar']])
+            ->post('/http-method', ['headers' => ['x-foo' => 'baz']])
+            ->assertContains('"x-foo":["Baz"]')
+            ->post('/http-method')
+            ->assertContains('"x-foo":["Bar"]')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function can_handle_any_content_type(): void
     {
         $this->browser()
