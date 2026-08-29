@@ -105,19 +105,19 @@ final class BrowserKitDriver extends Driver
 
     public function reload(): void
     {
-        $this->client()->reload();
+        $this->wrapRequest(fn() => $this->client()->reload());
         $this->forms = [];
     }
 
     public function forward(): void
     {
-        $this->client()->forward();
+        $this->wrapRequest(fn() => $this->client()->forward());
         $this->forms = [];
     }
 
     public function back(): void
     {
-        $this->client()->back();
+        $this->wrapRequest(fn() => $this->client()->back());
         $this->forms = [];
     }
 
