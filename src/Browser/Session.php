@@ -83,6 +83,14 @@ final class Session extends MinkSession
         return $this->client()->getCrawler();
     }
 
+    public function content(): string
+    {
+        // reading an error page's body is legitimate: crawler() and saveSource() both allow it
+        $this->ensureResponseExists();
+
+        return $this->getPage()->getContent();
+    }
+
     public function isRedirect(): bool
     {
         return $this->getStatusCode() >= 300 && $this->getStatusCode() < 400;

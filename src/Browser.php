@@ -125,7 +125,7 @@ abstract class Browser
 
     final public function content(): string
     {
-        return $this->session()->page()->getContent();
+        return $this->session()->content();
     }
 
     /**

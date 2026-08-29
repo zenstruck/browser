@@ -1304,6 +1304,17 @@ trait BrowserTests
         $this->assertStringContainsString('text content', $content);
     }
 
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_get_content_of_an_exception_page(): void
+    {
+        $content = $this->browser()->visit('/exception')->content();
+
+        $this->assertStringContainsString('exception thrown', $content);
+    }
+
     protected static function catchFileContents(string $expectedFile, callable $callback): string
     {
         (new Filesystem())->remove($expectedFile);
