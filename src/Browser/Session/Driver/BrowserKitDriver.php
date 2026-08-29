@@ -71,7 +71,8 @@ final class BrowserKitDriver extends Driver
 
     public function request(string $method, string $url, HttpOptions $options): void
     {
-        $options = $options->merge(['server' => $this->serverParameters]);
+        // clone to avoid HttpOptions::merge() mutating the caller's options
+        $options = (clone $options)->merge(['server' => $this->serverParameters]);
 
         $this->wrapRequest(function() use ($method, $url, $options) {
             $this->client()->request(
