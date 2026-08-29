@@ -120,7 +120,7 @@ abstract class Browser
 
     final public function crawler(): Crawler
     {
-        return $this->client()->getCrawler();
+        return $this->session()->crawler();
     }
 
     final public function content(): string
@@ -223,7 +223,7 @@ abstract class Browser
      */
     public function assertStatus(int $expected): self
     {
-        Assert::that($this->session()->getStatusCode())
+        Assert::that($this->session()->statusCode())
             ->is($expected, 'Current response status code is {actual}, but {expected} expected.')
         ;
 
@@ -235,10 +235,12 @@ abstract class Browser
      */
     public function assertSuccessful(): self
     {
+        $statusCode = $this->session()->statusCode();
+
         Assert::true(
-            $this->session()->getStatusCode() >= 200 && $this->session()->getStatusCode() < 300,
+            $statusCode >= 200 && $statusCode < 300,
             'Expected successful status code (2xx) but got {actual}.',
-            ['actual' => $this->session()->getStatusCode()],
+            ['actual' => $statusCode],
         );
 
         return $this;

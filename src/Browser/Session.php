@@ -68,6 +68,21 @@ final class Session extends MinkSession
         return $this->getPage();
     }
 
+    public function statusCode(): int
+    {
+        // not ensureNoException(): asserting the status of an error page is legitimate
+        $this->ensureResponseExists();
+
+        return $this->getStatusCode();
+    }
+
+    public function crawler(): Crawler
+    {
+        $this->ensureResponseExists();
+
+        return $this->client()->getCrawler();
+    }
+
     public function isRedirect(): bool
     {
         return $this->getStatusCode() >= 300 && $this->getStatusCode() < 400;
@@ -168,7 +183,7 @@ final class Session extends MinkSession
         exit(1);
     }
 
-    private function ensureNoException(): void
+    private function ensureResponseExists(): void
     {
         if (!$this->isStarted()) {
             ZenstruckAssert::fail('A request has not yet been made.');
@@ -177,6 +192,11 @@ final class Session extends MinkSession
         if ($this->getDriver()->lastRequestThrewExpectedException()) {
             ZenstruckAssert::fail('The last request threw the expected exception: make another request before continuing.');
         }
+    }
+
+    private function ensureNoException(): void
+    {
+        $this->ensureResponseExists();
 
         // an exception page always carries an error status: this runs before every action and
         // assertion, so successful responses are never inspected
@@ -214,6 +234,7 @@ final class Session extends MinkSession
     private function couldBeExceptionPage(): bool
     {
         try {
+            // not statusCode(), which calls back into here
             return $this->getStatusCode() >= 400;
         } catch (DriverException) {
             // the driver cannot tell us, so fall through to inspecting the response itself

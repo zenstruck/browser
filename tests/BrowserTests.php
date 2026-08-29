@@ -229,6 +229,36 @@ trait BrowserTests
 
     /**
      * @test
+     *
+     * @dataProvider responseAccessorProvider
+     */
+    #[Test]
+    #[DataProvider('responseAccessorProvider')]
+    public function fails_if_reading_the_response_when_the_request_threw(callable $accessor): void
+    {
+        Assert::that(function() use ($accessor) {
+            $browser = $this->browser()
+                ->visit('/page1')
+                ->expectException(\Exception::class, 'exception thrown')
+                ->visit('/exception')
+            ;
+
+            $accessor($browser);
+        })->throws(AssertionFailedError::class, 'The last request threw the expected exception: make another request before continuing.');
+    }
+
+    /**
+     * These read the response without going through page(), so they need the check of their own.
+     */
+    public static function responseAccessorProvider(): iterable
+    {
+        yield 'assertStatus' => [fn(Browser $browser) => $browser->assertStatus(200)];
+        yield 'assertSuccessful' => [fn(Browser $browser) => $browser->assertSuccessful()];
+        yield 'crawler' => [fn(Browser $browser) => $browser->crawler()];
+    }
+
+    /**
+     * @test
      */
     #[Test]
     public function multiple_browsers(): void
