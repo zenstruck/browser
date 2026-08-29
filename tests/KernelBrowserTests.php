@@ -345,10 +345,11 @@ trait KernelBrowserTests
     #[Test]
     public function can_save_formatted_json_source(): void
     {
-        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/source.txt', function() {
+        $file = self::uniqueFilename('source.txt');
+        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/'.$file, function() use ($file) {
             $this->browser()
                 ->visit('/http-method')
-                ->saveSource('/source.txt')
+                ->saveSource('/'.$file)
             ;
         });
 
@@ -362,11 +363,12 @@ trait KernelBrowserTests
     #[Test]
     public function can_save_source_when_exception(): void
     {
-        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/source.txt', function() {
+        $file = self::uniqueFilename('source.txt');
+        $contents = self::catchFileContents(__DIR__.'/../var/browser/source/'.$file, function() use ($file) {
             $this->browser()
                 ->visit('/invalid-page')
                 ->assertStatus(404)
-                ->saveSource('/source.txt')
+                ->saveSource('/'.$file)
             ;
         });
 
