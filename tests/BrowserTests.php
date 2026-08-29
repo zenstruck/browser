@@ -252,9 +252,9 @@ trait BrowserTests
      */
     public static function responseAccessorProvider(): iterable
     {
-        yield 'assertStatus' => [fn(Browser $browser) => $browser->assertStatus(200)];
-        yield 'assertSuccessful' => [fn(Browser $browser) => $browser->assertSuccessful()];
-        yield 'crawler' => [fn(Browser $browser) => $browser->crawler()];
+        yield 'assertStatus' => [static fn(Browser $browser) => $browser->assertStatus(200)];
+        yield 'assertSuccessful' => [static fn(Browser $browser) => $browser->assertSuccessful()];
+        yield 'crawler' => [static fn(Browser $browser) => $browser->crawler()];
     }
 
     /**
