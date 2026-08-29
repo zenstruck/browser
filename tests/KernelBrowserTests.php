@@ -177,10 +177,21 @@ trait KernelBrowserTests
     {
         $this->browser()
             ->setDefaultHttpOptions(['headers' => ['x-foo' => 'bar']])
-            ->post('/http-method', ['headers' => ['x-foo' => 'baz']])
+            ->post('/http-method', [
+                'headers' => ['x-foo' => 'baz'],
+                'query' => ['q1' => 'qv1'],
+                'json' => ['b1' => 'bv1'],
+                'ajax' => true,
+            ])
             ->assertContains('"x-foo":["Baz"]')
+            ->assertContains('"query":{"q1":"qv1"}')
+            ->assertContains('"content":{"b1":"bv1"}')
+            ->assertContains('"ajax":true')
             ->post('/http-method')
             ->assertContains('"x-foo":["Bar"]')
+            ->assertContains('"query":[]')
+            ->assertContains('"content":null')
+            ->assertContains('"ajax":false')
         ;
     }
 
