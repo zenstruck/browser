@@ -77,20 +77,16 @@ Optionally, enable the provided extension in your `phpunit.xml`:
 
 This extension provides the following features:
 
-1. Intercepts test errors/failures and saves the browser's source (and screenshot/js console log if
-   applicable) to the filesystem.
-2. After your test suite is finished, list of summary of all saved artifacts (source/screenshots/js
-   console logs) in your console.
+1. Intercepts test errors/failures and saves the browser's source to the filesystem.
+2. After your test suite is finished, list of summary of all saved artifacts (source) in your console.
 
 ## Usage
 
-This library provides 2 different "browsers":
+This library provides 1 "browser":
 
 1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel *(fast)*.
-2. [PantherBrowser](#pantherbrowser): makes requests to a webserver with a real browser using `symfony/panther` which
-   allows testing javascript *(slow)*.
 
-You can use these Browsers in your tests by having your test class use the `HasBrowser` trait:
+You can use this Browser in your tests by having your test class use the `HasBrowser` trait:
 
 ```php
 namespace App\Tests;
@@ -109,17 +105,6 @@ class MyTest extends TestCase
     public function test_using_kernel_browser(): void
     {
         $this->browser()
-            ->visit('/my/page')
-            ->assertSeeIn('h1', 'Page Title')
-        ;
-    }
-
-    /**
-     * Requires this test extends Symfony\Component\Panther\PantherTestCase.
-     */
-    public function test_using_panther_browser(): void
-    {
-        $this->pantherBrowser()
             ->visit('/my/page')
             ->assertSeeIn('h1', 'Page Title')
         ;
@@ -456,96 +441,6 @@ $json = $browser
 > See the [full `zenstruck/assert` expectation API documentation](https://github.com/zenstruck/assert#expectation-api)
 > to see all the methods available on `Zenstruck\Browser\Json`.
 
-### PantherBrowser
-
-> [!NOTE]
-> The `PantherBrowser` is experimental in 1.0 and may be subject to BC Breaks.
-
-> [!TIP]
-> By default, Panther will not start a web server if it detects one already running
-> with the Symfony CLI. This is likely running in your `dev` environment and will cause
-> unexpected test failures. Set the env variable `BROWSER_ALWAYS_START_WEBSERVER=1`
-> to always start a webserver configured for your current test env when running
-> Panther tests.
-
-This browser has the following extra methods:
-
-```php
-/** @var \Zenstruck\Browser\PantherBrowser $browser **/
-
-$browser
-    // pauses the tests and enters "interactive mode" which
-    // allows you to investigate the current state in the browser
-    // (requires the env variable PANTHER_NO_HEADLESS=1)
-    ->pause()
-
-    // take a screenshot of the current browser state
-    // by default, saves to "<project-root>/var/browser/screenshots"
-    // configure with "BROWSER_SCREENSHOT_DIR" env variable
-    ->takeScreenshot('screenshot.png')
-
-    // save the browser's javascript console error log
-    // by default, saves to "<project-root>/var/browser/console-log"
-    // configure with "BROWSER_CONSOLE_LOG_DIR" env variable
-    ->saveConsoleLog('console.log')
-
-    // check if element is visible in the browser
-    ->assertVisible('.selector')
-    ->assertNotVisible('.selector')
-
-    // wait x milliseconds
-    ->wait(1000) // 1 second
-
-    ->waitUntilVisible('.selector')
-    ->waitUntilNotVisible('.selector')
-    ->waitUntilSeeIn('.selector', 'some text')
-    ->waitUntilNotSeeIn('.selector', 'some text')
-
-    ->doubleClick('Link')
-    ->rightClick('Link')
-
-    // dump() the browser's console error log
-    ->dumpConsoleLog()
-
-    // dd() the browser's console error log
-    ->ddConsoleLog()
-
-    // dd() and take screenshot (default filename is "screenshot.png")
-    ->ddScreenshot()
-;
-```
-
-### Multiple Browser Instances
-
-Within your test, you can call `->xBrowser()` methods multiple times to get
-different browser instances. This could be useful for testing an app with
-real-time capabilities (ie websockets):
-
-```php
-namespace App\Tests;
-
-use Symfony\Component\Panther\PantherTestCase;
-use Zenstruck\Browser\Test\HasBrowser;
-
-class MyTest extends PantherTestCase
-{
-    use HasBrowser;
-
-    public function testDemo(): void
-    {
-        $browser1 = $this->pantherBrowser()
-            ->visit('/my/page')
-            // ...
-        ;
-
-        $browser2 = $this->pantherBrowser()
-            ->visit('/my/page')
-            // ...
-        ;
-    }
-}
-```
-
 ### Advanced DOM Selectors
 
 Any browser method that accepts a `$selector` argument can be one of the following types:
@@ -553,10 +448,6 @@ Any browser method that accepts a `$selector` argument can be one of the followi
 1. `string` - [_auto selector_](#auto-string-selector)
 2. `Zenstruck\Dom\Selector` - [_selector object_](#selector-object)
 3. `callable` - [_callable selector_](#callable-selector)
-
-> [!NOTE]
-> Most [`PantherBrowser`](#pantherbrowser) specific methods that accept a `$selector`
-> argument only accept a string that's specific to the Panther client.
 
 #### Auto (`string`) Selector
 
@@ -673,15 +564,10 @@ There are several environment variables available to configure:
 | Variable                         | Description                                                                                                            | Default                            |
 |----------------------------------|------------------------------------------------------------------------------------------------------------------------|------------------------------------|
 | `BROWSER_SOURCE_DIR`             | Directory to save source files to.                                                                                     | `./var/browser/source`             |
-| `BROWSER_SCREENSHOT_DIR`         | Directory to save screenshots to (only applies to `PantherBrowser`).                                                   | `./var/browser/screenshots`        |
-| `BROWSER_CONSOLE_LOG_DIR`        | Directory to save javascript console logs to (only applies to `PantherBrowser`).                                       | `./var/browser/console-logs`       |
 | `BROWSER_FOLLOW_REDIRECTS`       | Whether to follow redirects by default (only applies to `KernelBrowser`).                                              | `1` _(true)_                       |
 | `BROWSER_CATCH_EXCEPTIONS`       | Whether to catch exceptions by default (only applies to `KernelBrowser`).                                              | `1` _(true)_                       |
 | `BROWSER_SOURCE_DEBUG`           | Whether to add request metadata to written source files (only applies to `KernelBrowser`).                             | `0` _(false)_                      |
 | `KERNEL_BROWSER_CLASS`           | `KernelBrowser` class to use.                                                                                          | `Zenstruck\Browser\KernelBrowser`  |
-| `PANTHER_BROWSER_CLASS`          | `PantherBrowser` class to use.                                                                                         | `Zenstruck\Browser\PantherBrowser` |
-| `PANTHER_NO_HEADLESS`            | Disable headless-mode and allow usage of `PantherBrowser::pause()`.                                                    | `0` _(false)_                      |
-| `BROWSER_ALWAYS_START_WEBSERVER` | Always start a webserver configured for your current test env before running tests (only applies to `PantherBrowser`). | `0` _(false)_                      |
 
 ## Extending
 
@@ -942,7 +828,6 @@ class AppBrowser extends KernelBrowser
 Then, depending on the implementation you extended from, set the appropriate env variable:
 
 * `KernelBrowser`: `KERNEL_BROWSER_CLASS`
-* `PantherBrowser`: `PANTHER_BROWSER_CLASS`
 
 For the example above, you would set `KERNEL_BROWSER_CLASS=App\Tests\AppBrowser`.
 
