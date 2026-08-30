@@ -3,7 +3,6 @@
 /vendor/
 /build/
 /var/
-/drivers/
 /attachment.zip
 /.php-cs-fixer.cache
 /.phpunit.result.cache

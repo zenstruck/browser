@@ -248,11 +248,7 @@ trait BrowserTests
             ;
         });
 
-        // Metadata are never prepended to source content with PantherBrowser
-        if ($this->browser() instanceof Browser\KernelBrowser) {
-            $this->assertStringContainsString('/page1', $output[0]);
-        }
-
+        $this->assertStringContainsString('/page1', $output[0]);
         $this->assertStringContainsString('<html', $output[0]);
         $this->assertStringContainsString('<h1>h1 title</h1>', $output[0]);
     }
