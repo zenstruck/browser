@@ -30,6 +30,13 @@ use Zenstruck\Browser\Session\Playwright\CookieJar as PlaywrightCookieJar;
  */
 class PlaywrightBrowser extends Browser
 {
+    /**
+     * Playwright defaults to 30 seconds, and its assertions to 5. Both are calibrated for a browser
+     * talking to a remote app: the kernel client is in-process, and a failing assertion cannot be
+     * reported until this expires, so it is worth keeping short.
+     */
+    private const DEFAULT_TIMEOUT = 2000;
+
     private ?string $screenshotDir;
     private ?string $consoleLogDir;
 
@@ -59,6 +66,10 @@ class PlaywrightBrowser extends Browser
 
         $this->screenshotDir = $options['screenshot_dir'] ?? null;
         $this->consoleLogDir = $options['console_log_dir'] ?? null;
+
+        $this->timeout(
+            isset($options['default_timeout']) ? (int) $options['default_timeout'] : self::DEFAULT_TIMEOUT,
+        );
 
         // subscribe before anything is navigated to, or the messages are already gone
         // @todo also collect uncaught errors once playwright-php exposes the "pageerror" event
@@ -102,6 +113,23 @@ class PlaywrightBrowser extends Browser
     }
 
     /**
+     * How long actions and assertions wait for the page to catch up. Use a short timeout to fail
+     * fast.
+     *
+     * @return static
+     */
+    final public function timeout(int $milliseconds): self
+    {
+        if ($milliseconds < 1) {
+            throw new \InvalidArgumentException(\sprintf('Timeout must be a positive number of milliseconds, "%d" given.', $milliseconds));
+        }
+
+        $this->session()->getDriver()->setAutoWaitTimeout($milliseconds);
+
+        return $this;
+    }
+
+    /**
      * @return static
      */
     final public function wait(int $milliseconds): self
@@ -116,7 +144,7 @@ class PlaywrightBrowser extends Browser
      */
     final public function waitUntilVisible(string $selector): self
     {
-        $this->page()->waitForSelector($selector, ['state' => 'visible']);
+        $this->page()->waitForSelector($selector, ['state' => 'visible', 'timeout' => $this->currentTimeout()]);
 
         return $this;
     }
@@ -126,7 +154,7 @@ class PlaywrightBrowser extends Browser
      */
     final public function waitUntilNotVisible(string $selector): self
     {
-        $this->page()->waitForSelector($selector, ['state' => 'hidden']);
+        $this->page()->waitForSelector($selector, ['state' => 'hidden', 'timeout' => $this->currentTimeout()]);
 
         return $this;
     }
@@ -139,6 +167,7 @@ class PlaywrightBrowser extends Browser
         $this->page()->waitForFunction(
             '([selector, text]) => { const el = document.querySelector(selector); return null !== el && el.checkVisibility() && el.textContent.includes(text); }',
             [$selector, $expected],
+            ['timeout' => $this->currentTimeout()],
         );
 
         return $this;
@@ -152,6 +181,7 @@ class PlaywrightBrowser extends Browser
         $this->page()->waitForFunction(
             '([selector, text]) => { const el = document.querySelector(selector); return null === el || !el.checkVisibility() || !el.textContent.includes(text); }',
             [$selector, $expected],
+            ['timeout' => $this->currentTimeout()],
         );
 
         return $this;
@@ -262,6 +292,11 @@ class PlaywrightBrowser extends Browser
     protected function cookieJar(): CookieJar
     {
         return new PlaywrightCookieJar($this->page());
+    }
+
+    private function currentTimeout(): int
+    {
+        return $this->session()->autoWait()->timeout() ?? self::DEFAULT_TIMEOUT;
     }
 
     private function page(): PageInterface

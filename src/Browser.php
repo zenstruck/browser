@@ -289,6 +289,7 @@ abstract class Browser
      */
     final public function fillField(string $selector, string $value): self
     {
+        $this->awaitField($selector);
         $this->session()->page()->fillField($selector, $value);
 
         return $this;
@@ -299,7 +300,7 @@ abstract class Browser
      */
     final public function checkField(string $selector): self
     {
-        $field = $this->session()->page()->findField($selector);
+        $field = $this->awaitField($selector);
 
         if ($field && 'radio' === \mb_strtolower((string) $field->getAttribute('type'))) {
             $this->session()->page()->selectFieldOption($selector, (string) $field->getAttribute('value'));
@@ -317,6 +318,7 @@ abstract class Browser
      */
     final public function uncheckField(string $selector): self
     {
+        $this->awaitField($selector);
         $this->session()->page()->uncheckField($selector);
 
         return $this;
@@ -349,6 +351,7 @@ abstract class Browser
      */
     final public function selectFieldOption(string $selector, string $value): self
     {
+        $this->awaitField($selector);
         $this->session()->page()->selectFieldOption($selector, $value);
 
         return $this;
@@ -359,6 +362,8 @@ abstract class Browser
      */
     final public function selectFieldOptions(string $selector, array $values): self
     {
+        $this->awaitField($selector);
+
         if (!$values) {
             $this->session->page()->fillField($selector, $values);
 
@@ -380,6 +385,8 @@ abstract class Browser
      */
     final public function attachFile(string $selector, array|string $filename): self
     {
+        $this->awaitField($selector);
+
         foreach ((array) $filename as $file) {
             if (!\file_exists($file)) {
                 throw new \InvalidArgumentException(\sprintf('File "%s" does not exist.', $file));
@@ -791,18 +798,7 @@ abstract class Browser
 
     final protected function getClickableElement(string $selector): NodeElement
     {
-        // try button
-        $element = $this->session()->page()->findButton($selector);
-
-        if (!$element) {
-            // try link
-            $element = $this->session()->page()->findLink($selector);
-        }
-
-        if (!$element) {
-            // try by css
-            $element = $this->session()->page()->find('css', $selector);
-        }
+        $element = $this->session()->autoWait()->lookup(fn() => $this->findClickable($selector));
 
         if (!$element) {
             Assert::fail('Clickable element "%s" not found.', [$selector]);
@@ -878,5 +874,18 @@ abstract class Browser
         }
 
         return $container->get('security.token_storage')->getToken();
+    }
+
+    private function findClickable(string $selector): ?NodeElement
+    {
+        // try button, then link, then css
+        return $this->session()->page()->findButton($selector)
+            ?? $this->session()->page()->findLink($selector)
+            ?? $this->session()->page()->find('css', $selector);
+    }
+
+    private function awaitField(string $selector): ?NodeElement
+    {
+        return $this->session()->autoWait()->lookup(fn() => $this->session()->page()->findField($selector));
     }
 }
