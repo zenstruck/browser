@@ -560,6 +560,9 @@ $browser
     ->assertVisible('.selector')
     ->assertNotVisible('.selector')
 
+    // change how long the calls that follow wait
+    ->timeout(5000)
+
     // wait x milliseconds
     ->wait(1000) // 1 second
 
@@ -586,6 +589,43 @@ $browser
 > [!NOTE]
 > Uncaught javascript errors are not included in the console log: Playwright reports these as a
 > separate `pageerror` event which `playwright-php` does not yet expose.
+
+#### Auto Waiting
+
+Actions and assertions wait for the page to catch up, so you rarely need an explicit wait. Clicking
+or filling a field waits for the element to turn up, an assertion is retried until it passes, and a
+"not" assertion passes as soon as it holds (immediately, if it already does). Everything gives up
+after `BROWSER_DEFAULT_TIMEOUT` milliseconds and fails.
+
+```php
+$this->browser()
+    ->visit('/my-page')
+
+    // no explicit wait needed: both wait for the element to appear
+    ->fillField('Search', 'zenstruck')
+    ->click('Search')
+
+    // retried until it passes, or the timeout expires
+    ->assertSeeIn('#results', 'zenstruck/browser')
+
+    // passes as soon as the spinner goes away
+    ->assertNotSeeElement('#spinner')
+;
+```
+
+> [!TIP]
+> This is particularly useful with [Turbo](https://turbo.hotwired.dev/), where visits, frames and
+> streams all update the page without a navigation to wait on. Assert something that only exists
+> after the update: content already on the page passes straight away.
+
+The timeout covers every wait, including the `wait*()` methods above. Page loads are the exception,
+whether from `visit()` or a click that navigates: those keep Playwright's own 30 second limit, since
+a cold kernel boot is far slower than anything you would want an assertion to wait for.
+
+> [!WARNING]
+> An assertion that is going to fail can only be reported as failed once the timeout expires, so
+> failures cost `BROWSER_DEFAULT_TIMEOUT` instead of returning instantly. Lower it, or call
+> `timeout()` for part of a test, if you would rather fail fast.
 
 ### Multiple Browser Instances
 
@@ -646,6 +686,7 @@ There are several environment variables available to configure:
 | `BROWSER_CONSOLE_LOG_DIR`  | Directory to save javascript console logs to (only applies to `PlaywrightBrowser`).             | `./var/browser/console-logs`          |
 | `BROWSER_FOLLOW_REDIRECTS` | Whether to follow redirects by default.                                                         | `1` _(true)_                          |
 | `BROWSER_CATCH_EXCEPTIONS` | Whether to catch exceptions by default.                                                         | `1` _(true)_                          |
+| `BROWSER_DEFAULT_TIMEOUT`  | Milliseconds actions and assertions wait before giving up (only applies to `PlaywrightBrowser`). | `2000`                                |
 | `BROWSER_SOURCE_DEBUG`     | Whether to add request metadata to written source files (only applies to `KernelBrowser`).      | `0` _(false)_                         |
 | `KERNEL_BROWSER_CLASS`     | `KernelBrowser` class to use.                                                                   | `Zenstruck\Browser\KernelBrowser`     |
 | `PLAYWRIGHT_BROWSER_CLASS` | `PlaywrightBrowser` class to use.                                                               | `Zenstruck\Browser\PlaywrightBrowser` |

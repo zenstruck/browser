@@ -29,6 +29,13 @@ use Zenstruck\Browser\Session\Driver;
  */
 final class PlaywrightDriver extends Driver
 {
+    /**
+     * What playwright falls back to when it is not given a timeout.
+     *
+     * @internal
+     */
+    public const PLAYWRIGHT_DEFAULT_TIMEOUT = 30_000;
+
     /** @var array<string,string[]> */
     private array $attachedFiles = [];
 
@@ -128,7 +135,7 @@ final class PlaywrightDriver extends Driver
 
     public function getAttribute($xpath, $name): ?string
     {
-        return $this->locator($xpath)->getAttribute($name);
+        return $this->locator($xpath)->getAttribute($name, ['timeout' => $this->timeout()]);
     }
 
     public function getValue($xpath): string|bool|array|null
@@ -136,7 +143,7 @@ final class PlaywrightDriver extends Driver
         $locator = $this->locator($xpath);
 
         if ('select' === $this->getTagName($xpath)) {
-            if (null !== $locator->getAttribute('multiple')) {
+            if (null !== $locator->getAttribute('multiple', ['timeout' => $this->timeout()])) {
                 return $locator->evaluate('el => Array.from(el.selectedOptions).map(o => o.value)');
             }
 
@@ -144,7 +151,7 @@ final class PlaywrightDriver extends Driver
         }
 
         if ('checkbox' === $this->typeOf($locator)) {
-            return $locator->isChecked() ? ($locator->getAttribute('value') ?? 'on') : null;
+            return $locator->isChecked() ? ($locator->getAttribute('value', ['timeout' => $this->timeout()]) ?? 'on') : null;
         }
 
         if ('radio' === $this->typeOf($locator)) {
@@ -161,7 +168,7 @@ final class PlaywrightDriver extends Driver
         $type = $this->typeOf($locator);
 
         if ('checkbox' === $type) {
-            $value ? $locator->check() : $locator->uncheck();
+            $value ? $locator->check(['timeout' => $this->timeout()]) : $locator->uncheck(['timeout' => $this->timeout()]);
 
             return;
         }
@@ -173,7 +180,7 @@ final class PlaywrightDriver extends Driver
         }
 
         if ('file' === $type) {
-            $locator->setInputFiles((string) $value);
+            $locator->setInputFiles((string) $value, ['timeout' => $this->timeout()]);
 
             return;
         }
@@ -185,22 +192,22 @@ final class PlaywrightDriver extends Driver
                 return;
             }
 
-            $locator->selectOption($value);
+            $locator->selectOption($value, ['timeout' => $this->timeout()]);
 
             return;
         }
 
-        $locator->fill((string) $value);
+        $locator->fill((string) $value, ['timeout' => $this->timeout()]);
     }
 
     public function check($xpath): void
     {
-        $this->locator($xpath)->check();
+        $this->locator($xpath)->check(['timeout' => $this->timeout()]);
     }
 
     public function uncheck($xpath): void
     {
-        $this->locator($xpath)->uncheck();
+        $this->locator($xpath)->uncheck(['timeout' => $this->timeout()]);
     }
 
     public function isChecked($xpath): bool
@@ -226,10 +233,10 @@ final class PlaywrightDriver extends Driver
         }
 
         try {
-            $locator->selectOption($values);
+            $locator->selectOption($values, ['timeout' => $this->timeout()]);
         } catch (\Throwable) {
             // try selecting by visible text
-            $locator->selectOption(['label' => $value]);
+            $locator->selectOption(['label' => $value], ['timeout' => $this->timeout()]);
         }
     }
 
@@ -241,14 +248,14 @@ final class PlaywrightDriver extends Driver
         $locator = $this->locator($xpath);
         $existing = $this->attachedFiles[$xpath] ?? [];
 
-        if ($existing && null === $locator->getAttribute('multiple')) {
+        if ($existing && null === $locator->getAttribute('multiple', ['timeout' => $this->timeout()])) {
             throw new \InvalidArgumentException('Cannot attach multiple files to a non-multiple file field.');
         }
 
         // cast: an SplFileInfo is a valid Browser::attachFile() argument but Playwright needs a path
         $this->attachedFiles[$xpath] = $files = [...$existing, (string) $path];
 
-        $locator->setInputFiles($files);
+        $locator->setInputFiles($files, ['timeout' => $this->timeout()]);
     }
 
     public function click($xpath): void
@@ -256,7 +263,7 @@ final class PlaywrightDriver extends Driver
         $this->downloadedContent = null;
 
         $this->wrapRequest(function() use ($xpath): void {
-            $this->locator($xpath)->click();
+            $this->locator($xpath)->click(['timeout' => $this->timeout()]);
             $this->page()->waitForLoadState();
         });
     }
@@ -267,7 +274,7 @@ final class PlaywrightDriver extends Driver
 
         $before = $this->page()->url();
 
-        $this->locator($xpath)->dblclick();
+        $this->locator($xpath)->dblclick(['timeout' => $this->timeout()]);
 
         $this->awaitPossibleNavigation($before);
     }
@@ -278,7 +285,7 @@ final class PlaywrightDriver extends Driver
 
         $before = $this->page()->url();
 
-        $this->locator($xpath)->click(['button' => 'right']);
+        $this->locator($xpath)->click(['button' => 'right', 'timeout' => $this->timeout()]);
 
         $this->awaitPossibleNavigation($before);
     }
@@ -342,9 +349,21 @@ final class PlaywrightDriver extends Driver
         return $this->page()->locator('xpath='.$xpath);
     }
 
+    /**
+     * Playwright is never told a default, so every call that can wait is given this explicitly.
+     * Its own default stands in when auto waiting is off.
+     *
+     * @todo click()/fill() run a private actionability check on a hardcoded 30s that no option
+     *       reaches; harmless while the element is resolved before we get here
+     */
+    private function timeout(): int
+    {
+        return $this->autoWait()->timeout() ?? self::PLAYWRIGHT_DEFAULT_TIMEOUT;
+    }
+
     private function typeOf(LocatorInterface $locator): string
     {
-        return \mb_strtolower((string) $locator->getAttribute('type'));
+        return \mb_strtolower((string) $locator->getAttribute('type', ['timeout' => $this->timeout()]));
     }
 
     private function lastResponseBody(): string

@@ -24,11 +24,19 @@ use Zenstruck\Assert as ZenstruckAssert;
  */
 final class Assert
 {
-    private WebAssert $webAssert;
+    /**
+     * These read the response rather than the page: it cannot change while we poll, so retrying
+     * them would only make their failures slower.
+     */
+    private const NOT_RETRYABLE = ['responseHeaderEquals', 'responseHeaderContains'];
 
-    public function __construct(WebAssert $webAssert)
+    private WebAssert $webAssert;
+    private AutoWait $autoWait;
+
+    public function __construct(WebAssert $webAssert, AutoWait $autoWait)
     {
         $this->webAssert = $webAssert;
+        $this->autoWait = $autoWait;
     }
 
     /**
@@ -39,7 +47,7 @@ final class Assert
     public function __call(string $name, array $arguments)
     {
         try {
-            $ret = $this->webAssert->{$name}(...$arguments);
+            $ret = $this->run($name, $arguments);
         } catch (ExpectationException $e) {
             ZenstruckAssert::fail($e->getMessage());
         }
@@ -47,5 +55,17 @@ final class Assert
         ZenstruckAssert::pass();
 
         return $ret;
+    }
+
+    /**
+     * @param mixed[] $arguments
+     */
+    private function run(string $name, array $arguments): mixed
+    {
+        if (\in_array($name, self::NOT_RETRYABLE, true)) {
+            return $this->webAssert->{$name}(...$arguments);
+        }
+
+        return $this->autoWait->assertion(fn() => $this->webAssert->{$name}(...$arguments));
     }
 }
