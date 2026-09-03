@@ -478,6 +478,8 @@ abstract class Browser
             Parameter::union(...$this->useParameters()),
         );
 
+        $this->afterUse();
+
         return $this;
     }
 
@@ -862,6 +864,15 @@ abstract class Browser
                 Assert::fail('DataCollector %s is not available for this request.', [$class]);
             })),
         ];
+    }
+
+    /**
+     * Called after a {@see use()} callback has run, to flush anything it was handed.
+     *
+     * @internal
+     */
+    protected function afterUse(): void
+    {
     }
 
     private function container(): ?ContainerInterface
