@@ -51,6 +51,11 @@ final class Kernel extends BaseKernel
         return new Response('success');
     }
 
+    public function readSession(Request $request): Response
+    {
+        return new Response($request->getSession()->get('key') ?? '(none)');
+    }
+
     public function text(): Response
     {
         return new Response('text content', 200, ['Content-Type' => 'text/plain']);
@@ -217,6 +222,7 @@ final class Kernel extends BaseKernel
     {
         $routes->add('page1', '/page1')->controller('kernel::page1');
         $routes->add('page2', '/page2')->controller('kernel::page2');
+        $routes->add('read-session', '/read-session')->controller('kernel::readSession');
         $routes->add('text', '/text')->controller('kernel::text');
         $routes->add('submit-form', '/submit-form')->controller('kernel::submitForm');
         $routes->add('http-method', '/http-method')->controller('kernel::httpMethod');

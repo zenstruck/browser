@@ -12,6 +12,8 @@
 namespace Zenstruck\Browser;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
+use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Session\Driver\BrowserKitDriver;
 use Zenstruck\Callback\Parameter;
@@ -26,6 +28,8 @@ use Zenstruck\Callback\Parameter;
 class KernelBrowser extends Browser
 {
     protected ?HttpOptions $defaultHttpOptions = null;
+
+    private ?SessionInterface $httpSession = null;
 
     /**
      * @internal
@@ -203,6 +207,48 @@ class KernelBrowser extends Browser
         return [
             ...parent::useParameters(),
             Parameter::typed(Json::class, Parameter::factory(fn() => $this->json())),
+            Parameter::typed(SessionInterface::class, Parameter::factory(fn() => $this->httpSession())),
         ];
+    }
+
+    protected function afterUse(): void
+    {
+        if (null === $session = $this->httpSession) {
+            return;
+        }
+
+        $this->httpSession = null;
+
+        $session->save();
+
+        // the cookie is left without a domain on purpose: the jar sends a domain-less
+        // cookie to any host, so this works whatever host the browser then visits
+        $this->cookieJar()->set(new Cookie($session->getName(), $session->getId()));
+    }
+
+    /**
+     * The session the next request will use, loaded from the session cookie if there is one.
+     *
+     * It is saved, and its cookie written, once the {@see use()} callback returns.
+     */
+    private function httpSession(): SessionInterface
+    {
+        if (null !== $this->httpSession) {
+            return $this->httpSession;
+        }
+
+        if (!($container = $this->client()->getContainer())->has('session.factory')) {
+            throw new \LogicException('Sessions are not available/enabled.');
+        }
+
+        $session = $container->get('session.factory')->createSession();
+
+        if (null !== $cookie = $this->cookieJar()->get($session->getName())) {
+            $session->setId($cookie->getValue());
+        }
+
+        $session->start();
+
+        return $this->httpSession = $session;
     }
 }
