@@ -379,6 +379,38 @@ $browser
 ;
 ```
 
+#### Session
+
+The _KernelBrowser_ can inject your app's http session into `->use()`, to read what
+the app stored or to set something up before making a request:
+
+```php
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
+
+$browser
+    ->use(function(\Symfony\Component\HttpFoundation\Session\SessionInterface $session) {
+        // seed the session before any request is made
+        $session->set('cart', ['product-1']);
+    })
+    ->visit('/cart')
+    ->assertSee('product-1')
+
+    ->use(function(\Symfony\Component\HttpFoundation\Session\SessionInterface $session) {
+        // read what the app stored
+        $this->assertSame(['product-1', 'product-2'], $session->get('cart'));
+    })
+;
+```
+
+The session is loaded from the session cookie if the browser already has one, so the
+id is preserved and nothing the app stored is lost. It is saved, and its cookie
+written, when the callback returns.
+
+> [!NOTE]
+> This requires the session to be enabled in your app, and a session storage that the
+> test process can write to, typically `session.storage.factory.mock_file` in the test
+> environment.
+
 #### HTTP Requests
 
 The _KernelBrowser_ can be used for testing API endpoints. The following http methods are available:
