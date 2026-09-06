@@ -938,6 +938,35 @@ trait BrowserTests
      * @test
      */
     #[Test]
+    public function see_in_assertions_accept_many_selectors(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->assertSeeIn(['h1', 'body'], 'h1 title')
+            ->assertNotSeeIn(['h1', 'title'], 'invalid text')
+        ;
+
+        // every selector must match, so one that does not fails the assertion
+        Assert::that(function() {
+            $this->browser()
+                ->visit('/page1')
+                ->assertSeeIn(['h1', 'title'], 'h1 title')
+            ;
+        })->throws(AssertionFailedError::class);
+
+        // and none may match for the negative one
+        Assert::that(function() {
+            $this->browser()
+                ->visit('/page1')
+                ->assertNotSeeIn(['title', 'h1'], 'h1 title')
+            ;
+        })->throws(AssertionFailedError::class);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function html_head_assertions(): void
     {
         $this->browser()
