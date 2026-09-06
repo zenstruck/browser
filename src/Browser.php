@@ -149,21 +149,29 @@ abstract class Browser
     }
 
     /**
+     * @param string|iterable<string> $selector One or many css selectors, all of which must contain the text
+     *
      * @return static
      */
-    final public function assertSeeIn(string $selector, string $expected): self
+    final public function assertSeeIn(string|iterable $selector, string $expected): self
     {
-        $this->session()->assert()->elementTextContains('css', $selector, $expected);
+        foreach (self::normalizeSelectors($selector) as $css) {
+            $this->session()->assert()->elementTextContains('css', $css, $expected);
+        }
 
         return $this;
     }
 
     /**
+     * @param string|iterable<string> $selector One or many css selectors, none of which may contain the text
+     *
      * @return static
      */
-    final public function assertNotSeeIn(string $selector, string $expected): self
+    final public function assertNotSeeIn(string|iterable $selector, string $expected): self
     {
-        $this->session()->assert()->elementTextNotContains('css', $selector, $expected);
+        foreach (self::normalizeSelectors($selector) as $css) {
+            $this->session()->assert()->elementTextNotContains('css', $css, $expected);
+        }
 
         return $this;
     }
@@ -878,5 +886,15 @@ abstract class Browser
         }
 
         return $container->get('security.token_storage')->getToken();
+    }
+
+    /**
+     * @param string|iterable<string> $selector
+     *
+     * @return iterable<string>
+     */
+    private static function normalizeSelectors(string|iterable $selector): iterable
+    {
+        return \is_string($selector) ? [$selector] : $selector;
     }
 }

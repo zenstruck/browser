@@ -153,6 +153,10 @@ $browser
     ->assertNotSee('some text')
     ->assertSeeIn('h1', 'some text')
     ->assertNotSeeIn('h1', 'some text')
+
+    // pass many selectors to check the same text in each of them
+    ->assertSeeIn(['title', 'h1'], 'some text')
+    ->assertNotSeeIn(['title', 'h1'], 'some text')
     ->assertSeeElement('h1')
     ->assertNotSeeElement('h1')
     ->assertElementCount('ul li', 2)
