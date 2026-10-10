@@ -28,7 +28,6 @@ jobs:
     steps:
       - uses: playwright-php/setup-playwright@v1
         with:
-          playwright-version: 1.62.1 # unpin once playwright-php/playwright#185 and #186 are released
           browsers: chromium
           with-deps: false
 
@@ -45,7 +44,6 @@ jobs:
     steps:
       - uses: playwright-php/setup-playwright@v1
         with:
-          playwright-version: 1.62.1 # unpin once playwright-php/playwright#185 and #186 are released
           browsers: chromium
           with-deps: false
 
