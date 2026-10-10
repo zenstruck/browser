@@ -19,7 +19,6 @@ use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Session\Playwright\CookieJar as PlaywrightCookieJar;
 use Zenstruck\Browser\Session\PlaywrightSession;
-use Zenstruck\Dom\Modifier;
 use Zenstruck\Dom\Node;
 use Zenstruck\Dom\Selector;
 
@@ -167,7 +166,7 @@ class PlaywrightBrowser extends Browser
     {
         $node = $this->clickable($selector);
 
-        return $this->wrapRequest(static fn() => $node->click(...$modifiers));
+        return $this->wrapRequest(fn() => $this->session->click($node, ...self::modifiers($modifiers)));
     }
 
     /**
@@ -179,7 +178,7 @@ class PlaywrightBrowser extends Browser
     {
         $node = $this->clickable($selector);
 
-        return $this->wrapRequest(static fn() => $node->doubleClick(...$modifiers));
+        return $this->wrapRequest(fn() => $this->session->doubleClick($node, ...self::modifiers($modifiers)));
     }
 
     /**
@@ -191,7 +190,7 @@ class PlaywrightBrowser extends Browser
     {
         $node = $this->clickable($selector);
 
-        return $this->wrapRequest(static fn() => $node->rightClick(...$modifiers));
+        return $this->wrapRequest(fn() => $this->session->rightClick($node, ...self::modifiers($modifiers)));
     }
 
     /**
@@ -203,7 +202,7 @@ class PlaywrightBrowser extends Browser
     {
         $node = $this->dom()->findOrFail($selector);
 
-        return $this->wrapRequest(static fn() => $node->hover(...$modifiers));
+        return $this->wrapRequest(fn() => $this->session->hover($node, ...self::modifiers($modifiers)));
     }
 
     /**
@@ -215,7 +214,7 @@ class PlaywrightBrowser extends Browser
     {
         $node = $this->dom()->findOrFail($selector);
 
-        return $this->wrapRequest(static fn() => $node->focus());
+        return $this->wrapRequest(fn() => $this->session->focus($node));
     }
 
     /**
@@ -227,7 +226,7 @@ class PlaywrightBrowser extends Browser
     {
         $node = $this->dom()->findOrFail($selector);
 
-        return $this->wrapRequest(static fn() => $node->blur());
+        return $this->wrapRequest(fn() => $this->session->blur($node));
     }
 
     /**
@@ -392,5 +391,15 @@ class PlaywrightBrowser extends Browser
         Assert::true($node->isVisible(), 'Clickable element "%s" is not visible.', [$selector]);
 
         return $node;
+    }
+
+    /**
+     * @param array<Modifier|string> $modifiers
+     *
+     * @return list<Modifier>
+     */
+    private static function modifiers(array $modifiers): array
+    {
+        return \array_values(\array_map(Modifier::normalize(...), $modifiers));
     }
 }

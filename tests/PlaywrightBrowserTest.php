@@ -15,10 +15,10 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Browser\Modifier;
 use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Test\LegacyExtension;
-use Zenstruck\Dom\Modifier;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

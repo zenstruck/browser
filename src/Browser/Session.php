@@ -13,14 +13,22 @@ namespace Zenstruck\Browser;
 
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Zenstruck\Dom;
-use Zenstruck\Dom\Session as DomSession;
+use Zenstruck\Dom\Inspector;
+use Zenstruck\Dom\Node;
+use Zenstruck\Dom\Node\Form\Field\Checkbox;
+use Zenstruck\Dom\Node\Form\Field\File;
+use Zenstruck\Dom\Node\Form\Field\Input;
+use Zenstruck\Dom\Node\Form\Field\Radio;
+use Zenstruck\Dom\Node\Form\Field\Select\Multiselect;
+use Zenstruck\Dom\Node\Form\Field\Select\Option;
+use Zenstruck\Dom\Node\Form\Field\Textarea;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
  */
-abstract class Session implements DomSession
+abstract class Session implements Inspector
 {
     public function __construct(private AbstractBrowser $client)
     {
@@ -65,4 +73,17 @@ abstract class Session implements DomSession
      * @return array<string,string[]>
      */
     abstract public function responseHeaders(): array;
+
+    abstract public function click(Node $node): void;
+
+    abstract public function select(Checkbox|Radio|Option $node): void;
+
+    abstract public function unselect(Checkbox|Multiselect $node): void;
+
+    /**
+     * @param string[] $filenames
+     */
+    abstract public function attach(File $node, array $filenames): void;
+
+    abstract public function fill(Input|Textarea $node, string $value): void;
 }
