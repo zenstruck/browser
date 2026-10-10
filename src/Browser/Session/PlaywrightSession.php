@@ -194,7 +194,7 @@ final class PlaywrightSession extends Session
         $this->locatorFor($node)->fill($value);
     }
 
-    public function text(Dom\Node $node): string
+    public function text(Node $node): string
     {
         // innerText falls back to textContent for elements that are not rendered, but a user only
         // sees what is visible - <title> is the exception, never rendered yet always meaningful
