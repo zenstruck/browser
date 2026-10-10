@@ -178,6 +178,9 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
+    /**
+     * @test
+     */
     #[Test]
     public function can_save_console_log(): void
     {
@@ -359,6 +362,19 @@ class PlaywrightBrowserTest extends KernelTestCase
             ->press('/')
             ->assertNotSeeIn('#keyboard-output', 'search opened')
             ->press('ControlOrMeta+/')
+            ->assertSeeIn('#keyboard-output', 'search opened')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_press_a_key_combination_built_from_a_modifier(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->press(Modifier::ControlOrMeta->plus('/'))
             ->assertSeeIn('#keyboard-output', 'search opened')
         ;
     }
