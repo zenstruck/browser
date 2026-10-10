@@ -281,7 +281,7 @@ class PlaywrightBrowser extends Browser
      */
     final protected function cookieJar(): CookieJar
     {
-        return new PlaywrightCookieJar($this->session->page());
+        return new PlaywrightCookieJar($this->session->page(), $this->client()->getBaseUrl());
     }
 
     /**

@@ -13,11 +13,14 @@ namespace Zenstruck;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session as HttpSession;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -62,6 +65,8 @@ abstract class Browser
     private bool $threwExpectedException = false;
 
     private bool $catchExceptions = true;
+
+    private ?SessionInterface $httpSession = null;
 
     /**
      * @internal
@@ -518,6 +523,8 @@ abstract class Browser
         Callback::createFor($callback)->invokeAll(
             Parameter::union(...$this->useParameters()),
         );
+
+        $this->flushHttpSession();
 
         return $this;
     }
@@ -976,7 +983,8 @@ abstract class Browser
             Parameter::typed(Dom::class, Parameter::factory(fn() => $this->dom())),
             Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->cookieJar())),
             Parameter::typed(AbstractBrowser::class, Parameter::factory(fn() => $this->client())),
-            Parameter::typed(ContainerInterface::class, Parameter::factory(fn() => \method_exists($this->client(), 'getContainer') ? $this->client()->getContainer() : null))->optional(),
+            Parameter::typed(ContainerInterface::class, Parameter::factory(fn() => $this->container()))->optional(),
+            Parameter::typed(SessionInterface::class, Parameter::factory(fn() => $this->httpSession())),
             Parameter::typed(DataCollectorInterface::class, Parameter::factory(function(string $class) {
                 foreach ($this->profile()->getCollectors() as $collector) {
                     if ($class === $collector::class) {
@@ -1011,13 +1019,68 @@ abstract class Browser
         $client->catchExceptions($catch);
     }
 
-    private function securityToken(): ?TokenInterface
+    /**
+     * The session the next request will use, loaded from the session cookie if there is one.
+     *
+     * It is saved, and its cookie written, once the {@see use()} callback returns.
+     */
+    private function httpSession(): SessionInterface
     {
-        if (!\method_exists($client = $this->client(), 'getContainer') || !$container = $client->getContainer()) {
-            throw new \LogicException('Security not available/enabled.');
+        if (null !== $this->httpSession) {
+            return $this->httpSession;
         }
 
-        if (!$container->has('security.token_storage')) {
+        $container = $this->container();
+
+        if (!$container?->has('session.factory')) {
+            throw new \LogicException('Sessions are not available/enabled.');
+        }
+
+        $session = $container->get('session.factory')->createSession();
+
+        if (null !== $cookie = $this->cookieJar()->get($session->getName())) {
+            $session->setId($cookie->getValue());
+        }
+
+        $session->start();
+
+        return $this->httpSession = $session;
+    }
+
+    private function flushHttpSession(): void
+    {
+        if (null === $session = $this->httpSession) {
+            return;
+        }
+
+        $this->httpSession = null;
+        $cookie = $this->cookieJar()->get($session->getName());
+
+        // only reading must not start a session the app would then see
+        if (null === $cookie && $session instanceof HttpSession && $session->isEmpty()) {
+            return;
+        }
+
+        $session->save();
+
+        if ($cookie?->getValue() === $session->getId()) {
+            return;
+        }
+
+        // no domain: the jar then scopes it to whatever host the browser visits
+        $this->cookieJar()->set(new Cookie($session->getName(), $session->getId()));
+    }
+
+    private function container(): ?ContainerInterface
+    {
+        return \method_exists($client = $this->client(), 'getContainer') ? $client->getContainer() : null;
+    }
+
+    private function securityToken(): ?TokenInterface
+    {
+        $container = $this->container();
+
+        if (!$container?->has('security.token_storage')) {
             throw new \LogicException('Security not available/enabled.');
         }
 

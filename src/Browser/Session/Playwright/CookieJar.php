@@ -27,8 +27,10 @@ use Symfony\Component\BrowserKit\Response;
  */
 final class CookieJar extends BrowserKitCookieJar
 {
-    public function __construct(private readonly PageInterface $page)
-    {
+    public function __construct(
+        private readonly PageInterface $page,
+        private readonly string $baseUrl,
+    ) {
     }
 
     public function set(Cookie $cookie): void
@@ -42,7 +44,8 @@ final class CookieJar extends BrowserKitCookieJar
 
         // playwright needs a domain/path pair: passing a url instead makes it derive the path from
         // that url, which silently widens a cookie scoped to something narrower
-        $data['domain'] = $cookie->getDomain() ?: (string) \parse_url($this->page->url(), \PHP_URL_HOST);
+        // before the first visit the page is on about:blank, which has no host
+        $data['domain'] = $cookie->getDomain() ?: \parse_url($this->page->url(), \PHP_URL_HOST) ?: (string) \parse_url($this->baseUrl, \PHP_URL_HOST);
         $data['path'] = $cookie->getPath();
 
         if (null !== $expires = $cookie->getExpiresTime()) {
