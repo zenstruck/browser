@@ -167,6 +167,17 @@ class PlaywrightBrowserTest extends KernelTestCase
      * @test
      */
     #[Test]
+    public function stylesheet_hidden_elements_are_not_visible(): void
+    {
+        // a class, not an inline style: only the browser can resolve this
+        $this->browser()
+            ->visit('/javascript')
+            ->assertNotVisible('#stylesheet-box')
+            ->assertNotSeeIn('#stylesheet-box', 'Contents of stylesheet box')
+        ;
+    }
+
+    #[Test]
     public function can_save_console_log(): void
     {
         $contents = self::catchFileContents(__DIR__.'/../var/browser/console-logs/console.log', function() {

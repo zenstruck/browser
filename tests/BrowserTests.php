@@ -1069,6 +1069,28 @@ trait BrowserTests
      * @test
      */
     #[Test]
+    public function field_state_is_read_back_after_interacting(): void
+    {
+        // typing and clicking change DOM properties, which the markup never carries
+        $this->browser()
+            ->visit('/page1')
+            ->fillField('Input 1', 'typed value')
+            ->assertFieldEquals('Input 1', 'typed value')
+            ->fillField('Title', 'typed title')
+            ->assertFieldEquals('Title', 'typed title')
+            ->uncheckField('Input 3')
+            ->assertNotChecked('Input 3')
+            ->checkField('Input 2')
+            ->assertChecked('Input 2')
+            ->selectField('Input 4', 'option 2')
+            ->assertSelected('Input 4', 'option 2')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function form_assertions(): void
     {
         $this->browser()

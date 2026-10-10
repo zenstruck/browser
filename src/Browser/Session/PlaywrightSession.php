@@ -28,6 +28,7 @@ use Zenstruck\Dom\Node\Form\Field\Select\Combobox;
 use Zenstruck\Dom\Node\Form\Field\Select\Multiselect;
 use Zenstruck\Dom\Node\Form\Field\Select\Option;
 use Zenstruck\Dom\Node\Form\Field\Textarea;
+use Zenstruck\Dom\RenderedSession;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -36,7 +37,7 @@ use Zenstruck\Dom\Node\Form\Field\Textarea;
  *
  * @method PlaywrightKernelClient client()
  */
-final class PlaywrightSession extends Session
+final class PlaywrightSession extends Session implements RenderedSession
 {
     private ?string $downloadedContent = null;
 
@@ -194,18 +195,33 @@ final class PlaywrightSession extends Session
         $this->locatorFor($node)->fill($value);
     }
 
+    public function value(Input|Textarea $node): string
+    {
+        return $this->locatorFor($node)->inputValue();
+    }
+
+    public function isSelected(Checkbox|Radio|Option $node): bool
+    {
+        if ($node instanceof Option) {
+            return (bool) $this->locatorFor($node)->evaluate('el => el.selected');
+        }
+
+        return $this->locatorFor($node)->isChecked();
+    }
+
     public function text(Node $node): string
     {
         // innerText falls back to textContent for elements that are not rendered, but a user only
-        // sees what is visible - <title> is the exception, never rendered yet always meaningful
+        // sees what is visible. <title> and <option> are the exceptions: neither is ever rendered
+        // on its own, yet both carry text the caller is asking about
         return (string) $this->locatorFor($node)->evaluate(
-            "el => 'TITLE' === el.tagName ? el.textContent : (el.checkVisibility() ? el.innerText : '')",
+            "el => ['TITLE', 'OPTION'].includes(el.tagName) ? el.textContent : (el.checkVisibility() ? el.innerText : '')",
         );
     }
 
-    public function isVisible(string $selector): bool
+    public function isVisible(Node $node): bool
     {
-        return $this->page()->locator($selector)->first()->isVisible();
+        return $this->locatorFor($node)->isVisible();
     }
 
     public function page(): PageInterface
