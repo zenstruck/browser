@@ -602,6 +602,23 @@ $browser
     ->doubleClick('Link')
     ->rightClick('Link')
 
+    // hold modifier keys while clicking (ControlOrMeta is Cmd on macOS, Ctrl elsewhere)
+    ->click('Link', Modifier::Shift)
+    ->click('Link', Modifier::ControlOrMeta)
+    ->click('Link', 'shift') // or by name, in any letter case
+    ->doubleClick('Link', Modifier::Alt)
+
+    ->hover('.menu')
+    ->hover('.menu', Modifier::Alt)
+    ->focus('#email')
+    ->blur('#email')
+
+    // press keys on whatever has focus (see https://playwright.dev/docs/api/class-keyboard#keyboard-press)
+    ->press('ControlOrMeta+/')          // hold keys together with "+"
+    ->press('Shift', 'Shift')           // or press them one after another
+    ->fillField('Search', 'foo')
+    ->press('Enter')                    // the filled field has focus
+
     // dump() the browser's console log
     ->dumpConsoleLog()
 

@@ -430,11 +430,13 @@ abstract class Browser
     /**
      * Click on a button, link or any DOM element.
      *
+     * @final
+     *
      * @param SelectorType $selector
      *
      * @return static
      */
-    final public function click(Selector|string|callable $selector): self
+    public function click(Selector|string|callable $selector): self
     {
         $node = $this->dom()->findOrFail(Selector::clickable($selector));
 

@@ -19,6 +19,7 @@ use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Session\Playwright\CookieJar as PlaywrightCookieJar;
 use Zenstruck\Browser\Session\PlaywrightSession;
+use Zenstruck\Dom\Modifier;
 use Zenstruck\Dom\Node;
 use Zenstruck\Dom\Selector;
 
@@ -154,15 +155,19 @@ class PlaywrightBrowser extends Browser
     }
 
     /**
+     * Click on a button, link or any DOM element, holding any modifier keys.
+     *
      * @param SelectorType $selector
      *
      * @return static
+     *
+     * @phpstan-ignore method.parentMethodFinalByPhpDoc (@final is for users, this adds modifier keys)
      */
-    final public function doubleClick(Selector|string|callable $selector): self
+    final public function click(Selector|string|callable $selector, Modifier|string ...$modifiers): self
     {
-        $this->session->doubleClick($this->clickable($selector));
+        $node = $this->clickable($selector);
 
-        return $this;
+        return $this->wrapRequest(static fn() => $node->click(...$modifiers));
     }
 
     /**
@@ -170,11 +175,71 @@ class PlaywrightBrowser extends Browser
      *
      * @return static
      */
-    final public function rightClick(Selector|string|callable $selector): self
+    final public function doubleClick(Selector|string|callable $selector, Modifier|string ...$modifiers): self
     {
-        $this->session->rightClick($this->clickable($selector));
+        $node = $this->clickable($selector);
 
-        return $this;
+        return $this->wrapRequest(static fn() => $node->doubleClick(...$modifiers));
+    }
+
+    /**
+     * @param SelectorType $selector
+     *
+     * @return static
+     */
+    final public function rightClick(Selector|string|callable $selector, Modifier|string ...$modifiers): self
+    {
+        $node = $this->clickable($selector);
+
+        return $this->wrapRequest(static fn() => $node->rightClick(...$modifiers));
+    }
+
+    /**
+     * @param SelectorType $selector
+     *
+     * @return static
+     */
+    final public function hover(Selector|string|callable $selector, Modifier|string ...$modifiers): self
+    {
+        $node = $this->dom()->findOrFail($selector);
+
+        return $this->wrapRequest(static fn() => $node->hover(...$modifiers));
+    }
+
+    /**
+     * @param SelectorType $selector
+     *
+     * @return static
+     */
+    final public function focus(Selector|string|callable $selector): self
+    {
+        $node = $this->dom()->findOrFail($selector);
+
+        return $this->wrapRequest(static fn() => $node->focus());
+    }
+
+    /**
+     * @param SelectorType $selector
+     *
+     * @return static
+     */
+    final public function blur(Selector|string|callable $selector): self
+    {
+        $node = $this->dom()->findOrFail($selector);
+
+        return $this->wrapRequest(static fn() => $node->blur());
+    }
+
+    /**
+     * Press keys on whatever has focus, one after another. Hold keys together with "+".
+     *
+     * @see https://playwright.dev/docs/api/class-keyboard#keyboard-press
+     *
+     * @return static
+     */
+    final public function press(string ...$keys): self
+    {
+        return $this->wrapRequest(fn() => $this->session->press(...$keys));
     }
 
     /**
