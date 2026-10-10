@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Test\LegacyExtension;
+use Zenstruck\Dom\Modifier;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -259,6 +260,7 @@ class PlaywrightBrowserTest extends KernelTestCase
             ->visit('/page1')
             ->doubleClick('#double-click-link a')
             ->assertOn('/page2')
+            ->assertSee('success')
         ;
     }
 
@@ -278,6 +280,132 @@ class PlaywrightBrowserTest extends KernelTestCase
             ->visit('/page1')
             ->rightClick('#context-menu-link a')
             ->assertOn('/page2')
+            ->assertSee('success')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function click_with_modifiers(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->click('#shift-click-link a')
+            ->assertOn('/page1')
+            ->click('#shift-click-link a', Modifier::Shift)
+            ->assertOn('/page2')
+            ->visit('/page1')
+            ->click('#shift-click-link a', 'shift')
+            ->assertOn('/page2')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_hover_an_element(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->assertNotVisible('#hover-menu')
+            ->hover('#hover-target')
+            ->assertVisible('#hover-menu')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_hover_with_modifiers(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->hover('#alt-hover-target')
+            ->assertNotSeeIn('#alt-hover-output', 'alt hovered')
+            ->hover('#hover-target')
+            ->hover('#alt-hover-target', 'alt')
+            ->assertSeeIn('#alt-hover-output', 'alt hovered')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_focus_and_blur_an_element(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->assertNotSeeIn('#focus-output', 'focused')
+            ->focus('#focus-input')
+            ->assertSeeIn('#focus-output', 'focused')
+            ->blur('#focus-input')
+            ->assertSeeIn('#focus-output', 'blurred')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_press_a_key_combination(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->press('/')
+            ->assertNotSeeIn('#keyboard-output', 'search opened')
+            ->press('ControlOrMeta+/')
+            ->assertSeeIn('#keyboard-output', 'search opened')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_press_a_key_sequence(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->press('Shift')
+            ->assertNotSeeIn('#keyboard-output', 'double shift')
+            ->visit('/javascript')
+            ->press('Shift', 'Shift')
+            ->assertSeeIn('#keyboard-output', 'double shift')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_press_a_key_on_the_focused_element(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->focus('#input')
+            ->press('a', 'b')
+            ->click('#submit')
+            ->assertSeeIn('#output', 'ab')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function pressing_enter_submits_a_form(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->fillField('input1', 'pressed')
+            ->press('Enter')
+            ->assertOn('/submit-form')
+            ->assertContains('"input_1":"pressed"')
         ;
     }
 

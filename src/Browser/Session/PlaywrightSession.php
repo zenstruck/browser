@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Browser\Session;
 use Zenstruck\Dom;
 use Zenstruck\Dom\Exception\RuntimeException;
+use Zenstruck\Dom\Modifier;
 use Zenstruck\Dom\Node;
 use Zenstruck\Dom\Node\Form\Field\Checkbox;
 use Zenstruck\Dom\Node\Form\Field\File;
@@ -113,32 +114,60 @@ final class PlaywrightSession extends Session implements RenderedSession
         }
     }
 
-    public function click(Node $node): void
+    public function click(Node $node, Modifier ...$modifiers): void
     {
         $this->downloadedContent = null;
 
-        $this->locatorFor($node)->click();
+        $this->locatorFor($node)->click(self::modifierOptions($modifiers));
         $this->page()->waitForLoadState();
     }
 
-    public function doubleClick(Node $node): void
+    public function doubleClick(Node $node, Modifier ...$modifiers): void
     {
         $this->downloadedContent = null;
 
         $before = $this->page()->url();
 
-        $this->locatorFor($node)->dblclick();
+        $this->locatorFor($node)->dblclick(self::modifierOptions($modifiers));
 
         $this->awaitPossibleNavigation($before);
     }
 
-    public function rightClick(Node $node): void
+    public function rightClick(Node $node, Modifier ...$modifiers): void
     {
         $this->downloadedContent = null;
 
         $before = $this->page()->url();
 
-        $this->locatorFor($node)->click(['button' => 'right']);
+        $this->locatorFor($node)->click(['button' => 'right', ...self::modifierOptions($modifiers)]);
+
+        $this->awaitPossibleNavigation($before);
+    }
+
+    public function hover(Node $node, Modifier ...$modifiers): void
+    {
+        $this->locatorFor($node)->hover(self::modifierOptions($modifiers));
+    }
+
+    public function focus(Node $node): void
+    {
+        $this->locatorFor($node)->focus();
+    }
+
+    public function blur(Node $node): void
+    {
+        $this->locatorFor($node)->blur();
+    }
+
+    public function press(string ...$keys): void
+    {
+        $this->downloadedContent = null;
+
+        $before = $this->page()->url();
+
+        foreach ($keys as $key) {
+            $this->page()->keyboard()->press($key);
+        }
 
         $this->awaitPossibleNavigation($before);
     }
@@ -230,8 +259,8 @@ final class PlaywrightSession extends Session implements RenderedSession
     }
 
     /**
-     * A dblclick/contextmenu handler may navigate by assigning location, which Playwright does not
-     * wait for. Give that a brief chance to happen before reporting the page as settled.
+     * A dblclick/contextmenu handler or a key press may navigate, which Playwright does not wait
+     * for. Give that a brief chance to happen before reporting the page as settled.
      */
     private function awaitPossibleNavigation(string $before): void
     {
@@ -266,6 +295,20 @@ final class PlaywrightSession extends Session implements RenderedSession
     private function locatorFor(Node $node): LocatorInterface
     {
         return $this->page()->locator('xpath='.$node->element()->getNodePath());
+    }
+
+    /**
+     * @param Modifier[] $modifiers
+     *
+     * @return array{modifiers?: list<string>}
+     */
+    private static function modifierOptions(array $modifiers): array
+    {
+        if (!$modifiers) {
+            return [];
+        }
+
+        return ['modifiers' => \array_map(static fn(Modifier $modifier) => $modifier->value, \array_values($modifiers))];
     }
 
     private function response(): Response

@@ -11,6 +11,7 @@
     <p><a href="/exception">exception link</a></p>
     <p id="double-click-link"><a onclick="return false" ondblclick="location=this.href" href="/page2">Double Click</a></p>
     <p id="context-menu-link"><a onclick="return false" oncontextmenu="location=this.href" href="/page2">Right Click</a></p>
+    <p id="shift-click-link"><a onclick="if (event.shiftKey) location=this.href; return false" href="/page2">Shift Click</a></p>
     <ul>
         <li>list 1</li>
         <li>list 2</li>

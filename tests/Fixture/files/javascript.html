@@ -34,6 +34,26 @@
 <div class="stylesheet-hidden" id="stylesheet-box">Contents of stylesheet box</div>
 <hr>
 
+<style>
+    #hover-menu { display: none; }
+    #hover-target:hover #hover-menu { display: block; }
+</style>
+
+<h1>Hover Test</h1>
+<div id="hover-target">hover me<div id="hover-menu">Contents of hover menu</div></div>
+<div id="alt-hover-target" onmouseover="if (event.altKey) document.getElementById('alt-hover-output').textContent = 'alt hovered'">alt hover me</div>
+<div id="alt-hover-output"></div>
+<hr>
+
+<h1>Focus Test</h1>
+<input id="focus-input" type="text" onfocus="document.getElementById('focus-output').textContent = 'focused'" onblur="document.getElementById('focus-output').textContent = 'blurred'">
+<div id="focus-output"></div>
+<hr>
+
+<h1>Keyboard Test</h1>
+<div id="keyboard-output"></div>
+<hr>
+
 <h1>Timeout Test</h1>
 <div style="display: none" id="timeout-box">Contents of timeout box</div>
 <hr>
@@ -75,6 +95,23 @@
         });
         $('#throw-error').click(function() {
             throw new Error('error object message');
+        });
+
+        var lastShift = 0;
+        $(document).on('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && '/' === e.key) {
+                $('#keyboard-output').text('search opened');
+            }
+
+            if ('Shift' !== e.key) {
+                return;
+            }
+
+            if (Date.now() - lastShift < 500) {
+                $('#keyboard-output').text('double shift');
+            }
+
+            lastShift = Date.now();
         });
     });
 </script>
