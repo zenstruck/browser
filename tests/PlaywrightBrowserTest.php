@@ -178,6 +178,9 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
+    /**
+     * @test
+     */
     #[Test]
     public function can_save_console_log(): void
     {
