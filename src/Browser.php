@@ -36,8 +36,10 @@ use Zenstruck\Dom\Node\Form\Field\Checkbox;
 use Zenstruck\Dom\Node\Form\Field\File;
 use Zenstruck\Dom\Node\Form\Field\Input;
 use Zenstruck\Dom\Node\Form\Field\Radio;
+use Zenstruck\Dom\Node\Form\Field\Select;
 use Zenstruck\Dom\Node\Form\Field\Select\Combobox;
 use Zenstruck\Dom\Node\Form\Field\Select\Multiselect;
+use Zenstruck\Dom\Node\Form\Field\Select\Option;
 use Zenstruck\Dom\Node\Form\Field\Textarea;
 use Zenstruck\Dom\Selector;
 use Zenstruck\Foundry\Factory;
@@ -313,7 +315,7 @@ abstract class Browser
             throw new RuntimeException(\sprintf('Node with selector "%s" is not a fillable form field.', Selector::wrap($selector)));
         }
 
-        $field->fill($value);
+        $this->session->fill($field, $value);
 
         return $this;
     }
@@ -327,11 +329,11 @@ abstract class Browser
     {
         $field = $this->field($selector);
 
-        match ($field::class) {
-            Radio::class => $field->select(),
-            Checkbox::class => $field->check(),
-            default => throw new RuntimeException(\sprintf('Node with selector "%s" is not a checkable form field.', Selector::wrap($selector))),
-        };
+        if (!$field instanceof Radio && !$field instanceof Checkbox) {
+            throw new RuntimeException(\sprintf('Node with selector "%s" is not a checkable form field.', Selector::wrap($selector)));
+        }
+
+        $this->session->select($field);
 
         return $this;
     }
@@ -343,7 +345,7 @@ abstract class Browser
      */
     final public function uncheckField(Selector|string|callable $selector): self
     {
-        $this->field($selector)->ensure(Checkbox::class)->uncheck();
+        $this->session->unselect($this->field($selector)->ensure(Checkbox::class));
 
         return $this;
     }
@@ -363,13 +365,13 @@ abstract class Browser
         $field = $this->field($selector);
 
         if ($field instanceof Checkbox) {
-            $field->check();
+            $this->session->select($field);
 
             return $this;
         }
 
         if ($field instanceof Radio && !\is_array($value)) {
-            $field->select($value);
+            $this->session->select($value ? self::radio($field, $value) : $field);
 
             return $this;
         }
@@ -379,15 +381,22 @@ abstract class Browser
         }
 
         if ($field instanceof Combobox) {
-            $field->select((string) $value);
+            $this->session->select(self::option($field, (string) $value));
 
             return $this;
         }
 
-        $value = (array) $value;
         $field = $field->ensure(Multiselect::class);
 
-        $value ? $field->select($value) : $field->deselectAll();
+        if (!$value) {
+            $this->session->unselect($field);
+
+            return $this;
+        }
+
+        foreach ((array) $value as $option) {
+            $this->session->select(self::option($field, $option));
+        }
 
         return $this;
     }
@@ -422,7 +431,20 @@ abstract class Browser
      */
     final public function attachFile(Selector|string|callable $selector, array|string $filename): self
     {
-        $this->field($selector)->ensure(File::class)->attach(...(array) $filename);
+        $field = $this->field($selector)->ensure(File::class);
+        $filenames = \array_map(\strval(...), (array) $filename);
+
+        if (\count($filenames) > 1 && !$field->isMultiple()) {
+            throw new \InvalidArgumentException('Cannot attach multiple files to a non-multiple file input.');
+        }
+
+        foreach ($filenames as $file) {
+            if (!\file_exists($file)) {
+                throw new \InvalidArgumentException(\sprintf('File "%s" does not exist.', $file));
+            }
+        }
+
+        $this->session->attach($field, $filenames);
 
         return $this;
     }
@@ -442,7 +464,7 @@ abstract class Browser
 
         Assert::true($node->isVisible(), 'Clickable element "%s" is not visible.', [$selector]);
 
-        return $this->wrapRequest(static fn() => $node->click());
+        return $this->wrapRequest(fn() => $this->session->click($node));
     }
 
     /**
@@ -1121,5 +1143,15 @@ abstract class Browser
     private function field(Selector|string|callable $selector): Field
     {
         return $this->dom()->findOrFail(Selector::field($selector))->ensure(Field::class);
+    }
+
+    private static function radio(Radio $field, string $value): Radio
+    {
+        return $field->withValue($value) ?? throw new RuntimeException(\sprintf('Could not find radio with value "%s".', $value));
+    }
+
+    private static function option(Select $field, string $value): Option
+    {
+        return $field->optionMatching($value) ?? throw new RuntimeException(\sprintf('Could not find option with value/text "%s".', $value));
     }
 }

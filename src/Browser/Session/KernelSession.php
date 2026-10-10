@@ -190,6 +190,16 @@ final class KernelSession extends Session
         $this->formFieldFor($node)->setValue($value);
     }
 
+    public function text(Node $node): ?string
+    {
+        return null;
+    }
+
+    public function isVisible(Node $node): ?bool
+    {
+        return null;
+    }
+
     public function value(Input|Textarea $node): ?string
     {
         $value = $this->formFieldFor($node)->getValue();

@@ -16,10 +16,10 @@ use Playwright\Locator\LocatorInterface;
 use Playwright\Page\PageInterface;
 use Playwright\Symfony\Client\PlaywrightKernelClient;
 use Symfony\Component\HttpFoundation\Response;
+use Zenstruck\Browser\Modifier;
 use Zenstruck\Browser\Session;
 use Zenstruck\Dom;
 use Zenstruck\Dom\Exception\RuntimeException;
-use Zenstruck\Dom\Modifier;
 use Zenstruck\Dom\Node;
 use Zenstruck\Dom\Node\Form\Field\Checkbox;
 use Zenstruck\Dom\Node\Form\Field\File;
@@ -29,7 +29,6 @@ use Zenstruck\Dom\Node\Form\Field\Select\Combobox;
 use Zenstruck\Dom\Node\Form\Field\Select\Multiselect;
 use Zenstruck\Dom\Node\Form\Field\Select\Option;
 use Zenstruck\Dom\Node\Form\Field\Textarea;
-use Zenstruck\Dom\RenderedSession;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -38,7 +37,7 @@ use Zenstruck\Dom\RenderedSession;
  *
  * @method PlaywrightKernelClient client()
  */
-final class PlaywrightSession extends Session implements RenderedSession
+final class PlaywrightSession extends Session
 {
     private ?string $downloadedContent = null;
 
@@ -210,13 +209,7 @@ final class PlaywrightSession extends Session implements RenderedSession
 
     public function attach(File $node, array $filenames): void
     {
-        $locator = $this->locatorFor($node);
-
-        if (\count($filenames) > 1 && null === $locator->getAttribute('multiple')) {
-            throw new \InvalidArgumentException('Cannot attach multiple files to a non-multiple file field.');
-        }
-
-        $locator->setInputFiles(\array_values($filenames));
+        $this->locatorFor($node)->setInputFiles(\array_values($filenames));
     }
 
     public function fill(Textarea|Input $node, string $value): void
