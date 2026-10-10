@@ -27,6 +27,7 @@ abstract class Driver extends CoreDriver
 {
     /** @var AbstractBrowser<Request, Response> */
     private AbstractBrowser $client;
+    private AutoWait $autoWait;
     private bool $started = false;
 
     /** @var mixed */
@@ -41,6 +42,20 @@ abstract class Driver extends CoreDriver
     public function __construct(AbstractBrowser $client)
     {
         $this->client = $client;
+        $this->autoWait = new AutoWait();
+    }
+
+    final public function autoWait(): AutoWait
+    {
+        return $this->autoWait;
+    }
+
+    /**
+     * @param int $timeout milliseconds, 0 or less to disable
+     */
+    final public function setAutoWaitTimeout(int $timeout): void
+    {
+        $this->autoWait = new AutoWait($timeout);
     }
 
     /**

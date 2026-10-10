@@ -22,6 +22,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Assert as ZenstruckAssert;
 use Zenstruck\Browser\Session\Assert;
+use Zenstruck\Browser\Session\AutoWait;
 use Zenstruck\Browser\Session\Driver;
 
 /**
@@ -58,7 +59,12 @@ final class Session extends MinkSession
     {
         $this->ensureNoException();
 
-        return new Assert(new WebAssert($this));
+        return new Assert(new WebAssert($this), $this->autoWait());
+    }
+
+    public function autoWait(): AutoWait
+    {
+        return $this->getDriver()->autoWait();
     }
 
     public function page(): DocumentElement

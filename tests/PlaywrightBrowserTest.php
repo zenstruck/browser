@@ -15,6 +15,7 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Assert;
 use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Browser\Test\LegacyExtension;
@@ -147,6 +148,135 @@ class PlaywrightBrowserTest extends KernelTestCase
             ->waitUntilNotSeeIn('#output', 'some text')
             ->assertNotSeeIn('#output', 'some text')
         ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function actions_wait_for_elements_that_are_not_there_yet(): void
+    {
+        // #late-button and #late-input only appear 500ms after load
+        $this->browser()
+            ->visit('/javascript')
+            ->fillField('late-input', 'typed')
+            ->click('late button')
+            ->assertSeeIn('#output', 'late clicked')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function assertions_wait_for_elements_that_are_not_there_yet(): void
+    {
+        $this->browser()
+            ->visit('/javascript')
+            ->assertSeeElement('#late-button')
+            ->assertSee('late button')
+            ->assertElementCount('#late-button', 1)
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function negative_assertions_wait_for_the_element_to_go_away(): void
+    {
+        // #doomed is removed 500ms after load
+        $this->browser()
+            ->visit('/javascript')
+            ->assertNotSeeElement('#doomed')
+            ->assertNotSee('Contents of doomed box')
+        ;
+    }
+
+    /**
+     * A "not" assertion that already holds must not sit through the timeout waiting for something
+     * that was never going to appear.
+     *
+     * @test
+     */
+    #[Test]
+    public function negative_assertions_that_already_hold_return_immediately(): void
+    {
+        $_SERVER['BROWSER_DEFAULT_TIMEOUT'] = '5000';
+
+        try {
+            $start = \hrtime(true);
+
+            $this->browser()
+                ->visit('/javascript')
+                ->assertNotSeeElement('#never-exists')
+                ->assertElementCount('#never-exists', 0)
+            ;
+
+            $this->assertLessThan(2.0, (\hrtime(true) - $start) / 1e9);
+        } finally {
+            unset($_SERVER['BROWSER_DEFAULT_TIMEOUT']);
+        }
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function the_timeout_can_be_changed_at_runtime(): void
+    {
+        $browser = $this->browser()
+            ->visit('/javascript')
+            // the element needs 500ms, so a 100ms budget must give up before it arrives
+            ->timeout(100)
+        ;
+
+        Assert::that(static fn() => $browser->assertSeeElement('#late-button'))
+            ->throws(AssertionFailedError::class)
+        ;
+
+        $browser
+            ->timeout(5000)
+            ->assertSeeElement('#late-button')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function the_timeout_cannot_be_zero_or_negative(): void
+    {
+        $browser = $this->browser();
+
+        Assert::that(static fn() => $browser->timeout(0))
+            ->throws(\InvalidArgumentException::class, 'Timeout must be a positive number of milliseconds, "0" given.')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function the_auto_wait_timeout_is_configurable(): void
+    {
+        $_SERVER['BROWSER_DEFAULT_TIMEOUT'] = '250';
+
+        try {
+            $browser = $this->browser()->visit('/javascript');
+
+            // time the assertion alone, navigation is not part of the budget under test
+            $start = \hrtime(true);
+
+            Assert::that(static fn() => $browser->assertSeeElement('#late-button'))
+                ->throws(AssertionFailedError::class)
+            ;
+
+            // the element needs 500ms: a 250ms budget must give up before it arrives
+            $this->assertLessThan(0.5, (\hrtime(true) - $start) / 1e9);
+        } finally {
+            unset($_SERVER['BROWSER_DEFAULT_TIMEOUT']);
+        }
     }
 
     /**

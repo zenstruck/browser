@@ -30,6 +30,11 @@
 <div style="display: none" id="timeout-box">Contents of timeout box</div>
 <hr>
 
+<h1>Auto Wait Test</h1>
+<div id="late-host"></div>
+<div id="doomed">Contents of doomed box</div>
+<hr>
+
 <h1>Console Log Test</h1>
 <button id="log-error">log error</button>
 <button id="throw-error">throw error</button>
@@ -51,6 +56,15 @@
 
         window.setTimeout(function() {
             $('#timeout-box').show();
+        }, 500);
+
+        window.setTimeout(function() {
+            $('#late-host').append(
+                $('<button>').attr('id', 'late-button').text('late button')
+                    .click(function() { $('#output').text('late clicked'); }),
+                $('<input type="text">').attr('id', 'late-input')
+            );
+            $('#doomed').remove();
         }, 500);
 
         $('#show').click(function() {
