@@ -14,11 +14,13 @@ namespace Zenstruck;
 use Behat\Mink\Element\NodeElement;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -43,6 +45,8 @@ abstract class Browser
 
     /** @var string[] */
     private array $savedSources = [];
+
+    private ?SessionInterface $httpSession = null;
 
     /**
      * @internal
@@ -478,7 +482,7 @@ abstract class Browser
             Parameter::union(...$this->useParameters()),
         );
 
-        $this->afterUse();
+        $this->flushHttpSession();
 
         return $this;
     }
@@ -854,6 +858,7 @@ abstract class Browser
             Parameter::typed(CookieJar::class, Parameter::factory(fn() => $this->cookieJar())),
             Parameter::typed(AbstractBrowser::class, Parameter::factory(fn() => $this->client())),
             Parameter::typed(ContainerInterface::class, Parameter::factory(fn() => $this->container())),
+            Parameter::typed(SessionInterface::class, Parameter::factory(fn() => $this->httpSession())),
             Parameter::typed(DataCollectorInterface::class, Parameter::factory(function(string $class) {
                 foreach ($this->profile()->getCollectors() as $collector) {
                     if ($class === $collector::class) {
@@ -866,18 +871,51 @@ abstract class Browser
         ];
     }
 
-    /**
-     * Called after a {@see use()} callback has run, to flush anything it was handed.
-     *
-     * @internal
-     */
-    protected function afterUse(): void
-    {
-    }
-
     private function container(): ?ContainerInterface
     {
         return \method_exists($this->client(), 'getContainer') ? $this->client()->getContainer() : null;
+    }
+
+    /**
+     * The session the next request will use, loaded from the session cookie if there is one.
+     *
+     * It is saved, and its cookie written, once the {@see use()} callback returns.
+     */
+    private function httpSession(): SessionInterface
+    {
+        if (null !== $this->httpSession) {
+            return $this->httpSession;
+        }
+
+        $container = $this->container();
+
+        if (!$container?->has('session.factory')) {
+            throw new \LogicException('Sessions are not available/enabled.');
+        }
+
+        $session = $container->get('session.factory')->createSession();
+
+        if (null !== $cookie = $this->cookieJar()->get($session->getName())) {
+            $session->setId($cookie->getValue());
+        }
+
+        $session->start();
+
+        return $this->httpSession = $session;
+    }
+
+    private function flushHttpSession(): void
+    {
+        if (null === $session = $this->httpSession) {
+            return;
+        }
+
+        $this->httpSession = null;
+
+        $session->save();
+
+        // no domain: the jar then scopes it to whatever host the browser visits
+        $this->cookieJar()->set(new Cookie($session->getName(), $session->getId()));
     }
 
     private function securityToken(): ?TokenInterface
