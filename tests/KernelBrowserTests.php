@@ -13,6 +13,7 @@ namespace Zenstruck\Browser\Tests;
 
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\Json;
 use Zenstruck\Browser\KernelBrowser;
@@ -24,6 +25,21 @@ use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
 trait KernelBrowserTests
 {
     use BrowserTests;
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function session_started_by_the_test_is_available_on_any_host(): void
+    {
+        $this->browser()
+            ->use(static function(SessionInterface $session) {
+                $session->set('key', 'no domain on the cookie');
+            })
+            ->visit('http://example.test/read-session')
+            ->assertContains('no domain on the cookie')
+        ;
+    }
 
     /**
      * @test

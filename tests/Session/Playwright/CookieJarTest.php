@@ -35,7 +35,7 @@ final class CookieJarTest extends TestCase
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage($method.'() is not supported by the real browser.');
 
-        $call(new CookieJar($this->createStub(PageInterface::class)));
+        $call(new CookieJar($this->createStub(PageInterface::class), 'http://localhost'));
     }
 
     public static function unsupportedMethodProvider(): iterable

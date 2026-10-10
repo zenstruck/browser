@@ -20,6 +20,7 @@ use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -40,6 +41,103 @@ trait BrowserTests
 {
     use HasBrowser {
         browser as kernelBrowser;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_write_to_the_session_before_making_a_request(): void
+    {
+        $this->browser()
+            ->use(static function(SessionInterface $session) {
+                $session->set('key', 'set by the test');
+            })
+            ->visit('/read-session')
+            ->assertContains('set by the test')
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function reading_the_session_before_making_a_request_does_not_start_one(): void
+    {
+        $this->browser()
+            ->use(function(SessionInterface $session) {
+                $this->assertNull($session->get('key'));
+            })
+            ->use(function(CookieJar $jar) {
+                $this->assertNull($jar->get('MOCKSESSID'));
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_read_the_session_written_by_the_application(): void
+    {
+        $this->browser()
+            ->visit('/page1?start-session=1')
+            ->use(function(SessionInterface $session) {
+                $this->assertSame('value', $session->get('key'));
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function session_written_by_the_test_is_visible_to_the_application_and_back(): void
+    {
+        $this->browser()
+            ->visit('/page1?start-session=1')
+            ->use(function(SessionInterface $session) {
+                $this->assertSame('value', $session->get('key'));
+
+                $session->set('key', 'overwritten');
+            })
+            ->visit('/read-session')
+            ->assertContains('overwritten')
+            ->use(function(SessionInterface $session) {
+                $this->assertSame('overwritten', $session->get('key'));
+            })
+        ;
+    }
+
+    /**
+     * The session id must not change when the test only reads or updates it, otherwise
+     * anything the application had stored under the previous id would be dropped.
+     *
+     * @test
+     */
+    #[Test]
+    public function using_the_session_keeps_the_existing_session_cookie(): void
+    {
+        $id = null;
+
+        $this->browser()
+            ->visit('/page1?start-session=1')
+            ->use(function(CookieJar $jar) use (&$id) {
+                $id = $jar->get('MOCKSESSID')?->getValue();
+
+                $this->assertNotNull($id);
+            })
+            ->use(function(SessionInterface $session) use (&$id) {
+                $this->assertSame($id, $session->getId());
+
+                $session->set('key', 'still the same session');
+            })
+            ->use(function(CookieJar $jar) use (&$id) {
+                $this->assertSame($id, $jar->get('MOCKSESSID')?->getValue());
+            })
+            ->visit('/read-session')
+            ->assertContains('still the same session')
+        ;
     }
 
     /**
