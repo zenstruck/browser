@@ -615,6 +615,7 @@ $browser
 
     // press keys on whatever has focus (see https://playwright.dev/docs/api/class-keyboard#keyboard-press)
     ->press('ControlOrMeta+/')          // hold keys together with "+"
+    ->press(Modifier::ControlOrMeta->plus('/')) // or build the combination from a modifier
     ->press('Shift', 'Shift')           // or press them one after another
     ->fillField('Search', 'foo')
     ->press('Enter')                    // the filled field has focus

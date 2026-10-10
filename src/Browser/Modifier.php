@@ -12,7 +12,7 @@
 namespace Zenstruck\Browser;
 
 /**
- * A key held down during a click.
+ * A key held down during a click or key press.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -41,5 +41,15 @@ enum Modifier: string
         $cases = \array_combine(\array_map('strtolower', $values), self::cases());
 
         return $cases[\mb_strtolower($modifier)] ?? throw new \InvalidArgumentException(\sprintf('Invalid modifier "%s", expected one of "%s".', $modifier, \implode('", "', $values)));
+    }
+
+    /**
+     * A key combination for {@see PlaywrightBrowser::press()}, e.g. "Shift+Enter".
+     */
+    public function plus(self|string $key, self|string ...$keys): string
+    {
+        $keys = \array_map(static fn(self|string $key) => $key instanceof self ? $key->value : $key, [$key, ...$keys]);
+
+        return \implode('+', [$this->value, ...$keys]);
     }
 }

@@ -53,4 +53,22 @@ final class ModifierTest extends TestCase
 
         Modifier::normalize('ctrl');
     }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function plus_a_key(): void
+    {
+        $this->assertSame('Shift+Enter', Modifier::Shift->plus('Enter'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function plus_another_modifier_and_a_key(): void
+    {
+        $this->assertSame('Control+Shift+Tab', Modifier::Control->plus(Modifier::Shift, 'Tab'));
+    }
 }
