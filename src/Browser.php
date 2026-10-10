@@ -201,7 +201,7 @@ abstract class Browser
      */
     final public function assertSee(string $expected): self
     {
-        Assert::that($this->visibleText('html'))->contains($expected, strict: false);
+        $this->dom()->assert()->contains($expected);
 
         return $this;
     }
@@ -211,7 +211,7 @@ abstract class Browser
      */
     final public function assertNotSee(string $expected): self
     {
-        Assert::that($this->visibleText('html'))->doesNotContain($expected, strict: false);
+        $this->dom()->assert()->doesNotContain($expected);
 
         return $this;
     }
@@ -223,7 +223,7 @@ abstract class Browser
      */
     final public function assertSeeIn(Selector|string|callable $selector, string $expected): self
     {
-        Assert::that($this->visibleText($selector))->contains($expected, strict: false);
+        $this->dom()->assert()->containsIn($selector, $expected);
 
         return $this;
     }
@@ -235,7 +235,7 @@ abstract class Browser
      */
     final public function assertNotSeeIn(Selector|string|callable $selector, string $expected): self
     {
-        Assert::that($this->visibleText($selector))->doesNotContain($expected, strict: false);
+        $this->dom()->assert()->doesNotContainIn($selector, $expected);
 
         return $this;
     }
@@ -1114,16 +1114,6 @@ abstract class Browser
     private static function failWithException(string $class, string $message): void
     {
         Assert::fail('The last request threw an exception: %s - %s', [$class, $message]);
-    }
-
-    /**
-     * @param SelectorType $selector
-     */
-    private function visibleText(Selector|string|callable $selector): ?string
-    {
-        $text = $this->dom()->findAll($selector)->map(fn(Dom\Node $node) => $this->session->text($node));
-
-        return \implode(' ', $text) ?: null;
     }
 
     private function field(Selector|string|callable $selector): Field

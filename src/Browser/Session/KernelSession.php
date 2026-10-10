@@ -190,6 +190,32 @@ final class KernelSession extends Session
         $this->formFieldFor($node)->setValue($value);
     }
 
+    public function value(Input|Textarea $node): ?string
+    {
+        $value = $this->formFieldFor($node)->getValue();
+
+        return \is_string($value) ? $value : null;
+    }
+
+    public function isSelected(Checkbox|Radio|Option $node): bool
+    {
+        if ($node instanceof Option) {
+            $select = $node->selector() ?? throw new RuntimeException('Could not find "select" for "option".');
+
+            return \in_array($node->value(), (array) $this->formFieldFor($select)->getValue(), true);
+        }
+
+        $field = $this->formFieldFor($node);
+
+        \assert($field instanceof ChoiceFormField);
+
+        if ($node instanceof Checkbox) {
+            return null !== $field->getValue();
+        }
+
+        return $node->value() === $field->getValue();
+    }
+
     private function ensureSameSession(): void
     {
         if (!$this->isSameSession()) {

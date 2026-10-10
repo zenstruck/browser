@@ -55,13 +55,6 @@ abstract class Session implements DomSession
 
     abstract public function currentUrl(): string;
 
-    /**
-     * The node's text as a user sees it: a real browser reports what is rendered, not the markup.
-     */
-    public function text(Dom\Node $node): string
-    {
-        return $node->text();
-    }
 
     abstract public function statusCode(): int;
 

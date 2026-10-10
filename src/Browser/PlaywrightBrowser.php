@@ -70,9 +70,11 @@ class PlaywrightBrowser extends Browser
     /**
      * @return static
      */
-    final public function assertVisible(string $selector): self
+    final public function assertVisible(Selector|string|callable $selector): self
     {
-        Assert::true($this->session->isVisible($selector), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
+        $node = $this->dom()->findOrFail($selector);
+
+        Assert::true($node->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
 
         return $this;
     }
@@ -80,9 +82,17 @@ class PlaywrightBrowser extends Browser
     /**
      * @return static
      */
-    final public function assertNotVisible(string $selector): self
+    final public function assertNotVisible(Selector|string|callable $selector): self
     {
-        Assert::false($this->session->isVisible($selector), 'Expected element "%s" to not be visible but it is.', [$selector]);
+        $node = $this->dom()->find($selector);
+
+        if (!$node) {
+            Assert::pass();
+
+            return $this;
+        }
+
+        Assert::false($node->isVisible(), 'Expected element "%s" to not be visible but it is.', [$selector]);
 
         return $this;
     }
