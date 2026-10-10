@@ -55,7 +55,6 @@ abstract class Session implements DomSession
 
     abstract public function currentUrl(): string;
 
-
     abstract public function statusCode(): int;
 
     abstract public function isStarted(): bool;
