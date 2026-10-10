@@ -237,14 +237,17 @@ final class PlaywrightSession extends Session
         return \array_values(\array_filter((array) $this->locatorFor($node)->evaluate('el => Array.from(el.selectedOptions, o => o.index)'), 'is_int'));
     }
 
-    public function text(Node $node): string
+    public function text(Node $node): ?string
     {
+        // neither is ever rendered on its own, yet both carry text the caller is asking about. The
+        // markup is a snapshot of the live page, so it is current and saves a round trip per option
+        if ($node instanceof Option || 'title' === \mb_strtolower($node->tag())) {
+            return null;
+        }
+
         // innerText falls back to textContent for elements that are not rendered, but a user only
-        // sees what is visible. <title> and <option> are the exceptions: neither is ever rendered
-        // on its own, yet both carry text the caller is asking about
-        return (string) $this->locatorFor($node)->evaluate(
-            "el => ['TITLE', 'OPTION'].includes(el.tagName) ? el.textContent : (el.checkVisibility() ? el.innerText : '')",
-        );
+        // sees what is visible
+        return (string) $this->locatorFor($node)->evaluate("el => el.checkVisibility() ? el.innerText : ''");
     }
 
     public function isVisible(Node $node): bool

@@ -203,17 +203,25 @@ final class KernelSession extends Session
 
     public function value(Input|Textarea $node): ?string
     {
-        $value = $this->formFieldFor($node)->getValue();
+        $value = $this->tracksField($node) ? $this->formFieldFor($node)->getValue() : null;
 
         return \is_string($value) ? $value : null;
     }
 
-    public function isSelected(Checkbox|Radio|Option $node): bool
+    public function isSelected(Checkbox|Radio|Option $node): ?bool
     {
         if ($node instanceof Option) {
-            $select = $node->selector() ?? throw new RuntimeException('Could not find "select" for "option".');
+            $select = $node->selector();
+
+            if (!$select || !$this->tracksField($select)) {
+                return null;
+            }
 
             return \in_array($node->value(), (array) $this->formFieldFor($select)->getValue(), true);
+        }
+
+        if (!$this->tracksField($node)) {
+            return null;
         }
 
         $field = $this->formFieldFor($node);
@@ -260,6 +268,18 @@ final class KernelSession extends Session
         } catch (BadMethodCallException) {
             throw new RuntimeException('The session has not yet been started.');
         }
+    }
+
+    /**
+     * Only fields of a form carry state beyond the markup; for anything else, dom reads the markup.
+     */
+    private function tracksField(Field $node): bool
+    {
+        if (!$node->form() || !$name = $node->name()) {
+            return false;
+        }
+
+        return $this->formFor($node)->has(\str_replace('[]', '', $name));
     }
 
     private function formFieldFor(Field $node): FormField
