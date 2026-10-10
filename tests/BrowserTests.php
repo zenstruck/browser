@@ -62,6 +62,22 @@ trait BrowserTests
      * @test
      */
     #[Test]
+    public function reading_the_session_before_making_a_request_does_not_start_one(): void
+    {
+        $this->browser()
+            ->use(function(SessionInterface $session) {
+                $this->assertNull($session->get('key'));
+            })
+            ->use(function(CookieJar $jar) {
+                $this->assertNull($jar->get('MOCKSESSID'));
+            })
+        ;
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function can_read_the_session_written_by_the_application(): void
     {
         $this->browser()

@@ -20,6 +20,7 @@ use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session as HttpSession;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
@@ -911,8 +912,18 @@ abstract class Browser
         }
 
         $this->httpSession = null;
+        $cookie = $this->cookieJar()->get($session->getName());
+
+        // only reading must not start a session the app would then see
+        if (null === $cookie && $session instanceof HttpSession && $session->isEmpty()) {
+            return;
+        }
 
         $session->save();
+
+        if ($cookie?->getValue() === $session->getId()) {
+            return;
+        }
 
         // no domain: the jar then scopes it to whatever host the browser visits
         $this->cookieJar()->set(new Cookie($session->getName(), $session->getId()));
