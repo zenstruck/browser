@@ -34,6 +34,7 @@ use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
 use Zenstruck\Callback\Exception\UnresolveableArgument;
 use Zenstruck\Dom;
+use Zenstruck\Dom\Exception\RuntimeException;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -1100,6 +1101,42 @@ trait BrowserTests
             ->assertContains('"input_4":"option 2"')
             ->assertContains('"input_6":["option 1","option 3"]')
             ->assertContains('"input_8":"option 3"')
+        ;
+    }
+
+    #[Test]
+    public function select_field_checks_checkboxes_by_value(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->selectField('input_12[]', 'b')
+            ->assertNotChecked('#input12a')
+            ->assertChecked('#input12b')
+            ->selectField('input_12[]', ['a', 'c'])
+            ->click('Submit')
+            ->assertOn('/submit-form')
+            ->assertContains('"input_12":["a","b","c"]')
+        ;
+    }
+
+    #[Test]
+    public function cannot_select_missing_checkbox_value(): void
+    {
+        $browser = $this->browser()->visit('/page1');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not find checkbox with value "missing".');
+
+        $browser->selectField('input_12[]', 'missing');
+    }
+
+    #[Test]
+    public function can_assert_fields_outside_a_form(): void
+    {
+        $this->browser()
+            ->visit('/page1')
+            ->assertFieldEquals('standalone_text', 'standalone value')
+            ->assertChecked('standalone_checkbox')
         ;
     }
 

@@ -364,8 +364,16 @@ abstract class Browser
     {
         $field = $this->field($selector);
 
-        if ($field instanceof Checkbox) {
+        if ($field instanceof Checkbox && null === $value) {
             $this->session->select($field);
+
+            return $this;
+        }
+
+        if ($field instanceof Checkbox) {
+            foreach ((array) $value as $checkbox) {
+                $this->session->select(self::checkbox($field, $checkbox));
+            }
 
             return $this;
         }
@@ -1143,6 +1151,18 @@ abstract class Browser
     private function field(Selector|string|callable $selector): Field
     {
         return $this->dom()->findOrFail(Selector::field($selector))->ensure(Field::class);
+    }
+
+    private static function checkbox(Checkbox $field, string $value): Checkbox
+    {
+        foreach ($field->collection() as $checkbox) {
+            // not Checkbox::value(), which is null while unchecked
+            if ($checkbox instanceof Checkbox && $value === ($checkbox->attr('value') ?? 'on')) {
+                return $checkbox;
+            }
+        }
+
+        throw new RuntimeException(\sprintf('Could not find checkbox with value "%s".', $value));
     }
 
     private static function radio(Radio $field, string $value): Radio
