@@ -293,9 +293,8 @@ final class KernelSession extends Session
         $this->ensureSameSession();
 
         $form = $node->form() ?? throw new RuntimeException(\sprintf('Unable to find form for "%s".', $node::class));
-        $element = $form->element();
-        $id = \md5($element->getLineNo().$element->getNodePath().$element->nodeValue);
 
-        return $this->forms[$id] ??= $form->crawler()->form();
+        // forms are reset with each response, so the path is unique among them
+        return $this->forms[$form->element()->getNodePath()] ??= $form->crawler()->form();
     }
 }
