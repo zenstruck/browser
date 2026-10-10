@@ -19,6 +19,7 @@ use Zenstruck\Browser\Json;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Tests\Fixture\CustomHttpOptions;
 use Zenstruck\Dom;
+use Zenstruck\Dom\Exception\RuntimeException;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,6 +27,17 @@ use Zenstruck\Dom;
 trait KernelBrowserTests
 {
     use BrowserTests;
+
+    #[Test]
+    public function cannot_click_elements_only_javascript_handles(): void
+    {
+        $browser = $this->browser()->visit('/page1');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Cannot click "summary": without a real browser, only links and form buttons can be clicked. Use a PlaywrightBrowser to click anything else.');
+
+        $browser->click('summary');
+    }
 
     #[Test]
     public function click_with_complex_callback_filter(): void
