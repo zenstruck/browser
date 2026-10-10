@@ -1131,6 +1131,17 @@ trait BrowserTests
     }
 
     #[Test]
+    public function cannot_select_missing_radio_value(): void
+    {
+        $browser = $this->browser()->visit('/page1');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not find radio with value "missing".');
+
+        $browser->selectField('input_8', 'missing');
+    }
+
+    #[Test]
     public function can_assert_fields_outside_a_form(): void
     {
         $this->browser()

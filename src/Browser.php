@@ -372,14 +372,14 @@ abstract class Browser
 
         if ($field instanceof Checkbox) {
             foreach ((array) $value as $checkbox) {
-                $this->session->select(self::checkbox($field, $checkbox));
+                $this->session->select(self::memberWithValue($field, $checkbox));
             }
 
             return $this;
         }
 
         if ($field instanceof Radio && !\is_array($value)) {
-            $this->session->select($value ? self::radio($field, $value) : $field);
+            $this->session->select($value ? self::memberWithValue($field, $value) : $field);
 
             return $this;
         }
@@ -1153,21 +1153,23 @@ abstract class Browser
         return $this->dom()->findOrFail(Selector::field($selector))->ensure(Field::class);
     }
 
-    private static function checkbox(Checkbox $field, string $value): Checkbox
+    /**
+     * @template T of Checkbox|Radio
+     *
+     * @param T $field
+     *
+     * @return T
+     */
+    private static function memberWithValue(Checkbox|Radio $field, string $value): Checkbox|Radio
     {
-        foreach ($field->collection() as $checkbox) {
+        foreach ($field->collection() as $member) {
             // not Checkbox::value(), which is null while unchecked
-            if ($checkbox instanceof Checkbox && $value === ($checkbox->attr('value') ?? 'on')) {
-                return $checkbox;
+            if ($member instanceof $field && $value === ($member->attr('value') ?? 'on')) {
+                return $member;
             }
         }
 
-        throw new RuntimeException(\sprintf('Could not find checkbox with value "%s".', $value));
-    }
-
-    private static function radio(Radio $field, string $value): Radio
-    {
-        return $field->withValue($value) ?? throw new RuntimeException(\sprintf('Could not find radio with value "%s".', $value));
+        throw new RuntimeException(\sprintf('Could not find %s with value "%s".', $field instanceof Radio ? 'radio' : 'checkbox', $value));
     }
 
     private static function option(Select $field, string $value): Option
