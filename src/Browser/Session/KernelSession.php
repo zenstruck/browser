@@ -30,6 +30,7 @@ use Zenstruck\Dom\Node\Form\Field\Checkbox;
 use Zenstruck\Dom\Node\Form\Field\File;
 use Zenstruck\Dom\Node\Form\Field\Input;
 use Zenstruck\Dom\Node\Form\Field\Radio;
+use Zenstruck\Dom\Node\Form\Field\Select;
 use Zenstruck\Dom\Node\Form\Field\Select\Combobox;
 use Zenstruck\Dom\Node\Form\Field\Select\Multiselect;
 use Zenstruck\Dom\Node\Form\Field\Select\Option;
@@ -224,6 +225,12 @@ final class KernelSession extends Session
         }
 
         return $node->value() === $field->getValue();
+    }
+
+    public function selectedIndexes(Select $node): ?array
+    {
+        // without a round trip to save, asking each option is as cheap
+        return null;
     }
 
     private function ensureSameSession(): void
