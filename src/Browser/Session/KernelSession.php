@@ -113,7 +113,7 @@ final class KernelSession extends Session
         }
 
         if (!$node instanceof Button) {
-            throw new RuntimeException(\sprintf('"%s" only supports clicking on "a" tags or buttons.', __CLASS__));
+            throw new RuntimeException(\sprintf('Cannot click "%s": without a real browser, only links and form buttons can be clicked. Use a PlaywrightBrowser to click anything else.', $node->tag()));
         }
 
         $form = $this->formFor($node);
