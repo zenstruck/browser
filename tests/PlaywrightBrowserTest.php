@@ -17,22 +17,17 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Browser\Modifier;
 use Zenstruck\Browser\PlaywrightBrowser;
+use Zenstruck\Browser\Test\ArtifactTracker;
 use Zenstruck\Browser\Test\HasBrowser;
-use Zenstruck\Browser\Test\LegacyExtension;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @group playwright
  */
 #[Group('playwright')]
 class PlaywrightBrowserTest extends KernelTestCase
 {
     use BrowserTests, HasBrowser;
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_playwright_browser_as_typehint(): void
     {
@@ -44,13 +39,10 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function extension_saves_a_screenshot_and_console_log_when_a_test_fails(): void
     {
-        $extension = new LegacyExtension();
+        $extension = new ArtifactTracker();
         $extension->executeBeforeFirstTest();
         $extension->executeBeforeTest('X::y');
 
@@ -63,9 +55,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         $this->assertFileExists(__DIR__.'/../var/browser/console-logs/error_X__y__0.log');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_take_screenshot(): void
     {
@@ -77,9 +66,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         });
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_wait(): void
     {
@@ -91,9 +77,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_wait_until_visible_and_not_visible(): void
     {
@@ -120,9 +103,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_wait_until_see_in_and_not_see_in(): void
     {
@@ -150,9 +130,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_check_if_element_is_visible_and_not_visible(): void
     {
@@ -164,9 +141,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function stylesheet_hidden_elements_are_not_visible(): void
     {
@@ -178,9 +152,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_save_console_log(): void
     {
@@ -196,9 +167,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         $this->assertStringContainsString('console.error message', $contents);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_dump_console_log_with_console_error(): void
     {
@@ -213,9 +181,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         $this->assertStringContainsString('console.error message', \json_encode($output, \JSON_THROW_ON_ERROR));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_dump_console_log_with_throw_error(): void
     {
@@ -232,9 +197,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         $this->assertStringContainsString('Error: error object message', \json_encode($output, \JSON_THROW_ON_ERROR));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function cannot_follow_invisible_link(): void
     {
@@ -247,9 +209,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_double_click_an_element(): void
     {
@@ -267,9 +226,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function context_menu_on_element(): void
     {
@@ -287,9 +243,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function click_with_modifiers(): void
     {
@@ -305,9 +258,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_hover_an_element(): void
     {
@@ -319,9 +269,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_hover_with_modifiers(): void
     {
@@ -335,9 +282,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_focus_and_blur_an_element(): void
     {
@@ -351,9 +295,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_press_a_key_combination(): void
     {
@@ -366,9 +307,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_press_a_key_combination_built_from_a_modifier(): void
     {
@@ -379,9 +317,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_press_a_key_sequence(): void
     {
@@ -395,9 +330,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_press_a_key_on_the_focused_element(): void
     {
@@ -410,9 +342,6 @@ class PlaywrightBrowserTest extends KernelTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function pressing_enter_submits_a_form(): void
     {

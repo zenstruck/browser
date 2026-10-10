@@ -27,9 +27,6 @@ trait KernelBrowserTests
 {
     use BrowserTests;
 
-    /**
-     * @test
-     */
     #[Test]
     public function click_with_complex_callback_filter(): void
     {
@@ -48,9 +45,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function session_started_by_the_test_is_available_on_any_host(): void
     {
@@ -63,9 +57,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_kernel_browser_as_typehint(): void
     {
@@ -77,9 +68,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function reboots_the_kernel_between_requests_by_default(): void
     {
@@ -97,9 +85,6 @@ trait KernelBrowserTests
         $this->assertNotSame($containers[0], $containers[1]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_disable_reboot(): void
     {
@@ -117,9 +102,6 @@ trait KernelBrowserTests
         $this->assertSame($containers[0], $containers[1]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_re_enable_reboot(): void
     {
@@ -138,9 +120,6 @@ trait KernelBrowserTests
         $this->assertNotSame($containers[0], $containers[1]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function http_method_actions(): void
     {
@@ -191,9 +170,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_set_default_http_options(): void
     {
@@ -207,9 +183,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function default_http_options_are_not_mutated_by_request_options(): void
     {
@@ -233,9 +206,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_handle_any_content_type(): void
     {
@@ -248,9 +218,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_assert_json_matches(): void
     {
@@ -271,9 +238,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function assert_content_types(): void
     {
@@ -290,9 +254,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_dump_empty_json_request(): void
     {
@@ -306,9 +267,6 @@ trait KernelBrowserTests
         $this->assertStringContainsString('content-type: application/json', $output[0]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_dump_json_response_as_array(): void
     {
@@ -322,9 +280,6 @@ trait KernelBrowserTests
         $this->assertStringContainsString('    "foo": "bar"', $output[0]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function dump_includes_headers_and_status(): void
     {
@@ -339,9 +294,6 @@ trait KernelBrowserTests
         $this->assertStringContainsString('content-type: text/html;', $output[0]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_dump_json_array_key(): void
     {
@@ -355,9 +307,6 @@ trait KernelBrowserTests
         $this->assertSame('bar', $output[0]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_dump_json_path_expression(): void
     {
@@ -377,9 +326,6 @@ trait KernelBrowserTests
         $this->assertSame([1, 2, 3], $output[0]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_save_formatted_json_source(): void
     {
@@ -395,9 +341,6 @@ trait KernelBrowserTests
         $this->assertStringContainsString('    "content": null,', $contents);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_save_source_when_exception(): void
     {
@@ -413,9 +356,6 @@ trait KernelBrowserTests
         $this->assertStringContainsString('No route found for', $contents);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_access_json_object(): void
     {
@@ -428,9 +368,6 @@ trait KernelBrowserTests
         $this->assertSame($expected, $json->decoded());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_json_object(): void
     {
@@ -443,9 +380,6 @@ trait KernelBrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_dump_xml_selector(): void
     {
@@ -461,9 +395,6 @@ trait KernelBrowserTests
         $this->assertSame('<loc attr="attribute">https://www.example.com/page2</loc>', $output[1]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_access_the_xml_crawler(): void
     {
@@ -476,9 +407,6 @@ trait KernelBrowserTests
         $this->assertCount(2, $crawler);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_expect_exception_for_http_request(): void
     {

@@ -15,15 +15,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Test\LegacyExtension;
+use Zenstruck\Browser\Test\ArtifactTracker;
 
 final class NormalizationTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider namesProvider
-     * @dataProvider edgeCaseTestNames
-     */
     #[Test]
     #[DataProvider('namesProvider')]
     #[DataProvider('edgeCaseTestNames')]
@@ -35,7 +30,7 @@ final class NormalizationTest extends TestCase
             ->method('saveCurrentState')
             ->with($expectedOutput);
 
-        $extension = new LegacyExtension();
+        $extension = new ArtifactTracker();
         $extension->executeBeforeFirstTest();
         $extension->executeBeforeTest($testName);
         $extension::registerBrowser($browser);

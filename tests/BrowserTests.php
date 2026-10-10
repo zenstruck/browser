@@ -28,8 +28,8 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\VarDumper\VarDumper;
 use Zenstruck\Assert;
 use Zenstruck\Browser;
+use Zenstruck\Browser\Test\ArtifactTracker;
 use Zenstruck\Browser\Test\HasBrowser;
-use Zenstruck\Browser\Test\LegacyExtension;
 use Zenstruck\Browser\Tests\Fixture\TestComponent1;
 use Zenstruck\Browser\Tests\Fixture\TestComponent2;
 use Zenstruck\Callback\Exception\UnresolveableArgument;
@@ -44,9 +44,6 @@ trait BrowserTests
         browser as kernelBrowser;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_write_to_the_session_before_making_a_request(): void
     {
@@ -59,9 +56,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function reading_the_session_before_making_a_request_does_not_start_one(): void
     {
@@ -75,9 +69,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_read_the_session_written_by_the_application(): void
     {
@@ -89,9 +80,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function session_written_by_the_test_is_visible_to_the_application_and_back(): void
     {
@@ -113,8 +101,6 @@ trait BrowserTests
     /**
      * The session id must not change when the test only reads or updates it, otherwise
      * anything the application had stored under the previous id would be dropped.
-     *
-     * @test
      */
     #[Test]
     public function using_the_session_keeps_the_existing_session_cookie(): void
@@ -141,9 +127,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function fails_if_trying_to_manipulate_exception_page(): void
     {
@@ -169,9 +152,6 @@ trait BrowserTests
         })->throws(AssertionFailedError::class, 'The last request threw an exception: Zenstruck\Browser\Tests\Fixture\CustomException - exception thrown');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_enable_exception_throwing(): void
     {
@@ -184,9 +164,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_re_enable_catching_exceptions(): void
     {
@@ -207,9 +184,6 @@ trait BrowserTests
         $this->fail('Exception was not caught.');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function exceptions_are_caught_by_default(): void
     {
@@ -219,9 +193,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function fails_if_expected_exception_not_thrown(): void
     {
@@ -264,9 +235,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_expect_exception_for_form_submit(): void
     {
@@ -277,9 +245,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_expect_exception_for_link_click(): void
     {
@@ -292,9 +257,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function fails_if_acting_after_an_expected_exception(): void
     {
@@ -326,11 +288,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider responseAccessorProvider
-     */
     #[Test]
     #[DataProvider('responseAccessorProvider')]
     public function fails_if_reading_the_response_when_the_request_threw(callable $accessor): void
@@ -356,9 +313,6 @@ trait BrowserTests
         yield 'crawler' => [static fn(Browser $browser) => $browser->crawler()];
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function multiple_browsers(): void
     {
@@ -376,9 +330,6 @@ trait BrowserTests
         $browser1->assertOn('/page1');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function assert_on(): void
     {
@@ -396,11 +347,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider encodedUrlProvider
-     */
     #[Test]
     #[DataProvider('encodedUrlProvider')]
     public function assert_on_encoded($url, $expected): void
@@ -423,9 +369,6 @@ trait BrowserTests
         yield ['/page1#foo bar', '/page1#foo+bar'];
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_current_browser(): void
     {
@@ -444,9 +387,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_components(): void
     {
@@ -458,9 +398,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function component_pre_assertions_and_actions_are_called(): void
     {
@@ -472,9 +409,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_crawler(): void
     {
@@ -486,9 +420,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_cookie_jar(): void
     {
@@ -500,9 +431,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_manipulate_cookies(): void
     {
@@ -546,9 +474,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function with_can_accept_multiple_browsers_and_components(): void
     {
@@ -566,9 +491,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function invalid_use_callback_parameter_throws_type_error(): void
     {
@@ -577,9 +499,6 @@ trait BrowserTests
         $this->browser()->use(static function(string $invalidType) {});
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function following_redirect_follows_all_by_default(): void
     {
@@ -593,9 +512,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_re_enable_following_redirects(): void
     {
@@ -609,9 +525,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function calling_follow_redirects_when_the_response_is_a_redirect_follows_the_redirect(): void
     {
@@ -627,9 +540,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function calling_follow_redirects_before_a_request_has_been_made_just_enables_following_redirects(): void
     {
@@ -640,9 +550,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_limit_redirects_followed(): void
     {
@@ -663,9 +570,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function assert_redirected_to_follows_all_redirects_by_default(): void
     {
@@ -676,9 +580,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function assert_redirected_to_can_configure_number_of_redirects_to_follow(): void
     {
@@ -689,9 +590,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function exception_thrown_if_asserting_redirected_and_not_intercepting_redirects(): void
     {
@@ -704,9 +602,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function exception_thrown_if_asserting_redirected_to_and_not_intercepting_redirects(): void
     {
@@ -719,9 +614,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function click_and_intercept(): void
     {
@@ -736,9 +628,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function redirects_are_followed_by_default(): void
     {
@@ -748,9 +637,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function response_header_assertions(): void
     {
@@ -762,9 +648,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function response_status_assertions(): void
     {
@@ -776,9 +659,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_container_as_typehint(): void
     {
@@ -790,9 +670,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_act_as_user(): void
     {
@@ -803,9 +680,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_make_authentication_assertions(): void
     {
@@ -824,9 +698,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_check_if_not_authenticated_after_request(): void
     {
@@ -837,9 +708,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_login_with_a_form_and_be_remembered(): void
     {
@@ -866,9 +734,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_enable_the_profiler(): void
     {
@@ -881,15 +746,12 @@ trait BrowserTests
         $this->assertTrue($profile->hasCollector('request'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function extension_saves_the_browser_state_when_a_test_fails(): void
     {
         // drives the hooks phpunit calls: saveBrowserStates() swallows its exceptions, so a
         // regression there is invisible without asserting the artifacts land
-        $extension = new LegacyExtension();
+        $extension = new ArtifactTracker();
         $extension->executeBeforeFirstTest();
         $extension->executeBeforeTest('X::y');
 
@@ -900,9 +762,6 @@ trait BrowserTests
         $this->assertFileExists(__DIR__.'/../var/browser/source/failure_X__y__0.html');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_profile_multiple_requests(): void
     {
@@ -916,9 +775,6 @@ trait BrowserTests
         $this->assertNotSame($first->getToken(), $second->getToken());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_access_the_profiler(): void
     {
@@ -931,9 +787,6 @@ trait BrowserTests
         $this->assertTrue($profile->hasCollector('request'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_data_collector(): void
     {
@@ -946,9 +799,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function content_assertions(): void
     {
@@ -960,9 +810,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function assert_see_in_multiple_elements(): void
     {
@@ -973,9 +820,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_dump_response(): void
     {
@@ -991,9 +835,6 @@ trait BrowserTests
         $this->assertStringContainsString('<h1>h1 title</h1>', $output[0]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_save_source(): void
     {
@@ -1009,9 +850,6 @@ trait BrowserTests
         $this->assertStringContainsString('<h1>h1 title</h1>', $contents);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_save_source_as_zip(): void
     {
@@ -1029,9 +867,6 @@ trait BrowserTests
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function html_assertions(): void
     {
@@ -1049,9 +884,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function html_head_assertions(): void
     {
@@ -1065,9 +897,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function field_state_is_read_back_after_interacting(): void
     {
@@ -1087,9 +916,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function form_assertions(): void
     {
@@ -1141,9 +967,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function link_action(): void
     {
@@ -1160,9 +983,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function click_on_element(): void
     {
@@ -1173,9 +993,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function click_with_callback_filter(): void
     {
@@ -1190,9 +1007,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function form_actions_by_field_label(): void
     {
@@ -1221,9 +1035,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function form_actions_by_field_id(): void
     {
@@ -1250,9 +1061,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function form_actions_by_field_name(): void
     {
@@ -1277,9 +1085,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function select_field(): void
     {
@@ -1298,9 +1103,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_submit_form_with_different_submit_buttons(): void
     {
@@ -1333,8 +1135,6 @@ trait BrowserTests
 
     /**
      * @see https://github.com/zenstruck/browser/issues/55
-     *
-     * @test
      */
     #[Test]
     public function can_submit_filled_form_with_different_submit_buttons(): void
@@ -1377,9 +1177,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function cannot_attach_file_that_does_not_exist(): void
     {
@@ -1391,9 +1188,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_attach_multiple_files(): void
     {
@@ -1405,9 +1199,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function cannot_attach_multiple_files_to_a_non_multiple_input(): void
     {
@@ -1419,9 +1210,6 @@ trait BrowserTests
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_dump_html_element(): void
     {
@@ -1436,9 +1224,6 @@ trait BrowserTests
         $this->assertSame('<p id="link"><a href="/page2" title="click here">a link.</a> not a link</p>', $output[0]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function if_dump_selector_matches_multiple_elements_all_are_dumped(): void
     {
@@ -1454,9 +1239,6 @@ trait BrowserTests
         $this->assertSame('<li>list 2</li>', $output[1]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_access_the_html_crawler(): void
     {
@@ -1469,9 +1251,6 @@ trait BrowserTests
         $this->assertCount(2, $crawler);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_get_content(): void
     {
@@ -1480,9 +1259,6 @@ trait BrowserTests
         $this->assertStringContainsString('text content', $content);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_get_content_of_an_exception_page(): void
     {

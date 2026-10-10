@@ -21,9 +21,6 @@ final class KernelBrowserWebTestCaseTest extends WebTestCase
 {
     use KernelBrowserTests;
 
-    /**
-     * @test
-     */
     #[Test]
     public function calling_browser_ensures_kernel_is_shutdown(): void
     {
@@ -35,9 +32,6 @@ final class KernelBrowserWebTestCaseTest extends WebTestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_native_web_test_case_assertions(): void
     {

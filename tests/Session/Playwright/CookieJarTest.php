@@ -23,11 +23,6 @@ use Zenstruck\Browser\Session\Playwright\CookieJar;
  */
 final class CookieJarTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider unsupportedMethodProvider
-     */
     #[Test]
     #[DataProvider('unsupportedMethodProvider')]
     public function methods_the_browser_cannot_back_throw(string $method, callable $call): void
