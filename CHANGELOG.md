@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [v1.13.0](https://github.com/zenstruck/browser/releases/tag/v1.13.0)
+
+October 10th, 2026 - [v1.12.0...v1.13.0](https://github.com/zenstruck/browser/compare/v1.12.0...v1.13.0)
+
+* b44a1a5 feat: allow injecting the http session into `use()` (#213) by @Amoifr, @kbond
+* 571a7c4 ci: pin Playwright to 1.62.1 (#216) by @kbond
+* 7de7e8a test: unique artifact filenames to fix a race under paratest (#209) by @Amoifr
+* d0f90bf fix: fail when acting on the browser after an expected exception (#207) by @Amoifr, @kbond
+* ba0876d fix: don't mutate the default http options when merging request options (#210) by @Amoifr, @kbond
+
 ## [v1.12.0](https://github.com/zenstruck/browser/releases/tag/v1.12.0)
 
 August 24th, 2026 - [v1.11.0...v1.12.0](https://github.com/zenstruck/browser/compare/v1.11.0...v1.12.0)
