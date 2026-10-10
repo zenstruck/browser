@@ -21,11 +21,6 @@ use Zenstruck\Browser\Json;
 
 class JsonTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider selectorExistsProvider
-     */
     #[Test]
     #[DataProvider('selectorExistsProvider')]
     public function assert_has_passes_if_selector_exists(string $json, string $selector): void
@@ -33,11 +28,6 @@ class JsonTest extends TestCase
         (new Json($json))->assertHas($selector);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider selectorDoesNotExistProvider
-     */
     #[Test]
     #[DataProvider('selectorDoesNotExistProvider')]
     public function assert_has_fails_if_selector_does_not_exist(string $json, string $selector): void
@@ -48,11 +38,6 @@ class JsonTest extends TestCase
         (new Json($json))->assertHas($selector);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider selectorDoesNotExistProvider
-     */
     #[Test]
     #[DataProvider('selectorDoesNotExistProvider')]
     public function assert_missing_passes_if_selector_does_not_exist(string $json, string $selector): void
@@ -60,11 +45,6 @@ class JsonTest extends TestCase
         (new Json($json))->assertMissing($selector);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider selectorExistsProvider
-     */
     #[Test]
     #[DataProvider('selectorExistsProvider')]
     public function assert_missing_fails_if_selector_exists(string $json, string $selector): void
@@ -97,11 +77,6 @@ class JsonTest extends TestCase
         yield ['{"foo":{"bar": "baz"}}', 'foo.baz'];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider selectHasCountProvider
-     */
     #[Test]
     #[DataProvider('selectHasCountProvider')]
     public function can_assert_a_selector_has_count(string $json, int $expectedCount): void
@@ -115,20 +90,12 @@ class JsonTest extends TestCase
         yield ['[1,2,3]', 3];
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_perform_assertions_on_itself(): void
     {
         (new Json('["foo","bar"]'))->contains('bar')->doesNotContain('food');
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider scalarChildAssertionProvider
-     */
     #[Test]
     #[DataProvider('scalarChildAssertionProvider')]
     public function can_perform_assertion_on_scalar_child(string $json, string $selector, callable $asserter): void
@@ -144,11 +111,6 @@ class JsonTest extends TestCase
         yield ['{"hydra":{"totalItems":0}}', 'hydra.totalItems', static function(Json $json) {$json->is(0); }];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider arrayChildAssertionProvider
-     */
     #[Test]
     #[DataProvider('arrayChildAssertionProvider')]
     public function can_perform_assertion_on_array_child(string $json, string $selector, callable $asserter): void
@@ -162,11 +124,6 @@ class JsonTest extends TestCase
         yield ['{"foo":[{"bar": 1}, {"bar": 2}]}', 'foo[*].bar', static function(Json $json) {$json->isGreaterThan(0); }];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider invalidArrayChildAssertionProvider
-     */
     #[Test]
     #[DataProvider('invalidArrayChildAssertionProvider')]
     public function assert_that_each_throws_if_invalid_array_given(string $json, string $selector, callable $asserter): void

@@ -23,10 +23,6 @@ use Zenstruck\Browser\Modifier;
 #[CoversClass(Modifier::class)]
 final class ModifierTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider modifiers
-     */
     #[Test]
     #[DataProvider('modifiers')]
     public function normalize(Modifier|string $modifier, Modifier $expected): void
@@ -49,9 +45,6 @@ final class ModifierTest extends TestCase
         yield 'meta' => ['meta', Modifier::Meta];
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function normalize_throws_for_an_invalid_modifier(): void
     {
@@ -61,18 +54,12 @@ final class ModifierTest extends TestCase
         Modifier::normalize('ctrl');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function plus_a_key(): void
     {
         $this->assertSame('Shift+Enter', Modifier::Shift->plus('Enter'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function plus_another_modifier_and_a_key(): void
     {

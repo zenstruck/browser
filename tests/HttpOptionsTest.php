@@ -20,9 +20,6 @@ use Zenstruck\Browser\HttpOptions;
  */
 final class HttpOptionsTest extends TestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function defaults(): void
     {
@@ -34,9 +31,6 @@ final class HttpOptionsTest extends TestCase
         $this->assertNull($options->body());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_configure_with_constructor_array(): void
     {
@@ -56,9 +50,6 @@ final class HttpOptionsTest extends TestCase
         $this->assertSame($expectedBody, $options->body());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_configure_via_withers(): void
     {
@@ -84,9 +75,6 @@ final class HttpOptionsTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_configure_json_and_ajax_with_constructor_array(): void
     {
@@ -110,9 +98,6 @@ final class HttpOptionsTest extends TestCase
         $this->assertSame($expectedServer, $options->server());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function ajax_constructor(): void
     {
@@ -127,9 +112,6 @@ final class HttpOptionsTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function json_constructor_with_value(): void
     {
@@ -145,9 +127,6 @@ final class HttpOptionsTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function json_constructor_with_no_value(): void
     {
@@ -163,9 +142,6 @@ final class HttpOptionsTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function json_ajax_constructor_with_value(): void
     {
@@ -182,9 +158,6 @@ final class HttpOptionsTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function json_ajax_constructor_with_no_value(): void
     {
@@ -201,9 +174,6 @@ final class HttpOptionsTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function create_with_self(): void
     {
@@ -212,9 +182,6 @@ final class HttpOptionsTest extends TestCase
         $this->assertSame($options, HttpOptions::create($options));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_merge_with_array(): void
     {
@@ -248,9 +215,6 @@ final class HttpOptionsTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_merge_with_http_options_object(): void
     {
@@ -279,9 +243,6 @@ final class HttpOptionsTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_override_json_and_ajax_headers(): void
     {
@@ -302,9 +263,6 @@ final class HttpOptionsTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function dots_in_query_string_are_preserved(): void
     {

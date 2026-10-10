@@ -16,8 +16,10 @@ use Zenstruck\Browser;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @internal
  */
-class LegacyExtension
+final class ArtifactTracker
 {
     /** @var Browser[] */
     private static array $registeredBrowsers = [];

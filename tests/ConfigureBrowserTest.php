@@ -23,9 +23,6 @@ final class ConfigureBrowserTest extends WebTestCase
 {
     use HasBrowser;
 
-    /**
-     * @test
-     */
     #[Test]
     public function browser_has_been_configured(): void
     {

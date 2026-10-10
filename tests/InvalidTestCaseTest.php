@@ -22,9 +22,6 @@ final class InvalidTestCaseTest extends TestCase
 {
     use HasBrowser;
 
-    /**
-     * @test
-     */
     #[Test]
     public function cannot_create_browser(): void
     {

@@ -55,17 +55,6 @@ composer require zenstruck/browser --dev
 
 Optionally, enable the provided extension in your `phpunit.xml`:
 
-- PHPUnit 8 or 9 :
-```xml
-<!-- phpunit.xml -->
-
-<extensions>
-    <extension class="Zenstruck\Browser\Test\BrowserExtension" />
-</extensions>
-```
-
-- PHPUnit 10+ :
-
 ```xml
 <phpunit>
    ...

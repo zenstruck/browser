@@ -47,8 +47,6 @@ trait HasBrowser
 
     /**
      * @internal
-     *
-     * @after
      */
     #[After]
     final public static function _resetBrowserClients(): void
@@ -98,7 +96,7 @@ trait HasBrowser
             $browser = new $class($client, $browserOptions);
         }
 
-        BrowserExtension::registerBrowser($browser);
+        ArtifactTracker::registerBrowser($browser);
 
         return $browser;
     }
@@ -134,7 +132,7 @@ trait HasBrowser
             'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
         ]);
 
-        BrowserExtension::registerBrowser($browser);
+        ArtifactTracker::registerBrowser($browser);
 
         return $browser;
     }
