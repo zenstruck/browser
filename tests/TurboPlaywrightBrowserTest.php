@@ -14,6 +14,7 @@ namespace Zenstruck\Browser\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Playwright\Dialog\DialogInterface;
 
 /**
  * Runs the whole Playwright suite again with Turbo loaded into every page.
@@ -86,14 +87,22 @@ final class TurboPlaywrightBrowserTest extends PlaywrightBrowserTest
      * @test
      */
     #[Test]
-    public function turbo_confirm_dialogs_are_accepted(): void
+    public function can_accept_a_turbo_confirmation(): void
     {
-        $this->browser()
-            ->visit('/nav')
+        $browser = $this->browser()->visit('/nav');
+        $confirmation = null;
+        $browser->client()->getPage()->events()->onDialog(static function(DialogInterface $dialog) use (&$confirmation): void {
+            $confirmation = $dialog->message();
+            $dialog->accept();
+        });
+
+        $browser
             ->click('confirm link')
             ->assertOn('/nav/target')
             ->assertSee('navigation target')
         ;
+
+        $this->assertSame('Are you sure?', $confirmation);
     }
 
     /**

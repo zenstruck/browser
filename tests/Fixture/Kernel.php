@@ -66,11 +66,6 @@ final class Kernel extends BaseKernel
         return new Response(\file_get_contents(__DIR__.'/files/javascript.html'));
     }
 
-    public function turbo(): Response
-    {
-        return new Response(\file_get_contents(__DIR__.'/files/turbo.js'), 200, ['Content-Type' => 'text/javascript']);
-    }
-
     public function xml(): Response
     {
         return new Response(\file_get_contents(__DIR__.'/files/xml.xml'), 200, ['Content-Type' => 'text/xml']);
@@ -220,6 +215,10 @@ final class Kernel extends BaseKernel
         }
 
         $c->loadFromExtension('security', $security);
+        $c->loadFromExtension('playwright', ['assets' => [
+            'public_roots' => [__DIR__.'/files'],
+            'prefixes' => ['/turbo.js'],
+        ]]);
         $c->register('logger', NullLogger::class); // disable logging
         $c->register(InjectTurbo::class)->addTag('kernel.event_listener', ['event' => 'kernel.response']);
         $c->register(NavigationController::class)->setPublic(true)->addTag('controller.service_arguments');
@@ -244,8 +243,6 @@ final class Kernel extends BaseKernel
         $routes->add('login', '/login')->controller('kernel::login');
         $routes->add('logout', '/logout')->controller('kernel::logout');
         $routes->add('zip', '/zip')->controller('kernel::zip');
-        $routes->add('turbo', '/turbo.js')->controller('kernel::turbo');
-
         $routes->add('nav', '/nav')->controller([NavigationController::class, 'index']);
         $routes->add('nav-target', '/nav/target')->controller([NavigationController::class, 'target']);
         $routes->add('nav-redirect', '/nav/redirect')->controller([NavigationController::class, 'redirect']);

@@ -27,7 +27,7 @@ use Zenstruck\Browser\Test\LegacyExtension;
 #[Group('playwright')]
 class PlaywrightBrowserTest extends KernelTestCase
 {
-    use BrowserTests, HasBrowser, NavigationTests;
+    use BrowserTests, HasBrowser, NavigationTests, PlaywrightWaitingTests;
 
     /**
      * @test

@@ -12,11 +12,13 @@
 namespace Zenstruck\Browser\Session;
 
 use Behat\Mink\Driver\CoreDriver;
+use Behat\Mink\WebAssert;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Zenstruck\Assert;
+use Zenstruck\Assert as ZenstruckAssert;
 use Zenstruck\Browser\HttpOptions;
+use Zenstruck\Browser\Session;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -49,6 +51,11 @@ abstract class Driver extends CoreDriver
     public function client(): AbstractBrowser
     {
         return $this->client;
+    }
+
+    public function createAssertions(Session $session): Assert
+    {
+        return new Assert(new WebAssert($session));
     }
 
     public function start(): void
@@ -130,7 +137,7 @@ abstract class Driver extends CoreDriver
         $this->clientCatchExceptions(false);
 
         try {
-            Assert::that($callback)->throws($this->expectedException, $this->expectedExceptionMessage);
+            ZenstruckAssert::that($callback)->throws($this->expectedException, $this->expectedExceptionMessage);
 
             $this->lastRequestThrewExpectedException = true;
         } finally {

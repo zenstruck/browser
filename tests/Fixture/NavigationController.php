@@ -30,6 +30,7 @@ final class NavigationController
 
     public function target(Request $request): Response
     {
+        \usleep($request->query->getInt('delay') * 1000);
         $query = \htmlspecialchars(\http_build_query($request->query->all()));
 
         return self::page('navigation target', <<<HTML
@@ -56,7 +57,7 @@ final class NavigationController
         $title = $request->request->getString('title');
 
         if ('' === $title) {
-            return self::page('navigation index', self::indexBody('<p id="error">title is required</p>'), 422);
+            return self::page('navigation index', self::indexBody('<p id="error">title is required</p>'), status: 422);
         }
 
         return new RedirectResponse('/nav/target?'.\http_build_query(['created' => $title]), 303);
@@ -202,7 +203,7 @@ final class NavigationController
             <a href="/zip">download link</a>
             <a href="/nav/reload">reload link</a>
             <a href="/nav/delete" data-turbo-method="delete">delete link</a>
-            <a href="/nav/target" data-turbo-confirm="Are you sure?">confirm link</a>
+            <a href="/nav/target" data-turbo-method="get" data-turbo-confirm="Are you sure?">confirm link</a>
             <form action="/nav/search" method="get">
                 <label for="q">Search</label>
                 <input id="q" name="q" type="text">
