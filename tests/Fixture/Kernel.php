@@ -66,6 +66,11 @@ final class Kernel extends BaseKernel
         return new Response(\file_get_contents(__DIR__.'/files/javascript.html'));
     }
 
+    public function turbo(): Response
+    {
+        return new Response(\file_get_contents(__DIR__.'/files/turbo.js'), 200, ['Content-Type' => 'text/javascript']);
+    }
+
     public function xml(): Response
     {
         return new Response(\file_get_contents(__DIR__.'/files/xml.xml'), 200, ['Content-Type' => 'text/xml']);
@@ -216,6 +221,8 @@ final class Kernel extends BaseKernel
 
         $c->loadFromExtension('security', $security);
         $c->register('logger', NullLogger::class); // disable logging
+        $c->register(InjectTurbo::class)->addTag('kernel.event_listener', ['event' => 'kernel.response']);
+        $c->register(NavigationController::class)->setPublic(true)->addTag('controller.service_arguments');
     }
 
     private function configureRoutes(RoutingConfigurator $routes): void
@@ -237,5 +244,19 @@ final class Kernel extends BaseKernel
         $routes->add('login', '/login')->controller('kernel::login');
         $routes->add('logout', '/logout')->controller('kernel::logout');
         $routes->add('zip', '/zip')->controller('kernel::zip');
+        $routes->add('turbo', '/turbo.js')->controller('kernel::turbo');
+
+        $routes->add('nav', '/nav')->controller([NavigationController::class, 'index']);
+        $routes->add('nav-target', '/nav/target')->controller([NavigationController::class, 'target']);
+        $routes->add('nav-redirect', '/nav/redirect')->controller([NavigationController::class, 'redirect']);
+        $routes->add('nav-search', '/nav/search')->controller([NavigationController::class, 'search']);
+        $routes->add('nav-create', '/nav/create')->controller([NavigationController::class, 'create'])->methods(['POST']);
+        $routes->add('nav-reload', '/nav/reload')->controller([NavigationController::class, 'reload']);
+        $routes->add('nav-delete', '/nav/delete')->controller([NavigationController::class, 'delete'])->methods(['DELETE']);
+        $routes->add('nav-morph', '/nav/morph')->controller([NavigationController::class, 'morph']);
+        $routes->add('nav-frames', '/nav/frames')->controller([NavigationController::class, 'frames']);
+        $routes->add('nav-frame-content', '/nav/frames/content')->controller([NavigationController::class, 'frameContent']);
+        $routes->add('nav-frame-form', '/nav/frames/form')->controller([NavigationController::class, 'frameForm'])->methods(['POST']);
+        $routes->add('nav-streams', '/nav/streams')->controller([NavigationController::class, 'streams']);
     }
 }
