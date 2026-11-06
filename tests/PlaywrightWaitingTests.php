@@ -14,7 +14,7 @@ namespace Zenstruck\Browser\Tests;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Playwright\Exception\TimeoutException;
+use Playwright\Exception\PlaywrightException;
 use Zenstruck\Assert;
 use Zenstruck\Browser\PlaywrightBrowser;
 
@@ -198,17 +198,26 @@ trait PlaywrightWaitingTests
 
     /**
      * @test
+     *
+     * @dataProvider actionsWithTimeout
      */
     #[Test]
-    public function the_actionability_wait_uses_the_configured_timeout(): void
+    #[DataProvider('actionsWithTimeout')]
+    public function the_actionability_wait_uses_the_configured_timeout(string $action, array $arguments): void
     {
-        $browser = $this->browserWithUpdate('<button disabled>Disabled button</button>', '');
+        $browser = $this->browserWithUpdate('<button disabled>Disabled button</button><input id="disabled-field" disabled>', '');
         $browser->timeout(50);
         $start = \hrtime(true);
 
-        Assert::that(static fn() => $browser->click('Disabled button'))->throws(TimeoutException::class);
+        Assert::that(static fn() => $browser->{$action}(...$arguments))->throws(PlaywrightException::class, 'Timeout 50ms exceeded');
 
         $this->assertLessThan(1.0, (\hrtime(true) - $start) / 1e9);
+    }
+
+    public static function actionsWithTimeout(): iterable
+    {
+        yield 'click' => ['click', ['Disabled button']];
+        yield 'fill' => ['fillField', ['disabled-field', 'typed']];
     }
 
     /**

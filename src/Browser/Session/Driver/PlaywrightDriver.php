@@ -15,7 +15,6 @@ use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\WebAssert;
 use Playwright\Exception\PlaywrightException;
-use Playwright\Locator\Locator;
 use Playwright\Locator\LocatorInterface;
 use Playwright\Page\PageInterface;
 use Playwright\Symfony\Client\PlaywrightKernelClient;
@@ -221,12 +220,6 @@ final class PlaywrightDriver extends Driver
             return;
         }
 
-        if ($locator instanceof Locator) {
-            $locator->fill((string) $value, ['timeout' => $this->timeout], $this->timeout);
-
-            return;
-        }
-
         $locator->fill((string) $value, ['timeout' => $this->timeout]);
     }
 
@@ -386,22 +379,8 @@ final class PlaywrightDriver extends Driver
      */
     private function clickLocator(LocatorInterface $locator, array $options = []): void
     {
-        $this->performClick($locator, [...$options, 'trial' => true, 'timeout' => $this->timeout]);
-        $this->performClick($locator, [...$options, 'timeout' => 30_000]);
-    }
-
-    /**
-     * LocatorInterface omits the binding's separate actionability timeout.
-     */
-    private function performClick(LocatorInterface $locator, array $options): void
-    {
-        if ($locator instanceof Locator) {
-            $locator->click($options, $this->timeout);
-
-            return;
-        }
-
-        $locator->click($options);
+        $locator->click([...$options, 'trial' => true, 'timeout' => $this->timeout]);
+        $locator->click([...$options, 'timeout' => 30_000]);
     }
 
     private function typeOf(LocatorInterface $locator): string
