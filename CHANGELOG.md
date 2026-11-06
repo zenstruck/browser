@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## [v1.14.0](https://github.com/zenstruck/browser/releases/tag/v1.14.0)
+
+November 6th, 2026 - [v1.13.0...v1.14.0](https://github.com/zenstruck/browser/compare/v1.13.0...v1.14.0)
+
+* 3aa1eaf ci: test PHP 8.6 (#217) by @kbond
+* 9084e29 fix: detect Symfony 8.2 exception pages (#217) by @kbond
+* dddbd85 ci: test Symfony 8.2 (#217) by @kbond
+* f7a1920 refactor(playwright): let the registry manage sessions (#217) by @kbond
+* 84128ad refactor(playwright): inherit page timeout defaults (#217) by @kbond
+* c3cb836 fix(playwright): use native action timeout options (#217) by @kbond
+* 271065a chore(playwright): require Symfony bridge 0.12 (#217) by @kbond
+* 65df2f5 ci: unpin Playwright (#217) by @kbond
+* 9a0213b feat(playwright): use native waits for actions and assertions (#227) by @kbond
+* ee9516b test: run the Playwright suite with and without Turbo (#227) by @kbond
+* 5ce3520 docs: move `README` security policy to the end [skip ci] by @kbond
+
 ## [v1.13.0](https://github.com/zenstruck/browser/releases/tag/v1.13.0)
 
 October 10th, 2026 - [v1.12.0...v1.13.0](https://github.com/zenstruck/browser/compare/v1.12.0...v1.13.0)
