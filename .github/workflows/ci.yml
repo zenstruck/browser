@@ -15,7 +15,7 @@ jobs:
       matrix:
         php: [8.2, 8.3, 8.4, 8.5]
         deps: [highest]
-        symfony: [6.4.*, 7.4.*, 8.1.*]
+        symfony: [6.4.*, 7.4.*, 8.1.*, 8.2.*]
         include:
           - php: 8.2
             deps: lowest
@@ -25,6 +25,10 @@ jobs:
             symfony: 8.1.*
           - php: 8.3
             symfony: 8.1.*
+          - php: 8.2
+            symfony: 8.2.*
+          - php: 8.3
+            symfony: 8.2.*
     steps:
       - uses: playwright-php/setup-playwright@v1
         with:
