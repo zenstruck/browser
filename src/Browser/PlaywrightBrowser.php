@@ -11,15 +11,16 @@
 
 namespace Zenstruck\Browser;
 
+use Behat\Mink\Element\NodeElement;
 use Playwright\Console\ConsoleMessage;
 use Playwright\Page\PageInterface;
 use Playwright\Symfony\Client\PlaywrightKernelClient;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\Filesystem\Filesystem;
-use Zenstruck\Assert;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Session\Driver\PlaywrightDriver;
 use Zenstruck\Browser\Session\Playwright\CookieJar as PlaywrightCookieJar;
+use Zenstruck\Browser\Session\Playwright\Selectors;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -59,6 +60,7 @@ class PlaywrightBrowser extends Browser
 
         $this->screenshotDir = $options['screenshot_dir'] ?? null;
         $this->consoleLogDir = $options['console_log_dir'] ?? null;
+        $this->timeout((int) ($options['default_timeout'] ?? 2000));
 
         // subscribe before anything is navigated to, or the messages are already gone
         // @todo also collect uncaught errors once playwright-php exposes the "pageerror" event
@@ -76,9 +78,7 @@ class PlaywrightBrowser extends Browser
      */
     final public function assertVisible(string $selector): self
     {
-        $element = $this->session()->assert()->elementExists('css', $selector);
-
-        Assert::true($element->isVisible(), 'Expected element "%s" to be visible but it isn\'t.', [$selector]);
+        $this->session()->assert()->elementVisible($selector);
 
         return $this;
     }
@@ -88,15 +88,17 @@ class PlaywrightBrowser extends Browser
      */
     final public function assertNotVisible(string $selector): self
     {
-        $element = $this->session()->page()->find('css', $selector);
+        $this->session()->assert()->elementVisible($selector, true);
 
-        if (!$element) {
-            Assert::pass();
+        return $this;
+    }
 
-            return $this;
-        }
-
-        Assert::false($element->isVisible(), 'Expected element "%s" to not be visible but it is.', [$selector]);
+    /**
+     * @return static
+     */
+    final public function timeout(int $milliseconds): self
+    {
+        $this->driver()->timeout($milliseconds);
 
         return $this;
     }
@@ -262,6 +264,43 @@ class PlaywrightBrowser extends Browser
     protected function cookieJar(): CookieJar
     {
         return new PlaywrightCookieJar($this->page(), $this->client()->getBaseUrl());
+    }
+
+    protected function getClickableElement(string $selector): NodeElement
+    {
+        $this->session()->page();
+        $xpath = (new Selectors($this->session()->getSelectorsHandler()))->clickable($selector);
+
+        if (!$this->driver()->nativeWait()->element($xpath, 'visible')) {
+            return parent::getClickableElement($selector);
+        }
+
+        return new NodeElement($xpath, $this->session());
+    }
+
+    protected function getField(string $selector): NodeElement
+    {
+        $this->session()->page();
+        $xpath = (new Selectors($this->session()->getSelectorsHandler()))->field($selector);
+
+        if (!$this->driver()->nativeWait()->element($xpath, 'attached')) {
+            return parent::getField($selector);
+        }
+
+        return new NodeElement($xpath, $this->session());
+    }
+
+    protected function waitForUrl(string $expected, array $parts, bool $negated = false): void
+    {
+        $this->driver()->nativeWait()->url($expected, $parts, $negated);
+    }
+
+    private function driver(): PlaywrightDriver
+    {
+        $driver = $this->session()->getDriver();
+        \assert($driver instanceof PlaywrightDriver);
+
+        return $driver;
     }
 
     private function page(): PageInterface

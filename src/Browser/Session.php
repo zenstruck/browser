@@ -15,7 +15,6 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Session as MinkSession;
-use Behat\Mink\WebAssert;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\DomCrawler\Crawler;
@@ -58,7 +57,7 @@ final class Session extends MinkSession
     {
         $this->ensureNoException();
 
-        return new Assert(new WebAssert($this));
+        return $this->getDriver()->createAssertions($this);
     }
 
     public function page(): DocumentElement

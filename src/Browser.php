@@ -12,6 +12,7 @@
 namespace Zenstruck;
 
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
@@ -86,6 +87,7 @@ abstract class Browser
      */
     final public function assertOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
+        $this->waitForUrl($expected, $parts);
         Assert::run(new SameUrlAssertion($this->session()->getCurrentUrl(), $expected, $parts));
 
         return $this;
@@ -98,6 +100,7 @@ abstract class Browser
      */
     final public function assertNotOn(string $expected, array $parts = ['path', 'query', 'fragment']): self
     {
+        $this->waitForUrl($expected, $parts, true);
         Assert::not(new SameUrlAssertion($this->session()->getCurrentUrl(), $expected, $parts));
 
         return $this;
@@ -294,7 +297,7 @@ abstract class Browser
      */
     final public function fillField(string $selector, string $value): self
     {
-        $this->session()->page()->fillField($selector, $value);
+        $this->getField($selector)->setValue($value);
 
         return $this;
     }
@@ -304,15 +307,15 @@ abstract class Browser
      */
     final public function checkField(string $selector): self
     {
-        $field = $this->session()->page()->findField($selector);
+        $field = $this->getField($selector);
 
-        if ($field && 'radio' === \mb_strtolower((string) $field->getAttribute('type'))) {
-            $this->session()->page()->selectFieldOption($selector, (string) $field->getAttribute('value'));
+        if ('radio' === \mb_strtolower((string) $field->getAttribute('type'))) {
+            $field->selectOption((string) $field->getAttribute('value'));
 
             return $this;
         }
 
-        $this->session()->page()->checkField($selector);
+        $field->check();
 
         return $this;
     }
@@ -322,7 +325,7 @@ abstract class Browser
      */
     final public function uncheckField(string $selector): self
     {
-        $this->session()->page()->uncheckField($selector);
+        $this->getField($selector)->uncheck();
 
         return $this;
     }
@@ -354,7 +357,7 @@ abstract class Browser
      */
     final public function selectFieldOption(string $selector, string $value): self
     {
-        $this->session()->page()->selectFieldOption($selector, $value);
+        $this->getField($selector)->selectOption($value);
 
         return $this;
     }
@@ -364,14 +367,16 @@ abstract class Browser
      */
     final public function selectFieldOptions(string $selector, array $values): self
     {
+        $field = $this->getField($selector);
+
         if (!$values) {
-            $this->session->page()->fillField($selector, $values);
+            $field->setValue($values);
 
             return $this;
         }
 
         foreach ($values as $value) {
-            $this->session()->page()->selectFieldOption($selector, $value, true);
+            $field->selectOption($value, true);
         }
 
         return $this;
@@ -390,7 +395,7 @@ abstract class Browser
                 throw new \InvalidArgumentException(\sprintf('File "%s" does not exist.', $file));
             }
 
-            $this->session()->page()->attachFileToField($selector, $file);
+            $this->getField($selector)->attachFile($file);
         }
 
         return $this;
@@ -435,9 +440,7 @@ abstract class Browser
      */
     final public function assertSelected(string $selector, string $expected): self
     {
-        $field = $this->session()->assert()->fieldExists($selector);
-
-        Assert::that((array) $field->getValue())->contains($expected);
+        $this->session()->assert()->fieldValueContains($selector, $expected);
 
         return $this;
     }
@@ -447,9 +450,7 @@ abstract class Browser
      */
     final public function assertNotSelected(string $selector, string $expected): self
     {
-        $field = $this->session()->assert()->fieldExists($selector);
-
-        Assert::that((array) $field->getValue())->doesNotContain($expected);
+        $this->session()->assert()->fieldValueContains($selector, $expected, true);
 
         return $this;
     }
@@ -796,7 +797,7 @@ abstract class Browser
         return $this;
     }
 
-    final protected function getClickableElement(string $selector): NodeElement
+    protected function getClickableElement(string $selector): NodeElement
     {
         // try button
         $element = $this->session()->page()->findButton($selector);
@@ -826,6 +827,19 @@ abstract class Browser
         }
 
         return $element;
+    }
+
+    protected function getField(string $selector): NodeElement
+    {
+        if (!$field = $this->session()->page()->findField($selector)) {
+            throw new ElementNotFoundException($this->session()->getDriver(), 'form field', 'id|name|label|value', $selector);
+        }
+
+        return $field;
+    }
+
+    protected function waitForUrl(string $expected, array $parts, bool $negated = false): void
+    {
     }
 
     /**

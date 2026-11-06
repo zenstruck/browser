@@ -192,6 +192,7 @@ trait HasBrowser
             'console_log_dir' => $_SERVER['BROWSER_CONSOLE_LOG_DIR'] ?? './var/browser/console-logs',
             'follow_redirects' => (bool) ($_SERVER['BROWSER_FOLLOW_REDIRECTS'] ?? true),
             'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
+            'default_timeout' => $_SERVER['BROWSER_DEFAULT_TIMEOUT'] ?? null,
         ]);
 
         BrowserExtension::registerBrowser($browser);

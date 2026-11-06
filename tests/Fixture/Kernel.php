@@ -215,7 +215,13 @@ final class Kernel extends BaseKernel
         }
 
         $c->loadFromExtension('security', $security);
+        $c->loadFromExtension('playwright', ['assets' => [
+            'public_roots' => [__DIR__.'/files'],
+            'prefixes' => ['/turbo.js'],
+        ]]);
         $c->register('logger', NullLogger::class); // disable logging
+        $c->register(InjectTurbo::class)->addTag('kernel.event_listener', ['event' => 'kernel.response']);
+        $c->register(NavigationController::class)->setPublic(true)->addTag('controller.service_arguments');
     }
 
     private function configureRoutes(RoutingConfigurator $routes): void
@@ -237,5 +243,17 @@ final class Kernel extends BaseKernel
         $routes->add('login', '/login')->controller('kernel::login');
         $routes->add('logout', '/logout')->controller('kernel::logout');
         $routes->add('zip', '/zip')->controller('kernel::zip');
+        $routes->add('nav', '/nav')->controller([NavigationController::class, 'index']);
+        $routes->add('nav-target', '/nav/target')->controller([NavigationController::class, 'target']);
+        $routes->add('nav-redirect', '/nav/redirect')->controller([NavigationController::class, 'redirect']);
+        $routes->add('nav-search', '/nav/search')->controller([NavigationController::class, 'search']);
+        $routes->add('nav-create', '/nav/create')->controller([NavigationController::class, 'create'])->methods(['POST']);
+        $routes->add('nav-reload', '/nav/reload')->controller([NavigationController::class, 'reload']);
+        $routes->add('nav-delete', '/nav/delete')->controller([NavigationController::class, 'delete'])->methods(['DELETE']);
+        $routes->add('nav-morph', '/nav/morph')->controller([NavigationController::class, 'morph']);
+        $routes->add('nav-frames', '/nav/frames')->controller([NavigationController::class, 'frames']);
+        $routes->add('nav-frame-content', '/nav/frames/content')->controller([NavigationController::class, 'frameContent']);
+        $routes->add('nav-frame-form', '/nav/frames/form')->controller([NavigationController::class, 'frameForm'])->methods(['POST']);
+        $routes->add('nav-streams', '/nav/streams')->controller([NavigationController::class, 'streams']);
     }
 }

@@ -420,6 +420,8 @@ trait BrowserTests
         yield ['/page1#foo bar', '/page1#foo%20bar'];
         yield ['/page1#foo+bar', '/page1#foo bar'];
         yield ['/page1#foo bar', '/page1#foo+bar'];
+        yield ['/page1?progress=100%', '/page1?progress=100%25'];
+        yield ['/page1?currency=%E2%82%AC&progress=100%', '/page1?currency=€&progress=100%'];
     }
 
     /**
