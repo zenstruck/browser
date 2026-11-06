@@ -39,7 +39,6 @@ final class PlaywrightDriver extends Driver
     private array $attachedFiles = [];
 
     private ?string $downloadedContent = null;
-    private int $timeout = 2000;
 
     public function __construct(PlaywrightKernelClient $client)
     {
@@ -52,14 +51,13 @@ final class PlaywrightDriver extends Driver
             throw new \InvalidArgumentException(\sprintf('Timeout must be a positive number of milliseconds, "%d" given.', $milliseconds));
         }
 
-        $this->timeout = $milliseconds;
         $this->page()->setDefaultTimeout($milliseconds);
         $this->page()->setDefaultNavigationTimeout(30_000);
     }
 
     public function nativeWait(): Wait
     {
-        return new Wait($this->page(), $this->timeout);
+        return new Wait($this->page());
     }
 
     public function createAssertions(Session $session): Assert
@@ -220,7 +218,7 @@ final class PlaywrightDriver extends Driver
             return;
         }
 
-        $locator->fill((string) $value, ['timeout' => $this->timeout]);
+        $locator->fill((string) $value);
     }
 
     public function check($xpath): void
@@ -298,7 +296,7 @@ final class PlaywrightDriver extends Driver
         $before = $this->page()->url();
 
         $locator = $this->locator($xpath);
-        $locator->dblclick(['trial' => true, 'timeout' => $this->timeout]);
+        $locator->dblclick(['trial' => true]);
         $locator->dblclick(['timeout' => 30_000]);
 
         $this->awaitPossibleNavigation($before);
@@ -379,7 +377,7 @@ final class PlaywrightDriver extends Driver
      */
     private function clickLocator(LocatorInterface $locator, array $options = []): void
     {
-        $locator->click([...$options, 'trial' => true, 'timeout' => $this->timeout]);
+        $locator->click([...$options, 'trial' => true]);
         $locator->click([...$options, 'timeout' => 30_000]);
     }
 
