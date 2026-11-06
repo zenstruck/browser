@@ -27,13 +27,17 @@
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^9.6.21|^10.4|^11.5|^12.0|^13.0",
-        "playwright-php/playwright": "^1.4",
-        "playwright-php/playwright-symfony": "^0.10",
+        "playwright-php/playwright": "^1.5.1",
+        "playwright-php/playwright-symfony": "^0.12",
         "symfony/console": "^6.4|^7.0|^8.0",
         "symfony/mime": "^6.4|^7.0|^8.0",
         "symfony/panther": "^1.1|^2.0.1",
         "symfony/phpunit-bridge": "^6.4|^7.0|^8.0",
         "symfony/security-bundle": "^6.4|^7.0|^8.0"
+    },
+    "conflict": {
+        "playwright-php/playwright": "<1.5.1",
+        "playwright-php/playwright-symfony": "<0.12"
     },
     "suggest": {
         "justinrainbow/json-schema": "Json schema validator. Needed to use Json::assertMatchesSchema().",

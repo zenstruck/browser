@@ -523,7 +523,7 @@ made by the browser are intercepted and passed to *your* booted kernel. The brow
 to the same application instance (and container) as your test, so mocked services, an in-memory
 database and the profiler behave as they do with the [`KernelBrowser`](#kernelbrowser).
 
-It requires [playwright-php/playwright-symfony](https://github.com/playwright-php/playwright-symfony)
+It requires [playwright-php/playwright-symfony](https://github.com/playwright-php/playwright-symfony) 0.12+
 (PHP 8.2+/Symfony 6.4+), Node.js 20+, and the Playwright browsers:
 
 ```
