@@ -21,14 +21,14 @@ use Playwright\Page\PageInterface;
  */
 final class Wait
 {
-    public function __construct(private PageInterface $page, private int $timeout)
+    public function __construct(private PageInterface $page)
     {
     }
 
     public function condition(string $predicate, mixed $arguments = null): void
     {
         try {
-            $this->page->waitForFunction($predicate, $arguments, ['timeout' => $this->timeout]);
+            $this->page->waitForFunction($predicate, $arguments);
         } catch (TimeoutException) {
             // The following assertion supplies the existing failure message.
         }
@@ -37,7 +37,7 @@ final class Wait
     public function element(string $xpath, string $state): bool
     {
         try {
-            $this->page->waitForSelector('xpath='.$xpath, ['state' => $state, 'timeout' => $this->timeout]);
+            $this->page->waitForSelector('xpath='.$xpath, ['state' => $state]);
 
             return true;
         } catch (TimeoutException) {

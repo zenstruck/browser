@@ -42,13 +42,6 @@ trait HasBrowser
      */
     private static ?BrowserRegistry $sharedPlaywrightBrowser = null;
 
-    /**
-     * The sessions claimed by the running test, each an isolated context on the shared browser.
-     *
-     * @var BrowserSessionInterface[]
-     */
-    private static array $playwrightSessions = [];
-
     private static ?KernelInterface $playwrightKernel = null;
 
     /**
@@ -61,7 +54,7 @@ trait HasBrowser
     {
         self::$primaryPantherClient = null;
 
-        self::closePlaywrightSessions();
+        self::$sharedPlaywrightBrowser?->resetSessions();
 
         self::$playwrightKernel = null;
     }
@@ -233,60 +226,12 @@ trait HasBrowser
 
         // the environment can differ between test classes, so the shared browser may not match
         if (self::$sharedPlaywrightBrowser && !self::$sharedPlaywrightBrowser->equals($requested)) {
-            self::stopSharedPlaywrightBrowser();
+            self::$sharedPlaywrightBrowser->stop();
+            self::$sharedPlaywrightBrowser = null;
         }
 
         $browser = self::$sharedPlaywrightBrowser ??= $requested;
 
-        return self::$playwrightSessions[] = self::createPlaywrightSession($browser);
-    }
-
-    private static function createPlaywrightSession(BrowserRegistry $browser): BrowserSessionInterface
-    {
-        try {
-            return $browser->createSession();
-        } catch (\Throwable) {
-            // an exception thrown by the app poisons the connection: playwright-php re-throws it on
-            // every subsequent call, so the browser has to be replaced rather than reused
-            self::stopSharedPlaywrightBrowser();
-        }
-
-        $replacement = self::$sharedPlaywrightBrowser = BrowserRegistry::fromEnvironment();
-
-        return $replacement->createSession();
-    }
-
-    private static function closePlaywrightSessions(): void
-    {
-        $sessions = self::$playwrightSessions;
-        self::$playwrightSessions = [];
-
-        foreach ($sessions as $session) {
-            // closing is what surfaces a poisoned connection, so a failure replaces the browser
-            // instead of leaving the next test to inherit it
-            if (!self::closePlaywrightSession($session)) {
-                return;
-            }
-        }
-    }
-
-    private static function closePlaywrightSession(BrowserSessionInterface $session): bool
-    {
-        try {
-            self::$sharedPlaywrightBrowser?->closeSession($session);
-        } catch (\Throwable) {
-            self::stopSharedPlaywrightBrowser();
-
-            return false;
-        }
-
-        return true;
-    }
-
-    private static function stopSharedPlaywrightBrowser(): void
-    {
-        self::$playwrightSessions = [];
-        self::$sharedPlaywrightBrowser?->stop();
-        self::$sharedPlaywrightBrowser = null;
+        return $browser->createSession();
     }
 }

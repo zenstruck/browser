@@ -15,7 +15,6 @@ use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\WebAssert;
 use Playwright\Exception\PlaywrightException;
-use Playwright\Locator\Locator;
 use Playwright\Locator\LocatorInterface;
 use Playwright\Page\PageInterface;
 use Playwright\Symfony\Client\PlaywrightKernelClient;
@@ -40,7 +39,6 @@ final class PlaywrightDriver extends Driver
     private array $attachedFiles = [];
 
     private ?string $downloadedContent = null;
-    private int $timeout = 2000;
 
     public function __construct(PlaywrightKernelClient $client)
     {
@@ -53,14 +51,13 @@ final class PlaywrightDriver extends Driver
             throw new \InvalidArgumentException(\sprintf('Timeout must be a positive number of milliseconds, "%d" given.', $milliseconds));
         }
 
-        $this->timeout = $milliseconds;
         $this->page()->setDefaultTimeout($milliseconds);
         $this->page()->setDefaultNavigationTimeout(30_000);
     }
 
     public function nativeWait(): Wait
     {
-        return new Wait($this->page(), $this->timeout);
+        return new Wait($this->page());
     }
 
     public function createAssertions(Session $session): Assert
@@ -221,13 +218,7 @@ final class PlaywrightDriver extends Driver
             return;
         }
 
-        if ($locator instanceof Locator) {
-            $locator->fill((string) $value, ['timeout' => $this->timeout], $this->timeout);
-
-            return;
-        }
-
-        $locator->fill((string) $value, ['timeout' => $this->timeout]);
+        $locator->fill((string) $value);
     }
 
     public function check($xpath): void
@@ -305,7 +296,7 @@ final class PlaywrightDriver extends Driver
         $before = $this->page()->url();
 
         $locator = $this->locator($xpath);
-        $locator->dblclick(['trial' => true, 'timeout' => $this->timeout]);
+        $locator->dblclick(['trial' => true]);
         $locator->dblclick(['timeout' => 30_000]);
 
         $this->awaitPossibleNavigation($before);
@@ -386,22 +377,8 @@ final class PlaywrightDriver extends Driver
      */
     private function clickLocator(LocatorInterface $locator, array $options = []): void
     {
-        $this->performClick($locator, [...$options, 'trial' => true, 'timeout' => $this->timeout]);
-        $this->performClick($locator, [...$options, 'timeout' => 30_000]);
-    }
-
-    /**
-     * LocatorInterface omits the binding's separate actionability timeout.
-     */
-    private function performClick(LocatorInterface $locator, array $options): void
-    {
-        if ($locator instanceof Locator) {
-            $locator->click($options, $this->timeout);
-
-            return;
-        }
-
-        $locator->click($options);
+        $locator->click([...$options, 'trial' => true]);
+        $locator->click([...$options, 'timeout' => 30_000]);
     }
 
     private function typeOf(LocatorInterface $locator): string

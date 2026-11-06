@@ -213,6 +213,8 @@ final class Session extends MinkSession
 
         $crawler = $this->client()->getCrawler();
 
+        $this->failWithExceptionHeader($crawler);
+
         // Symfony < 7.4 renders an html exception page
         if (\count($exceptionClassNode = $crawler->filter('.trace-details .trace-class')->first())) {
             $messageNode = $crawler->filter('.exception-message-wrapper .exception-message')->first();
@@ -236,6 +238,24 @@ final class Session extends MinkSession
             $exception[1],
             \preg_match('/#message: "([^"]*)"/', $content, $message) ? $message[1] : 'unknown message',
         );
+    }
+
+    /**
+     * Symfony 8.2 uses trace-class for stack frames, with the exception in a separate header.
+     */
+    private function failWithExceptionHeader(Crawler $crawler): void
+    {
+        $header = $crawler->filter('.exceptions-header .exc-single, .exceptions-header .exc-item')->first();
+
+        if (!\count($header)) {
+            return;
+        }
+
+        $classNode = $header->filter('.exc-subtitle abbr[title], .exc-item-class[title]')->first();
+        $class = \count($classNode) ? $classNode->attr('title') : $header->filter('.exc-subtitle, .exc-message')->first()->text();
+        $messageNode = $header->filter('.exc-subtitle + .exc-message, .exc-item-message')->first();
+
+        $this->failWithException((string) $class, \count($messageNode) ? $messageNode->text() : '');
     }
 
     private function couldBeExceptionPage(): bool
