@@ -47,6 +47,27 @@ class PlaywrightBrowserTest extends KernelTestCase
      * @test
      */
     #[Test]
+    public function a_kernel_exception_does_not_prevent_reusing_the_shared_browser(): void
+    {
+        $browser = $this->browser()->visit('/page1');
+        $sharedBrowser = $browser->client()->getPage()->context()->browser();
+
+        $browser
+            ->expectException(\RuntimeException::class, 'exception thrown')
+            ->click('exception link')
+        ;
+
+        $anotherBrowser = $this->browser()->visit('/page1')->assertSee('h1 title');
+
+        $this->assertSame($sharedBrowser, $anotherBrowser->client()->getPage()->context()->browser());
+
+        $browser->visit('/page1')->assertSee('h1 title');
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function extension_saves_a_screenshot_and_console_log_when_a_test_fails(): void
     {
         $extension = new LegacyExtension();
