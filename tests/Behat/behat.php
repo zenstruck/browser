@@ -17,6 +17,7 @@ use Behat\MinkExtension\Context\MinkContext;
 use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
 use Zenstruck\Browser\Behat\BrowserExtension;
+use Zenstruck\Browser\Behat\BrowserSteps;
 use Zenstruck\Browser\Tests\Behat\FeatureContext;
 use Zenstruck\Browser\Tests\Fixture\Kernel;
 
@@ -36,7 +37,7 @@ return (new Config())->withProfile(
         ->withExtension(new Extension(BrowserExtension::class))
         ->withSuite((new Suite('browser'))
             ->withPaths('tests/Behat/features')
-            ->withContexts(MinkContext::class, FeatureContext::class))
+            ->withContexts(MinkContext::class, BrowserSteps::class, FeatureContext::class))
 )->withProfile(
     (new Profile('failure', ['suites' => ['browser' => false]]))
         ->withSuite((new Suite('failure'))

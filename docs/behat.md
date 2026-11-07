@@ -34,6 +34,7 @@ use Behat\MinkExtension\Context\MinkContext;
 use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
 use Zenstruck\Browser\Behat\BrowserExtension;
+use Zenstruck\Browser\Behat\BrowserSteps;
 
 return (new Config())->withProfile(
     (new Profile('default'))
@@ -48,7 +49,7 @@ return (new Config())->withProfile(
         ->withExtension(new Extension(BrowserExtension::class))
         ->withSuite((new Suite('default'))
             ->withPaths('features')
-            ->withContexts(MinkContext::class))
+            ->withContexts(MinkContext::class, BrowserSteps::class))
 );
 ```
 
@@ -80,56 +81,60 @@ for the page to update. URL, regular expression and HTTP status checks run immed
 
 ## Step reference
 
-Use these stock `MinkContext` steps with either driver unless a table says otherwise. **n/a** means
-there is no equivalent stock step.
+The setup above registers stock steps from `MinkContext` and the additional steps marked
+**BrowserSteps**. Use the steps with either driver unless a table says otherwise. **n/a** means
+there is no equivalent step in either context.
 
-| Shared Browser API | Stock Behat step |
+| Shared Browser API | Behat step |
 | --- | --- |
 | `visit()` | `Given I am on "/path"` or `When I go to "/path"` |
-| `click()` | `When I press "button"` or `When I follow "link"`. Arbitrary element clicks are n/a. |
+| `click()` | `When I press "button"` or `When I follow "link"`. **BrowserSteps** adds `When I click the "#save" element` for CSS selectors. BrowserKit supports links and submit or reset buttons. |
 | `fillField()` | `When I fill in "field" with "value"` |
 | `checkField()`, `uncheckField()` | `When I check "field"` / `When I uncheck "field"` for checkboxes |
 | `selectField()`, `selectFieldOption()` | `When I select "value" from "field"` for a select or radio field. For a checkbox, use `When I check "field"`. |
-| `selectFieldOptions()` | Repeat `When I additionally select "value" from "field"`. Clearing all selections is n/a. |
+| `selectFieldOptions()` | Repeat `When I additionally select "value" from "field"`. **BrowserSteps** adds `When I clear the "field" selection` for multi-selects. |
 | `attachFile()` | `When I attach the file "path" to "field"` for one file |
 | `assertOn()` | `Then I should be on "/path"`. Mink ignores the query string. |
-| `assertNotOn()` | n/a |
+| `assertNotOn()` | **BrowserSteps** `Then I should not be on "/path"`. Like the stock URL step, this ignores the query string. |
 | `assertContains()`, `assertNotContains()` | `Then the response should contain "text"` / `Then the response should not contain "text"` |
 | `assertSee()`, `assertNotSee()` | `Then I should see "text"` / `Then I should not see "text"` |
 | `assertSeeIn()`, `assertNotSeeIn()` | `Then I should see "text" in the "#selector" element` / `Then I should not see "text" in the "#selector" element` |
 | `assertSeeElement()`, `assertNotSeeElement()` | `Then I should see a "#selector" element` / `Then I should not see a "#selector" element` |
 | `assertElementCount()` | `Then I should see 3 ".item" elements` |
-| `assertElementAttributeContains()`, `assertElementAttributeNotContains()` | n/a |
+| `assertElementAttributeContains()`, `assertElementAttributeNotContains()` | **BrowserSteps** `Then the "#save" element's "class" attribute should contain "active"` / `Then the "#save" element's "class" attribute should not contain "active"` |
 | `assertFieldEquals()`, `assertFieldNotEquals()` | `Then the "field" field should contain "value"` / `Then the "field" field should not contain "value"`. These compare the whole value. |
-| `assertSelected()`, `assertNotSelected()` | The field-value steps are the closest match for single selects. Multi-select membership is n/a. |
+| `assertSelected()`, `assertNotSelected()` | **BrowserSteps** `Then "admin" should be selected in "Roles"` / `Then "admin" should not be selected in "Roles"`. Use the option value. |
 | `assertChecked()`, `assertNotChecked()` | `Then the "field" checkbox should be checked` / `Then the "field" checkbox should be unchecked` |
 | `assertStatus()` | `Then the response status code should be 200` |
-| `assertSuccessful()` | n/a for the full `2xx` range |
-| `assertHeaderEquals()`, `assertHeaderContains()`, `assertContentType()` | n/a |
+| `assertSuccessful()` | **BrowserSteps** `Then the response should be successful` (any `2xx` status) |
+| `assertHeaderEquals()`, `assertHeaderContains()` | **BrowserSteps** `Then the "Content-Type" response header should equal "application/json"` / `Then the "Content-Type" response header should contain "json"` |
+| `assertContentType()` | **BrowserSteps** `Then the "Content-Type" response header should contain "json"` |
 | `actingAs()`, `assertAuthenticated()`, `assertNotAuthenticated()` | n/a |
 | `interceptRedirects()`, `followRedirects()`, `followRedirect()`, `clickAndIntercept()`, `assertRedirected()`, `assertRedirectedTo()` | n/a |
 | `throwExceptions()`, `catchExceptions()`, `expectException()`, `withProfiling()` | n/a |
 | `dump()` | `Then print last response` for a full response dump |
 | `saveSource()`, `saveCurrentState()`, `dd()` | n/a |
 
-| BrowserKit only (`KernelBrowser`) | Stock Behat step |
+| BrowserKit only (`KernelBrowser`) | Behat step |
 | --- | --- |
 | `get()`, `request('GET', ...)` | `Given I am on "/path"` for a plain GET. Request options are n/a. |
 | `post()`, `put()`, `patch()`, `delete()`, `request()` with other methods | n/a for direct HTTP requests |
 | `setDefaultHttpOptions()`, `disableReboot()`, `enableReboot()` | n/a |
-| `assertJson()`, `assertXml()`, `assertHtml()`, `assertJsonMatches()` | n/a |
+| `assertJson()`, `assertXml()`, `assertHtml()` | **BrowserSteps** `Then the "Content-Type" response header should contain "json"` (or `"xml"` or `"html"`) |
+| `assertJsonMatches()` | n/a |
 
-| Playwright only (`PlaywrightBrowser`) | Stock Behat step |
+| Playwright only (`PlaywrightBrowser`) | Behat step |
 | --- | --- |
 | `waitUntilSeeIn()`, `waitUntilNotSeeIn()` | The scoped text assertions above auto-wait and are the closest match. The negative step requires the element to exist. |
-| `assertVisible()`, `assertNotVisible()`, `waitUntilVisible()`, `waitUntilNotVisible()` | n/a |
-| `doubleClick()`, `rightClick()` | n/a |
+| `assertVisible()`, `assertNotVisible()`, `waitUntilVisible()`, `waitUntilNotVisible()` | **BrowserSteps** `Then the "#toast" element should be visible` / `Then the "#toast" element should not be visible`. Both auto-wait. |
+| `doubleClick()`, `rightClick()` | **BrowserSteps** `When I double-click the "#row" element` / `When I right-click the "#row" element` |
 | `timeout()`, `wait()`, `pause()` | n/a |
 | `takeScreenshot()`, `ddScreenshot()`, `saveConsoleLog()`, `dumpConsoleLog()`, `ddConsoleLog()` | n/a |
 
 ## Custom steps
 
-Extend `BrowserContext` to use `$this->browser()` for `KernelBrowser` in ordinary scenarios
+Create your own context class by extending `BrowserContext`, as shown in the `FeatureContext`
+example below. Use `$this->browser()` for `KernelBrowser` in ordinary scenarios
 and `$this->playwrightBrowser()` for `PlaywrightBrowser` in `@javascript` scenarios. Both use
 the active Mink session, so custom and stock Mink steps share the same page and state. Calling
 a helper with a different active driver throws a `LogicException`.
@@ -158,6 +163,7 @@ final class FeatureContext extends BrowserContext
 }
 ```
 
-Add `FeatureContext::class` to the suite's `withContexts()` call alongside `MinkContext::class`.
+Register your custom context class in the suite's `withContexts()` call alongside
+`MinkContext::class` and `BrowserSteps::class`. For the example above, add `FeatureContext::class`.
 SymfonyExtension also supports registering contexts as Symfony services for constructor dependency
 injection.

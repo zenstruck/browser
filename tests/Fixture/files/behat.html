@@ -3,8 +3,14 @@
 <head><meta charset="utf-8"><title>Behat browser</title></head>
 <body>
     <h1>Static greeting</h1>
-    <form action="/page2">
+    <form action="/submit-form" method="post">
         <label>Message <input name="message" id="message"></label>
+        <label>Roles
+            <select name="roles[]" multiple>
+                <option value="member" selected>Member</option>
+                <option value="admin">Admin</option>
+            </select>
+        </label>
         <button>Send</button>
     </form>
     <a href="/page2">Next page</a>
@@ -19,6 +25,7 @@
         document.getElementById('update').addEventListener('click', () => {
             setTimeout(() => {
                 document.getElementById('output').textContent = document.getElementById('message').value;
+                document.getElementById('output').className = 'updated';
             }, 400);
         });
         document.getElementById('clear').addEventListener('click', () => {
@@ -27,6 +34,13 @@
         document.getElementById('store').addEventListener('click', () => {
             localStorage.setItem('message', 'saved');
             storage.textContent = 'Storage: saved';
+        });
+        document.getElementById('storage').addEventListener('dblclick', () => {
+            storage.textContent = 'Double-clicked';
+        });
+        document.getElementById('storage').addEventListener('contextmenu', event => {
+            event.preventDefault();
+            storage.textContent = 'Right-clicked';
         });
     </script>
 </body>
