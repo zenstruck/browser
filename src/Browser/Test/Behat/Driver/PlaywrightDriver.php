@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Browser\Behat\Driver;
+namespace Zenstruck\Browser\Test\Behat\Driver;
 
 use Behat\Mink\Driver\CoreDriver;
 use Behat\Mink\Exception\DriverException;

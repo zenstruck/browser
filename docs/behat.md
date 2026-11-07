@@ -36,8 +36,8 @@ use Behat\Config\Suite;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
-use Zenstruck\Browser\Behat\BrowserExtension;
-use Zenstruck\Browser\Behat\BrowserSteps;
+use Zenstruck\Browser\Test\Behat\BrowserExtension;
+use Zenstruck\Browser\Test\Behat\BrowserSteps;
 
 return (new Config())->withProfile(
     (new Profile('default'))
@@ -177,7 +177,7 @@ a helper with a different active driver throws a `LogicException`.
 <?php
 
 use Behat\Step\Then;
-use Zenstruck\Browser\Behat\BrowserContext;
+use Zenstruck\Browser\Test\Behat\BrowserContext;
 
 final class FeatureContext extends BrowserContext
 {

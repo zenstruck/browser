@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Browser\Behat;
+namespace Zenstruck\Browser\Test\Behat;
 
 use Behat\Mink\Mink as BaseMink;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
-use Zenstruck\Browser\Behat\Driver\PlaywrightDriver;
+use Zenstruck\Browser\Test\Behat\Driver\PlaywrightDriver;
 
 /**
  * @internal

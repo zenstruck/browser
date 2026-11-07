@@ -2,7 +2,7 @@
 
 This library provides a fluent API for Symfony functional tests. `src/Browser.php` is the shared API, `src/Browser/Session.php` coordinates requests and assertions, and `src/Browser/Session/Driver/` handles driver-specific behavior. `KernelBrowser` runs against the Symfony kernel without a real browser. `PlaywrightBrowser` drives a real browser and routes requests to the test's booted kernel.
 
-The experimental Behat integration lives in `src/Browser/Behat/`. Mink runs scenarios with `KernelBrowser` by default and uses `PlaywrightBrowser` for `@javascript` scenarios. The Playwright adapter reuses Browser's waits and assertion predicates.
+The experimental Behat integration lives in `src/Browser/Test/Behat/`. Mink runs scenarios with `KernelBrowser` by default and uses `PlaywrightBrowser` for `@javascript` scenarios. The Playwright adapter reuses Browser's waits and assertion predicates.
 
 ## Changes
 

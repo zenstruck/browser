@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Browser\Behat\Driver;
+namespace Zenstruck\Browser\Test\Behat\Driver;
 
 use Behat\MinkExtension\ServiceContainer\Driver\DriverFactory;
 use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;

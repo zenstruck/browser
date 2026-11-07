@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Browser\Behat;
+namespace Zenstruck\Browser\Test\Behat;
 
 use Behat\Step\Then;
 use Behat\Step\When;
 use Zenstruck\Assert;
-use Zenstruck\Browser\Behat\Driver\PlaywrightDriver;
+use Zenstruck\Browser\Test\Behat\Driver\PlaywrightDriver;
 
 /**
  * @experimental

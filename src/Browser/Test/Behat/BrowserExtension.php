@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Browser\Behat;
+namespace Zenstruck\Browser\Test\Behat;
 
 use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Testwork\ServiceContainer\Extension;
@@ -17,8 +17,8 @@ use Behat\Testwork\ServiceContainer\ExtensionManager;
 use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Zenstruck\Browser\Behat\Driver\KernelDriverFactory;
-use Zenstruck\Browser\Behat\Driver\PlaywrightDriverFactory;
+use Zenstruck\Browser\Test\Behat\Driver\KernelDriverFactory;
+use Zenstruck\Browser\Test\Behat\Driver\PlaywrightDriverFactory;
 
 /**
  * @experimental

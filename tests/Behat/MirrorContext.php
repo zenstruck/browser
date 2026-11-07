@@ -17,7 +17,7 @@ use Behat\Step\Given;
 use Behat\Step\Then;
 use Playwright\Dialog\DialogInterface;
 use Zenstruck\Assert;
-use Zenstruck\Browser\Behat\BrowserContext;
+use Zenstruck\Browser\Test\Behat\BrowserContext;
 
 final class MirrorContext extends BrowserContext
 {

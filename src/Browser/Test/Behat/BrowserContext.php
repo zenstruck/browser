@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Browser\Behat;
+namespace Zenstruck\Browser\Test\Behat;
 
 use Behat\MinkExtension\Context\RawMinkContext;
-use Zenstruck\Browser\Behat\Driver\KernelDriver;
-use Zenstruck\Browser\Behat\Driver\PlaywrightDriver;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\PlaywrightBrowser;
+use Zenstruck\Browser\Test\Behat\Driver\KernelDriver;
+use Zenstruck\Browser\Test\Behat\Driver\PlaywrightDriver;
 
 /**
  * @experimental

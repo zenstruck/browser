@@ -16,11 +16,11 @@ use Behat\Step\Then;
 use Behat\Step\When;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Assert;
-use Zenstruck\Browser\Behat\BrowserContext;
-use Zenstruck\Browser\Behat\Driver\KernelDriver;
-use Zenstruck\Browser\Behat\Driver\PlaywrightDriver;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\PlaywrightBrowser;
+use Zenstruck\Browser\Test\Behat\BrowserContext;
+use Zenstruck\Browser\Test\Behat\Driver\KernelDriver;
+use Zenstruck\Browser\Test\Behat\Driver\PlaywrightDriver;
 
 final class FeatureContext extends BrowserContext
 {

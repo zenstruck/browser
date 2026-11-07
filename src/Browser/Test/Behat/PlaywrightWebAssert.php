@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Browser\Behat;
+namespace Zenstruck\Browser\Test\Behat;
 
 use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Element\TraversableElement;
 use Behat\Mink\Session;
 use Behat\Mink\WebAssert;
-use Zenstruck\Browser\Behat\Driver\PlaywrightDriver;
 use Zenstruck\Browser\Session\Playwright\Selectors;
+use Zenstruck\Browser\Test\Behat\Driver\PlaywrightDriver;
 
 /**
  * Mink 1.10 declares scalar parameters without types.
