@@ -223,19 +223,23 @@ class PlaywrightBrowserTest extends KernelTestCase
      * @test
      */
     #[Test]
-    public function can_dump_console_log_with_throw_error(): void
+    public function can_save_and_dump_console_log_with_an_uncaught_error(): void
     {
-        $this->markTestSkipped('Uncaught JS errors are a Playwright "pageerror" event, which playwright-php does not expose.');
+        $browser = $this->browser()
+            ->visit('/javascript')
+            ->click('throw error')
+            ->visit('/page1')
+        ;
 
-        $output = self::catchVarDumperOutput(function() {
-            $this->browser()
-                ->visit('/javascript')
-                ->click('throw error')
-                ->dumpConsoleLog()
-            ;
+        $output = self::catchVarDumperOutput($browser->dumpConsoleLog(...));
+        $filename = self::uniqueFilename('page-errors.log');
+        $contents = self::catchFileContents(__DIR__.'/../var/browser/console-logs/'.$filename, static function() use ($browser, $filename): void {
+            $browser->saveConsoleLog($filename);
         });
 
-        $this->assertStringContainsString('Error: error object message', \json_encode($output, \JSON_THROW_ON_ERROR));
+        $this->assertStringContainsString('"type": "pageerror"', $contents);
+        $this->assertStringContainsString('Error: error object message', $contents);
+        $this->assertSame($output[0], \json_decode($contents, true, flags: \JSON_THROW_ON_ERROR));
     }
 
     /**

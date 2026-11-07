@@ -63,7 +63,6 @@ class PlaywrightBrowser extends Browser
         $this->timeout((int) ($options['default_timeout'] ?? 2000));
 
         // subscribe before anything is navigated to, or the messages are already gone
-        // @todo also collect uncaught errors once playwright-php exposes the "pageerror" event
         $this->page()->events()->onConsole(function(ConsoleMessage $message): void {
             $this->consoleMessages[] = [
                 'type' => $message->type(),
@@ -194,7 +193,7 @@ class PlaywrightBrowser extends Browser
             $filename = \sprintf('%s/%s', \rtrim($this->consoleLogDir, '/'), \ltrim($filename, '/'));
         }
 
-        $log = \json_encode($this->consoleMessages, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);
+        $log = \json_encode($this->consoleLog(), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR);
 
         (new Filesystem())->dumpFile($this->savedConsoleLogs[] = $filename, $log);
 
@@ -203,7 +202,7 @@ class PlaywrightBrowser extends Browser
 
     final public function dumpConsoleLog(): self
     {
-        Session::varDump($this->consoleMessages);
+        Session::varDump($this->consoleLog());
 
         return $this;
     }
@@ -301,6 +300,36 @@ class PlaywrightBrowser extends Browser
         \assert($driver instanceof PlaywrightDriver);
 
         return $driver;
+    }
+
+    /**
+     * @return array<array{type:string,text:string,location:array<string,mixed>}>
+     */
+    private function consoleLog(): array
+    {
+        $client = $this->client();
+        $page = $client->getPage();
+
+        if (null === $page || $page->isClosed()) {
+            return $this->consoleMessages;
+        }
+
+        $errors = $page->pageErrors(['filter' => 'all']);
+        $log = $this->consoleMessages;
+
+        foreach ($errors as $error) {
+            $log[] = [
+                'type' => 'pageerror',
+                'text' => $error->stack() ?? \sprintf(
+                    '%s: %s',
+                    $error->name(),
+                    $error->message(),
+                ),
+                'location' => [],
+            ];
+        }
+
+        return $log;
     }
 
     private function page(): PageInterface
