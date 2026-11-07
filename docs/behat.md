@@ -59,6 +59,36 @@ return (new Config())->withProfile(
 Behat 3.22 and later support this PHP config. If you're migrating from YAML, run
 `vendor/bin/behat --convert-config` on Behat 3 before upgrading to Behat 4.
 
+## Browser options
+
+Set options under each driver in the Mink extension's `sessions` configuration.
+An option in `behat.php` takes precedence over its environment variable. Omitted options
+use the same environment variables and defaults as PHPUnit. Use `null` for a driver
+that uses all the defaults.
+
+```php
+'sessions' => [
+    'kernel' => ['zenstruck_kernel' => [
+        'browser_class' => \App\Tests\AppBrowser::class,
+        'follow_redirects' => false,
+    ]],
+    'playwright' => ['zenstruck_playwright' => [
+        'default_timeout' => 5000,
+    ]],
+],
+```
+
+| Option | Environment fallback | Drivers |
+| --- | --- | --- |
+| `browser_class` | `KERNEL_BROWSER_CLASS` or `PLAYWRIGHT_BROWSER_CLASS` | Both. Use the corresponding browser class or a subclass. |
+| `source_dir` | `BROWSER_SOURCE_DIR` | Both |
+| `source_debug` | `BROWSER_SOURCE_DEBUG` | Both |
+| `follow_redirects` | `BROWSER_FOLLOW_REDIRECTS` | Both |
+| `catch_exceptions` | `BROWSER_CATCH_EXCEPTIONS` | Both |
+| `screenshot_dir` | `BROWSER_SCREENSHOT_DIR` | Playwright |
+| `console_log_dir` | `BROWSER_CONSOLE_LOG_DIR` | Playwright |
+| `default_timeout` | `BROWSER_DEFAULT_TIMEOUT` | Playwright. Use a positive integer in milliseconds. |
+
 ## Running scenarios
 
 Run `vendor/bin/behat`. MinkExtension selects `KernelBrowser` by default. Tag a scenario, feature

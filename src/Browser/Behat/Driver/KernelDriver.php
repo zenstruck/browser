@@ -14,6 +14,7 @@ namespace Zenstruck\Browser\Behat\Driver;
 use Behat\Mink\Driver\BrowserKitDriver;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Browser\BrowserConfiguration;
 use Zenstruck\Browser\KernelBrowser;
 
 /**
@@ -28,8 +29,9 @@ final class KernelDriver extends BrowserKitDriver
     public function __construct(
         private readonly KernelInterface $kernel,
         private readonly ?string $baseUrl = null,
+        private readonly array $options = [],
     ) {
-        parent::__construct($this->createClient(), $this->baseUrl);
+        $this->initializeClient();
     }
 
     public function browser(): KernelBrowser
@@ -46,11 +48,12 @@ final class KernelDriver extends BrowserKitDriver
         parent::reset();
 
         // SymfonyExtension reboots the kernel between scenarios, so its test client must be resolved again.
-        parent::__construct($this->createClient(), $this->baseUrl);
+        $this->initializeClient();
     }
 
-    private function createClient(): SymfonyKernelBrowser
+    private function initializeClient(): void
     {
+        [$class, $options] = BrowserConfiguration::kernel($this->options);
         $container = $this->kernel->getContainer();
 
         if (!$container->has('test.client')) {
@@ -63,8 +66,8 @@ final class KernelDriver extends BrowserKitDriver
             throw new \LogicException('The "test.client" service must be a Symfony KernelBrowser.');
         }
 
-        $this->browser = new KernelBrowser($client);
-
-        return $this->browser->client();
+        // Mink enables redirects in its constructor, so apply the browser options afterwards.
+        parent::__construct($client, $this->baseUrl);
+        $this->browser = new $class($client, $options);
     }
 }

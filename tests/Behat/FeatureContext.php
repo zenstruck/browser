@@ -19,6 +19,8 @@ use Zenstruck\Assert;
 use Zenstruck\Browser\Behat\BrowserContext;
 use Zenstruck\Browser\Behat\Driver\KernelDriver;
 use Zenstruck\Browser\Behat\Driver\PlaywrightDriver;
+use Zenstruck\Browser\KernelBrowser;
+use Zenstruck\Browser\PlaywrightBrowser;
 
 final class FeatureContext extends BrowserContext
 {
@@ -41,11 +43,11 @@ final class FeatureContext extends BrowserContext
     }
 
     #[Then('the :type browser is used')]
-    public function assertBrowserType(string $type): void
+    public function assertBrowserType(string $type, bool $configured = false): void
     {
-        $expectedDriver = match ($type) {
-            'kernel' => KernelDriver::class,
-            'playwright' => PlaywrightDriver::class,
+        [$expectedDriver, $classVariable, $defaultClass] = match ($type) {
+            'kernel' => [KernelDriver::class, 'KERNEL_BROWSER_CLASS', KernelBrowser::class],
+            'playwright' => [PlaywrightDriver::class, 'PLAYWRIGHT_BROWSER_CLASS', PlaywrightBrowser::class],
         };
 
         $session = $this->getSession();
@@ -57,6 +59,17 @@ final class FeatureContext extends BrowserContext
         };
         Assert::true($browser === $driver->browser(), 'The context must use the active session browser.');
         Assert::true('behat' === $this->kernel->getEnvironment(), 'The context kernel was not injected.');
+        $expectedClass = $configured ? $defaultClass : ($_SERVER[$classVariable] ?? $defaultClass);
+        Assert::true($browser::class === $expectedClass, 'Expected browser class "{expected}", got "{actual}".', [
+            'expected' => $expectedClass,
+            'actual' => $browser::class,
+        ]);
+    }
+
+    #[Then('the configured :type browser is used')]
+    public function assertConfiguredBrowserType(string $type): void
+    {
+        $this->assertBrowserType($type, true);
     }
 
     #[Then('waiting for missing content times out')]

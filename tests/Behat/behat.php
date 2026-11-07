@@ -19,6 +19,8 @@ use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
 use Zenstruck\Browser\Behat\BrowserExtension;
 use Zenstruck\Browser\Behat\BrowserSteps;
+use Zenstruck\Browser\KernelBrowser;
+use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Tests\Behat\FeatureContext;
 use Zenstruck\Browser\Tests\Behat\MirrorContext;
 use Zenstruck\Browser\Tests\Behat\TurboContext;
@@ -48,6 +50,15 @@ return (new Config())->withProfile(
             'sessions' => [
                 'kernel' => ['zenstruck_kernel' => null],
                 'playwright' => ['zenstruck_playwright' => null],
+                'configured_kernel' => ['zenstruck_kernel' => [
+                    'browser_class' => KernelBrowser::class,
+                    'follow_redirects' => false,
+                ]],
+                'configured_playwright' => ['zenstruck_playwright' => [
+                    'browser_class' => PlaywrightBrowser::class,
+                    'follow_redirects' => false,
+                    'default_timeout' => 1500,
+                ]],
             ],
         ]))
         ->withExtension(new Extension(BrowserExtension::class))

@@ -50,3 +50,15 @@ Feature: Use Browser in Behat contexts
         Then the "kernel" browser is used
         When I click the "a[href='/page2']" element
         Then I should see "success"
+
+    @mink:configured_kernel
+    Scenario: BrowserKit session options override environment variables
+        Given I am on "/redirect1"
+        Then the response status code should be 302
+        And the configured "kernel" browser is used
+
+    @mink:configured_playwright
+    Scenario: Playwright session options override environment variables
+        Given I am on "/redirect1"
+        Then the response status code should be 302
+        And the configured "playwright" browser is used

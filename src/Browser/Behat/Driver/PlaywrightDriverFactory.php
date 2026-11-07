@@ -34,6 +34,15 @@ final class PlaywrightDriverFactory implements DriverFactory
 
     public function configure(ArrayNodeDefinition $builder): void
     {
+        $options = $builder->children();
+        $options->scalarNode('browser_class');
+        $options->scalarNode('source_dir');
+        $options->booleanNode('source_debug');
+        $options->booleanNode('follow_redirects');
+        $options->booleanNode('catch_exceptions');
+        $options->scalarNode('screenshot_dir');
+        $options->scalarNode('console_log_dir');
+        $options->integerNode('default_timeout')->min(1);
     }
 
     public function buildDriver(array $config): Definition
@@ -41,6 +50,7 @@ final class PlaywrightDriverFactory implements DriverFactory
         return new Definition(PlaywrightDriver::class, [
             new Reference(SymfonyExtension::DRIVER_KERNEL_ID),
             '%mink.base_url%',
+            $config,
         ]);
     }
 }

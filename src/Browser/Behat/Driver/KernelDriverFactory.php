@@ -34,6 +34,12 @@ final class KernelDriverFactory implements DriverFactory
 
     public function configure(ArrayNodeDefinition $builder): void
     {
+        $options = $builder->children();
+        $options->scalarNode('browser_class');
+        $options->scalarNode('source_dir');
+        $options->booleanNode('source_debug');
+        $options->booleanNode('follow_redirects');
+        $options->booleanNode('catch_exceptions');
     }
 
     public function buildDriver(array $config): Definition
@@ -41,6 +47,7 @@ final class KernelDriverFactory implements DriverFactory
         return new Definition(KernelDriver::class, [
             new Reference(SymfonyExtension::DRIVER_KERNEL_ID),
             '%mink.base_url%',
+            $config,
         ]);
     }
 }

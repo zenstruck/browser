@@ -713,7 +713,9 @@ is not shown, as ParaTest does not surface worker output by then.
 > [!NOTE]
 > The Behat integration is experimental and may introduce backward-incompatible changes.
 
-See the [Behat guide](docs/behat.md) for setup, `@javascript` scenarios and the step reference.
+See the [Behat guide](docs/behat.md) for setup, `@javascript` scenarios, and the step reference.
+Behat [browser options](docs/behat.md#browser-options) can be set per session in `behat.php` and
+fall back to the same environment variables as PHPUnit.
 
 ## Configuration
 

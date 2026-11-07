@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use Zenstruck\Browser\Tests\Fixture\CustomKernelBrowser;
+use Zenstruck\Browser\Tests\Fixture\CustomPlaywrightBrowser;
 
 /**
  * @group playwright
@@ -31,7 +33,7 @@ final class BrowserExtensionTest extends TestCase
         $process = $this->behat();
 
         self::assertSame(0, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
-        self::assertStringContainsString('189 scenarios (189 passed)', $process->getOutput());
+        self::assertStringContainsString('191 scenarios (191 passed)', $process->getOutput());
     }
 
     /**
@@ -57,7 +59,11 @@ final class BrowserExtensionTest extends TestCase
             '--format=progress',
             '--no-colors',
             '--strict',
-        ], \dirname(__DIR__, 2));
+        ], \dirname(__DIR__, 2), [
+            'KERNEL_BROWSER_CLASS' => CustomKernelBrowser::class,
+            'PLAYWRIGHT_BROWSER_CLASS' => CustomPlaywrightBrowser::class,
+            'BROWSER_FOLLOW_REDIRECTS' => '1',
+        ]);
         $process->setTimeout(180);
         $process->run();
 

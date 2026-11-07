@@ -26,6 +26,7 @@ use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Browser\BrowserConfiguration;
 use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Session\Playwright\Wait;
 
@@ -40,6 +41,7 @@ final class PlaywrightDriver extends CoreDriver
     public function __construct(
         private readonly KernelInterface $kernel,
         private readonly ?string $baseUrl = null,
+        private readonly array $options = [],
     ) {
     }
 
@@ -315,6 +317,7 @@ final class PlaywrightDriver extends CoreDriver
 
     private function createBrowser(): PlaywrightBrowser
     {
+        [$class, $options] = BrowserConfiguration::playwright($this->options);
         $container = $this->kernel->getContainer();
         $hosts = $container->hasParameter('playwright.intercepted_hosts') ? $container->getParameter('playwright.intercepted_hosts') : null;
         $baseUrl = $this->baseUrl ?: ($container->hasParameter('playwright.base_url') ? $container->getParameter('playwright.base_url') : null);
@@ -331,7 +334,7 @@ final class PlaywrightDriver extends CoreDriver
             \is_string($baseUrl) && '' !== $baseUrl ? $baseUrl : 'http://localhost',
         );
 
-        return new PlaywrightBrowser($client);
+        return new $class($client, $options);
     }
 
     private function page(): PageInterface
