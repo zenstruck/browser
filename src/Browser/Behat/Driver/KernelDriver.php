@@ -66,8 +66,15 @@ final class KernelDriver extends BrowserKitDriver
             throw new \LogicException('The "test.client" service must be a Symfony KernelBrowser.');
         }
 
+        $baseUrl = $this->baseUrl;
+
+        // Older Mink BrowserKit drivers require a path in the base URL.
+        if (null !== $baseUrl && !\is_string(\parse_url($baseUrl, \PHP_URL_PATH))) {
+            $baseUrl = null;
+        }
+
         // Mink enables redirects in its constructor, so apply the browser options afterwards.
-        parent::__construct($client, $this->baseUrl);
+        parent::__construct($client, $baseUrl);
         $this->browser = new $class($client, $options);
     }
 }

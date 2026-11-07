@@ -14,6 +14,7 @@ use Behat\Config\Extension;
 use Behat\Config\Filter\TagFilter;
 use Behat\Config\Profile;
 use Behat\Config\Suite;
+use Behat\Config\TesterOptions;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
@@ -40,6 +41,8 @@ return (new Config())->withProfile(
         'cache' => 'var/cache/behat-gherkin',
         'filters' => ['tags' => '~@pending'],
     ]]))
+        // The oldest supported HTML parser emits PHP deprecations.
+        ->withTesterOptions((new TesterOptions())->withErrorReporting(\E_ALL & ~\E_DEPRECATED))
         ->withExtension(new Extension(SymfonyExtension::class, [
             'bootstrap' => 'vendor/autoload.php',
             'kernel' => ['class' => Kernel::class, 'environment' => 'behat'],

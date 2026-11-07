@@ -31,6 +31,8 @@ use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Session\Playwright\Wait;
 
 /**
+ * Mink 1.10 declares scalar parameters without types.
+ *
  * @internal
  */
 final class PlaywrightDriver extends CoreDriver
@@ -81,7 +83,7 @@ final class PlaywrightDriver extends CoreDriver
         return $this->browser ??= $this->createBrowser();
     }
 
-    public function visit(string $url): void
+    public function visit($url): void
     {
         $browser = $this->browser();
         $browser->visit($url);
@@ -107,7 +109,7 @@ final class PlaywrightDriver extends CoreDriver
         return $this->response()->headers->all();
     }
 
-    public function setCookie(string $name, ?string $value = null): void
+    public function setCookie($name, $value = null): void
     {
         $browser = $this->browser();
         $browser->use(static function(CookieJar $cookies) use ($name, $value): void {
@@ -121,7 +123,7 @@ final class PlaywrightDriver extends CoreDriver
         });
     }
 
-    public function getCookie(string $name): ?string
+    public function getCookie($name): ?string
     {
         $value = null;
         $browser = $this->browser();
@@ -279,7 +281,7 @@ final class PlaywrightDriver extends CoreDriver
         return $this->page()->evaluate($script);
     }
 
-    public function wait(int $timeout, string $condition): bool
+    public function wait($timeout, $condition): bool
     {
         try {
             $this->page()->waitForFunction($condition, null, ['timeout' => $timeout]);
