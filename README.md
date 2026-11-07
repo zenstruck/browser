@@ -708,6 +708,10 @@ is not shown, as ParaTest does not surface worker output by then.
 > Expect one browser per worker: `--processes 8` means up to eight browsers, each with its own Node
 > process, so pick a number your machine and CI runner can carry.
 
+## Behat
+
+See the [Behat guide](docs/behat.md) for setup, `@javascript` scenarios and the step reference.
+
 ## Configuration
 
 There are several environment variables available to configure:

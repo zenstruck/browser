@@ -25,6 +25,11 @@ final class Wait
     {
     }
 
+    public function assertion(string $name, array $arguments): void
+    {
+        $this->condition(\file_get_contents(__DIR__.'/assertion.js'), [$name, $arguments]);
+    }
+
     public function condition(string $predicate, mixed $arguments = null): void
     {
         try {

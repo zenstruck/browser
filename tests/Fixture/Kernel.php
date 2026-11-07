@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Browser\Tests\Fixture;
 
+use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Playwright\Symfony\PlaywrightSymfonyBundle;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
@@ -29,6 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Zenstruck\Browser\Tests\Behat\FeatureContext;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -64,6 +66,11 @@ final class Kernel extends BaseKernel
     public function javascript(): Response
     {
         return new Response(\file_get_contents(__DIR__.'/files/javascript.html'));
+    }
+
+    public function behat(): Response
+    {
+        return new Response(\file_get_contents(__DIR__.'/files/behat.html'));
     }
 
     public function xml(): Response
@@ -179,6 +186,10 @@ final class Kernel extends BaseKernel
         yield new FrameworkBundle();
         yield new SecurityBundle();
         yield new PlaywrightSymfonyBundle();
+
+        if ('behat' === $this->environment) {
+            yield new FriendsOfBehatSymfonyExtensionBundle();
+        }
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
@@ -222,6 +233,12 @@ final class Kernel extends BaseKernel
         $c->register('logger', NullLogger::class); // disable logging
         $c->register(InjectTurbo::class)->addTag('kernel.event_listener', ['event' => 'kernel.response']);
         $c->register(NavigationController::class)->setPublic(true)->addTag('controller.service_arguments');
+
+        if ('behat' === $this->environment) {
+            $context = $c->register(FeatureContext::class);
+            $context->setAutowired(true);
+            $context->setPublic(true);
+        }
     }
 
     private function configureRoutes(RoutingConfigurator $routes): void
@@ -239,6 +256,7 @@ final class Kernel extends BaseKernel
         $routes->add('json', '/json')->controller('kernel::json');
         $routes->add('xml', '/xml')->controller('kernel::xml');
         $routes->add('javascript', '/javascript')->controller('kernel::javascript');
+        $routes->add('behat', '/behat')->controller('kernel::behat');
         $routes->add('user', '/user')->controller('kernel::user');
         $routes->add('login', '/login')->controller('kernel::login');
         $routes->add('logout', '/logout')->controller('kernel::logout');

@@ -38,6 +38,11 @@
             return first(parameters[0]) !== null && contains(text(first(parameters[0])), parameters[1]);
         case 'elementTextNotContains':
             return first(parameters[0]) !== null && !contains(text(first(parameters[0])), parameters[1]);
+        case 'elementContains':
+        case 'elementNotContains': {
+            const element = first(parameters[0]);
+            return element !== null && contains(element.innerHTML, parameters[1]) === (name === 'elementContains');
+        }
         case 'elementAttributeContains':
         case 'elementAttributeNotContains': {
             const attribute = first(parameters[0])?.getAttribute(parameters[1]);
