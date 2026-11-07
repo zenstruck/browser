@@ -11,18 +11,16 @@
 
 namespace Zenstruck\Browser\Tests\Behat;
 
-use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Step\When;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Assert;
+use Zenstruck\Browser\Behat\BrowserContext;
 use Zenstruck\Browser\Behat\Driver\KernelDriver;
 use Zenstruck\Browser\Behat\Driver\PlaywrightDriver;
-use Zenstruck\Browser\KernelBrowser;
-use Zenstruck\Browser\PlaywrightBrowser;
 
-final class FeatureContext extends RawMinkContext
+final class FeatureContext extends BrowserContext
 {
     public function __construct(private readonly KernelInterface $kernel)
     {
@@ -31,30 +29,33 @@ final class FeatureContext extends RawMinkContext
     #[Given('I open :path from my own context')]
     public function open(string $path): void
     {
-        $session = $this->getSession();
-        $driver = $session->getDriver();
+        $browser = $this->browser();
+        $browser->visit($path);
+    }
 
-        if (!$driver instanceof KernelDriver && !$driver instanceof PlaywrightDriver) {
-            throw new \LogicException('The Browser Mink drivers must be configured.');
-        }
-
-        $browser = $driver->browser();
+    #[Given('I open :path with Playwright from my own context')]
+    public function openWithPlaywright(string $path): void
+    {
+        $browser = $this->playwrightBrowser();
         $browser->visit($path);
     }
 
     #[Then('the :type browser is used')]
     public function assertBrowserType(string $type): void
     {
-        [$expectedDriver, $expectedBrowser] = match ($type) {
-            'kernel' => [KernelDriver::class, KernelBrowser::class],
-            'playwright' => [PlaywrightDriver::class, PlaywrightBrowser::class],
+        $expectedDriver = match ($type) {
+            'kernel' => KernelDriver::class,
+            'playwright' => PlaywrightDriver::class,
         };
 
         $session = $this->getSession();
         $driver = $session->getDriver();
         Assert::true($driver instanceof $expectedDriver, 'Unexpected Mink driver.');
-        $browser = $driver->browser();
-        Assert::true($browser instanceof $expectedBrowser, 'Unexpected browser type.');
+        $browser = match ($type) {
+            'kernel' => $this->browser(),
+            'playwright' => $this->playwrightBrowser(),
+        };
+        Assert::true($browser === $driver->browser(), 'The context must use the active session browser.');
         Assert::true('behat' === $this->kernel->getEnvironment(), 'The context kernel was not injected.');
     }
 

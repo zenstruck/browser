@@ -16,7 +16,7 @@ Feature: Use Browser in Behat contexts
 
     @javascript
     Scenario: Switch to PlaywrightBrowser
-        Given I open "/behat" from my own context
+        Given I open "/behat" with Playwright from my own context
         Then the "playwright" browser is used
         And I should see "Storage: empty"
         When I follow "Next page"

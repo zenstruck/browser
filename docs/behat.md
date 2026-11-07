@@ -129,25 +129,35 @@ there is no equivalent stock step.
 
 ## Custom steps
 
-Extend `RawMinkContext` to write steps that share the scenario's Mink session.
+Extend `BrowserContext` to use `$this->browser()` for `KernelBrowser` in ordinary scenarios
+and `$this->playwrightBrowser()` for `PlaywrightBrowser` in `@javascript` scenarios. Both use
+the active Mink session, so custom and stock Mink steps share the same page and state. Calling
+a helper with a different active driver throws a `LogicException`.
 
 ```php
 <?php
 
-use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Step\Then;
+use Zenstruck\Browser\Behat\BrowserContext;
 
-final class FeatureContext extends RawMinkContext
+final class FeatureContext extends BrowserContext
 {
     #[Then('the cart should contain :count items')]
     public function assertCartItems(int $count): void
     {
-        $assert = $this->assertSession();
-        $assert->elementsCount('css', '.cart-item', $count);
+        $browser = $this->browser();
+        $browser->assertElementCount('.cart-item', $count);
+    }
+
+    #[Then('the cart should be visible')]
+    public function assertCartVisible(): void
+    {
+        $browser = $this->playwrightBrowser();
+        $browser->assertVisible('#cart');
     }
 }
 ```
 
-Add your context to the suite alongside `MinkContext`. SymfonyExtension also supports registering
-contexts as Symfony services for constructor dependency injection. Both drivers expose `browser()`
-when a custom step needs Browser's fluent API.
+Add `FeatureContext::class` to the suite's `withContexts()` call alongside `MinkContext::class`.
+SymfonyExtension also supports registering contexts as Symfony services for constructor dependency
+injection.
