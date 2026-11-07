@@ -76,8 +76,9 @@ Feature: Greeting
         Then I should see "Rendered by JavaScript"
 ```
 
-On Playwright, literal text and HTML checks, element presence and counts, and form assertions wait
-for the page to update. URL, regular expression and HTTP status checks run immediately.
+On Playwright, literal text and HTML checks, element presence and counts, form assertions, and
+URL path and fragment comparisons wait for the page to update. Regular expression and HTTP status
+checks run immediately.
 
 ## Step reference
 

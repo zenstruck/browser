@@ -29,6 +29,18 @@ final class PlaywrightWebAssert extends WebAssert
         parent::__construct($session);
     }
 
+    public function addressEquals(string $page): void
+    {
+        $this->waitForAddress($page, false);
+        parent::addressEquals($page);
+    }
+
+    public function addressNotEquals(string $page): void
+    {
+        $this->waitForAddress($page, true);
+        parent::addressNotEquals($page);
+    }
+
     public function pageTextContains(string $text): void
     {
         $this->check(__FUNCTION__, [$text]);
@@ -170,5 +182,17 @@ final class PlaywrightWebAssert extends WebAssert
         $assert = new WebAssert($this->session);
 
         return $assert->{$assertion}(...$arguments);
+    }
+
+    private function waitForAddress(string $page, bool $negated): void
+    {
+        $address = $this->cleanUrl($page);
+        $this->driver->waitForCondition(<<<'JS'
+            ([expected, negated]) => {
+                const path = location.pathname.replace(/^\/[^./]+\.php\//, '/');
+                const fragment = location.hash === '#0' ? '' : location.hash;
+                return (path + fragment === expected) !== negated;
+            }
+            JS, [$address, $negated]);
     }
 }

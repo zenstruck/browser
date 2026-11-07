@@ -31,7 +31,7 @@ final class BrowserExtensionTest extends TestCase
         $process = $this->behat();
 
         self::assertSame(0, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
-        self::assertStringContainsString('10 scenarios (10 passed)', $process->getOutput());
+        self::assertStringContainsString('189 scenarios (189 passed)', $process->getOutput());
     }
 
     /**
@@ -58,7 +58,7 @@ final class BrowserExtensionTest extends TestCase
             '--no-colors',
             '--strict',
         ], \dirname(__DIR__, 2));
-        $process->setTimeout(60);
+        $process->setTimeout(180);
         $process->run();
 
         return $process;

@@ -11,6 +11,8 @@ The Behat integration lives in `src/Browser/Behat/`. Mink runs scenarios with `K
 - Use Playwright's condition-based waits for asynchronous behavior. Keep test state and artifacts isolated across ParaTest workers.
 - Update `README.md` when user-facing usage or configuration changes.
 - Put Behat regressions in `tests/Behat/` and update `docs/behat.md` when setup or steps change.
+- Whenever you add, change, or remove PHPUnit coverage, update the corresponding scenarios in `tests/Behat/mirror/` in the same patch. Write executable scenarios for supported behavior. For cases that need more step support, add a `@pending` scenario with the missing capability. For PHP-only cases, record a `@skip` entry with the reason.
+- Keep shared Playwright scenarios in feature files used by both the `playwright` and `turbo` suites. Put Turbo-only scenarios in `tests/Behat/mirror/turbo.feature`.
 
 ## Local checks
 
@@ -18,5 +20,6 @@ The Behat integration lives in `src/Browser/Behat/`. Mink runs scenarios with `K
 - Run `vendor/bin/phpunit --exclude-group playwright` for tests that do not need a real browser. Use `vendor/bin/phpunit --filter <name>` to focus on a test or class.
 - For Playwright, use Node.js 20+ and run `vendor/bin/playwright-install chromium`, then `vendor/bin/phpunit --group playwright`.
 - With Chromium installed, run `vendor/bin/phpunit tests/Behat/BrowserExtensionTest.php` for the Behat integration.
+- Run a mirror suite with `vendor/bin/behat --config=tests/Behat/behat.php --suite=turbo --strict`. Use `--tags=@pending` to see incomplete scenarios and their reasons.
 - Run the full suite with `vendor/bin/phpunit`. CI also runs `vendor/bin/paratest --functional`.
 - Run static analysis with `vendor/bin/phpstan analyse`.

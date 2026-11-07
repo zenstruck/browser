@@ -294,6 +294,12 @@ final class PlaywrightDriver extends CoreDriver
         $wait->assertion($assertion, $arguments);
     }
 
+    public function waitForCondition(string $predicate, array $arguments): void
+    {
+        $wait = new Wait($this->page());
+        $wait->condition($predicate, $arguments);
+    }
+
     protected function findElementXpaths($xpath): array
     {
         $locator = $this->locator($xpath);
