@@ -17,6 +17,9 @@ use Zenstruck\Browser\Behat\Driver\PlaywrightDriver;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\PlaywrightBrowser;
 
+/**
+ * @experimental
+ */
 abstract class BrowserContext extends RawMinkContext
 {
     protected function browser(): KernelBrowser

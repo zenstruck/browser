@@ -710,6 +710,9 @@ is not shown, as ParaTest does not surface worker output by then.
 
 ## Behat
 
+> [!NOTE]
+> The Behat integration is experimental and may introduce backward-incompatible changes.
+
 See the [Behat guide](docs/behat.md) for setup, `@javascript` scenarios and the step reference.
 
 ## Configuration

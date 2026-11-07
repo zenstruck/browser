@@ -1,5 +1,8 @@
 # Behat
 
+> [!NOTE]
+> The Behat integration is experimental and may introduce backward-incompatible changes.
+
 Browser uses Symfony's kernel for ordinary scenarios and Playwright for scenarios tagged `@javascript`.
 Both run the application through the kernel, so you can test without starting a web server.
 

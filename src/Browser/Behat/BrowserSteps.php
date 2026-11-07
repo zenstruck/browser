@@ -16,6 +16,9 @@ use Behat\Step\When;
 use Zenstruck\Assert;
 use Zenstruck\Browser\Behat\Driver\PlaywrightDriver;
 
+/**
+ * @experimental
+ */
 final class BrowserSteps extends BrowserContext
 {
     #[When('I click the :selector element')]

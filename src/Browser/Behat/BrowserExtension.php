@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Zenstruck\Browser\Behat\Driver\KernelDriverFactory;
 use Zenstruck\Browser\Behat\Driver\PlaywrightDriverFactory;
 
+/**
+ * @experimental
+ */
 final class BrowserExtension implements Extension
 {
     public function getConfigKey(): string
