@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Panther\Client as PantherClient;
 use Symfony\Component\Panther\PantherTestCase;
 use Symfony\Component\Panther\PantherTestCaseTrait;
+use Zenstruck\Browser\BrowserConfiguration;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\PantherBrowser;
 use Zenstruck\Browser\PlaywrightBrowser;
@@ -120,18 +121,7 @@ trait HasBrowser
             throw new \LogicException(\sprintf('A KernelBrowser can only be created in TestCases that extend "%s".', KernelTestCase::class));
         }
 
-        $class = $_SERVER['KERNEL_BROWSER_CLASS'] ?? KernelBrowser::class;
-
-        if (!\is_a($class, KernelBrowser::class, true)) {
-            throw new \LogicException(\sprintf('"KERNEL_BROWSER_CLASS" env variable must reference a class that extends %s.', KernelBrowser::class));
-        }
-
-        $browserOptions = [
-            'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
-            'source_debug' => $_SERVER['BROWSER_SOURCE_DEBUG'] ?? false,
-            'follow_redirects' => (bool) ($_SERVER['BROWSER_FOLLOW_REDIRECTS'] ?? true),
-            'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
-        ];
+        [$class, $browserOptions] = BrowserConfiguration::kernel();
 
         if ($this instanceof WebTestCase) {
             static::ensureKernelShutdown();
@@ -170,23 +160,9 @@ trait HasBrowser
             throw new \LogicException(\sprintf('A PlaywrightBrowser can only be created in TestCases that extend "%s".', KernelTestCase::class));
         }
 
-        $class = $_SERVER['PLAYWRIGHT_BROWSER_CLASS'] ?? PlaywrightBrowser::class;
-
-        if (!\is_a($class, PlaywrightBrowser::class, true)) {
-            throw new \LogicException(\sprintf('"PLAYWRIGHT_BROWSER_CLASS" env variable must reference a class that extends %s.', PlaywrightBrowser::class));
-        }
-
+        [$class, $browserOptions] = BrowserConfiguration::playwright();
         $client = $this->playwrightClient();
-
-        $browser = new $class($client, [
-            'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
-            'source_debug' => $_SERVER['BROWSER_SOURCE_DEBUG'] ?? false,
-            'screenshot_dir' => $_SERVER['BROWSER_SCREENSHOT_DIR'] ?? './var/browser/screenshots',
-            'console_log_dir' => $_SERVER['BROWSER_CONSOLE_LOG_DIR'] ?? './var/browser/console-logs',
-            'follow_redirects' => (bool) ($_SERVER['BROWSER_FOLLOW_REDIRECTS'] ?? true),
-            'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
-            'default_timeout' => $_SERVER['BROWSER_DEFAULT_TIMEOUT'] ?? null,
-        ]);
+        $browser = new $class($client, $browserOptions);
 
         BrowserExtension::registerBrowser($browser);
 

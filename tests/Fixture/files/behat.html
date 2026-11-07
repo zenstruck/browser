@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Behat browser</title></head>
+<body>
+    <h1>Static greeting</h1>
+    <form action="/submit-form" method="post">
+        <label>Message <input name="message" id="message"></label>
+        <label>Roles
+            <select name="roles[]" multiple>
+                <option value="member" selected>Member</option>
+                <option value="admin">Admin</option>
+            </select>
+        </label>
+        <button>Send</button>
+    </form>
+    <a href="/page2">Next page</a>
+    <button type="button" id="update">Update</button>
+    <button type="button" id="clear">Clear</button>
+    <button type="button" id="store">Store</button>
+    <p id="output"></p>
+    <p id="storage"></p>
+    <script>
+        const storage = document.getElementById('storage');
+        storage.textContent = 'Storage: ' + (localStorage.getItem('message') || 'empty');
+        document.getElementById('update').addEventListener('click', () => {
+            setTimeout(() => {
+                document.getElementById('output').textContent = document.getElementById('message').value;
+                document.getElementById('output').className = 'updated';
+            }, 400);
+        });
+        document.getElementById('clear').addEventListener('click', () => {
+            setTimeout(() => document.getElementById('output').remove(), 400);
+        });
+        document.getElementById('store').addEventListener('click', () => {
+            localStorage.setItem('message', 'saved');
+            storage.textContent = 'Storage: saved';
+        });
+        document.getElementById('storage').addEventListener('dblclick', () => {
+            storage.textContent = 'Double-clicked';
+        });
+        document.getElementById('storage').addEventListener('contextmenu', event => {
+            event.preventDefault();
+            storage.textContent = 'Right-clicked';
+        });
+    </script>
+</body>
+</html>
