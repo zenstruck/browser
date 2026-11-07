@@ -25,7 +25,13 @@ use Zenstruck\Browser\PlaywrightBrowser;
 use Zenstruck\Browser\Tests\Behat\FeatureContext;
 use Zenstruck\Browser\Tests\Behat\MirrorContext;
 use Zenstruck\Browser\Tests\Behat\TurboContext;
+use Zenstruck\Browser\Tests\Fixture\CustomKernelBrowser;
+use Zenstruck\Browser\Tests\Fixture\CustomPlaywrightBrowser;
 use Zenstruck\Browser\Tests\Fixture\Kernel;
+
+$_SERVER['KERNEL_BROWSER_CLASS'] = CustomKernelBrowser::class;
+$_SERVER['PLAYWRIGHT_BROWSER_CLASS'] = CustomPlaywrightBrowser::class;
+$_SERVER['BROWSER_FOLLOW_REDIRECTS'] = '1';
 
 $mirrorSuite = static function(string $name, string $session, string ...$paths): Suite {
     return (new Suite($name, ['mink_session' => $session]))

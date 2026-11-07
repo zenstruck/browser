@@ -19,7 +19,7 @@ The experimental Behat integration lives in `src/Browser/Behat/`. Mink runs scen
 - Install PHP dependencies with `composer install`.
 - Run `vendor/bin/phpunit --exclude-group playwright` for tests that do not need a real browser. Use `vendor/bin/phpunit --filter <name>` to focus on a test or class.
 - For Playwright, use Node.js 20+ and run `vendor/bin/playwright-install chromium`, then `vendor/bin/phpunit --group playwright`.
-- With Chromium installed, run `vendor/bin/phpunit tests/Behat/BrowserExtensionTest.php` for the Behat integration.
+- With Chromium installed, run `vendor/bin/behat --config=tests/Behat/behat.php --format=progress --strict` for the full Behat suite. Run `vendor/bin/phpunit tests/Behat/BrowserExtensionTest.php` to check cleanup after a scenario fails.
 - Run a mirror suite with `vendor/bin/behat --config=tests/Behat/behat.php --suite=turbo --strict`. Use `--tags=@pending` to see incomplete scenarios and their reasons.
-- Run the full suite with `vendor/bin/phpunit`. CI also runs `vendor/bin/paratest --functional`.
+- Run the full PHPUnit suite with `vendor/bin/phpunit`. CI runs `vendor/bin/paratest --functional` and runs the full Behat suite in a separate step.
 - Run static analysis with `vendor/bin/phpstan analyse`.

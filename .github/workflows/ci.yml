@@ -42,6 +42,9 @@ jobs:
           deps: ${{ matrix.deps }}
           phpunit: paratest --functional
 
+      - name: Run Behat tests
+        run: vendor/bin/behat --config=tests/Behat/behat.php --format=progress --strict
+
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
