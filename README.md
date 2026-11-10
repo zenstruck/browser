@@ -877,6 +877,12 @@ $browser->use(function(Component1 $component1, Component2 $component2) {
 If you find yourself creating a lot of [http requests](#http-requests) with the same options
 (ie an `X-Token` header) there are a couple ways to reduce this duplication:
 
+> [!NOTE]
+> Default options apply to the [http methods](#http-requests) only (`->get()`, `->post()`,
+> `->put()`, `->patch()`, `->delete()` and `->request()`). `->visit()` is plain navigation and
+> sends no http options, so use `->get()` instead when a page needs them (for instance
+> `PHP_AUTH_USER`/`PHP_AUTH_PW` server parameters for HTTP basic authentication).
+
 1. Use `->setDefaultHttpOptions()` for the current browser:
    ```php
    /** @var \Zenstruck\Browser\KernelBrowser $browser **/
