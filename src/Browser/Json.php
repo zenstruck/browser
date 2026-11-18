@@ -12,6 +12,7 @@
 namespace Zenstruck\Browser;
 
 use JsonSchema\Validator;
+use Symfony\Component\JsonPath\JsonCrawler;
 use Zenstruck\Assert;
 use Zenstruck\Assert\Expectation;
 
@@ -28,6 +29,8 @@ final class Json implements \Stringable
 
     /** @var mixed */
     private $decoded;
+
+    private bool $jsonPath = false;
 
     public function __construct(string $source)
     {
@@ -54,8 +57,24 @@ final class Json implements \Stringable
     }
 
     /**
-     * @param string $expression JMESPath expression
-     * @param mixed  $expected
+     * Returns a new instance that resolves expressions with JSONPath (RFC 9535) instead of JMESPath.
+     *
+     * A JSONPath query selects a *list* of nodes, so every method below works on that list: a query
+     * matching a single node yields a one-element list, and one matching nothing yields an empty one.
+     *
+     * Requires "symfony/json-path".
+     */
+    public function usingJsonPath(): self
+    {
+        $clone = clone $this;
+        $clone->jsonPath = true;
+
+        return $clone;
+    }
+
+    /**
+     * @param string $expression JMESPath expression, or JSONPath expression with {@see usingJsonPath()}
+     * @param mixed  $expected   with JSONPath, the list of selected nodes
      */
     public function assertMatches(string $expression, $expected): self
     {
@@ -65,10 +84,18 @@ final class Json implements \Stringable
     }
 
     /**
-     * @param string $selector JMESPath selector
+     * @param string $selector JMESPath selector, or JSONPath expression with {@see usingJsonPath()}
      */
     public function assertHas(string $selector): self
     {
+        if ($this->jsonPath) {
+            Assert::that([] !== $this->find($selector))
+                ->equals(true, 'Element with selector "{selector}" not found.', ['selector' => $selector])
+            ;
+
+            return $this;
+        }
+
         $prefix = 1 === \preg_match('#^\[#', $selector) ? '' : '@.';
         $exploded = \explode('.', $prefix.$selector);
         $key = \array_pop($exploded);
@@ -82,10 +109,18 @@ final class Json implements \Stringable
     }
 
     /**
-     * @param string $selector JMESPath selector
+     * @param string $selector JMESPath selector, or JSONPath expression with {@see usingJsonPath()}
      */
     public function assertMissing(string $selector): self
     {
+        if ($this->jsonPath) {
+            Assert::that([] !== $this->find($selector))
+                ->equals(false, 'Element with selector "{selector}" exists but it should not.', ['selector' => $selector])
+            ;
+
+            return $this;
+        }
+
         $prefix = 1 === \preg_match('#^\[#', $selector) ? '' : '@.';
         $exploded = \explode('.', $prefix.$selector);
         $key = \array_pop($exploded);
@@ -103,7 +138,7 @@ final class Json implements \Stringable
      */
     public function assertThat(string $selector, callable $assert): self
     {
-        $assert(self::encode($this->search($selector)));
+        $assert($this->encode($this->search($selector)));
 
         return $this;
     }
@@ -122,7 +157,7 @@ final class Json implements \Stringable
         Assert::that($value)->isNotEmpty();
 
         foreach ($value as $item) {
-            $assert(self::encode($item));
+            $assert($this->encode($item));
         }
 
         return $this;
@@ -147,10 +182,16 @@ final class Json implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @param string $selector JMESPath selector, or JSONPath expression with {@see usingJsonPath()}
+     *
+     * @return mixed the selected value, or with JSONPath the list of selected nodes
      */
     public function search(string $selector)
     {
+        if ($this->jsonPath) {
+            return $this->find($selector);
+        }
+
         if (!\function_exists('JmesPath\search')) {
             throw new \LogicException('"mtdowling/jmespath.php" is required to search JSON (composer require --dev mtdowling/jmespath.php).');
         }
@@ -177,8 +218,27 @@ final class Json implements \Stringable
     /**
      * @param mixed $data
      */
-    private static function encode($data): self
+    private function encode($data): self
     {
-        return new self(\json_encode($data, \JSON_THROW_ON_ERROR));
+        $json = new self(\json_encode($data, \JSON_THROW_ON_ERROR));
+        $json->jsonPath = $this->jsonPath;
+
+        return $json;
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    private function find(string $expression): array
+    {
+        if (!\class_exists(JsonCrawler::class)) {
+            throw new \LogicException('"symfony/json-path" is required to search JSON with JSONPath (composer require --dev symfony/json-path).');
+        }
+
+        if ('' === \trim($this->source)) {
+            return [];
+        }
+
+        return (new JsonCrawler($this->source))->find($expression);
     }
 }

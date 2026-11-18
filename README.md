@@ -513,6 +513,45 @@ $json = $browser
 > See the [full `zenstruck/assert` expectation API documentation](https://github.com/zenstruck/assert#expectation-api)
 > to see all the methods available on `Zenstruck\Browser\Json`.
 
+##### JSONPath
+
+`Json::usingJsonPath()` returns a new `Json` that resolves expressions with
+[JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) instead of JMESPath. JMESPath stays the
+default, so existing assertions are unaffected.
+
+> [!NOTE]
+> `symfony/json-path` is required: `composer require --dev symfony/json-path`.
+
+A JSONPath query selects a **list of nodes**, so every method works on that list: a query matching a
+single node gives a one-element list, and one matching nothing gives an empty list.
+
+```php
+$json = $browser
+    ->get('/api/endpoint')
+    ->json()
+    ->usingJsonPath()
+;
+
+$json->assertMatches('$.foo.bar.baz', [1]); // a list, even for a single node
+$json->assertMatches('$.foo[*].baz', [1, 2, 3]);
+$json->assertHas('$.foo.bar.baz'); // at least one node is selected
+$json->assertMissing('$.foo.bar.boo'); // no node is selected
+$json->search('$.foo.bar.baz'); // list<mixed> (every node the query selects)
+
+// the Json passed to a closure keeps the JSONPath engine
+// {"foo": {"bar": "baz"}}
+$json->assertThat('$.foo', fn(Json $json) => $json->assertMatches('$[0].bar', ['baz']));
+
+// iterates the selected nodes
+// {"foo": [1, 2, 3]}
+$json->assertThatEach('$.foo[*]', fn(Json $json) => $json->isGreaterThan(0));
+```
+
+> [!NOTE]
+> The two syntaxes are not interchangeable: a JSONPath query must start with `$`, which JMESPath
+> rejects, and a JMESPath expression has no `$`, which JSONPath rejects. Pick the engine explicitly
+> rather than relying on the expression.
+
 ### PlaywrightBrowser
 
 > [!NOTE]
