@@ -52,6 +52,8 @@ class JsonEngineTest extends TestCase
      * No usingJsonPath() anywhere: the expression is resolved as JSONPath because the variable says so.
      *
      * @test
+     *
+     * @dataProvider jsonPathSpellings
      */
     #[Test]
     #[DataProvider('jsonPathSpellings')]
