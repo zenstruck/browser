@@ -35,9 +35,10 @@ class JsonPathMissingDependencyTest extends TestCase
     #[Test]
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function searching_without_the_package_explains_what_to_install(): void
+    public function opting_in_without_the_package_explains_what_to_install(): void
     {
-        $json = (new Json('{"foo":"bar"}'))->usingJsonPath();
+        // built before the autoloaders go, so the class under test is loaded and the crawler is not
+        $json = new Json('{"foo":"bar"}');
         $autoloaders = \spl_autoload_functions();
         $caught = null;
 
@@ -46,7 +47,7 @@ class JsonPathMissingDependencyTest extends TestCase
         }
 
         try {
-            $json->search('$.foo');
+            $json->usingJsonPath();
         } catch (\LogicException $e) {
             $caught = $e;
         } finally {

@@ -66,6 +66,8 @@ final class Json implements \Stringable
      */
     public function usingJsonPath(): self
     {
+        self::assertJsonPathIsAvailable();
+
         $clone = clone $this;
         $clone->jsonPath = true;
 
@@ -244,14 +246,19 @@ final class Json implements \Stringable
         return $json;
     }
 
+    private static function assertJsonPathIsAvailable(): void
+    {
+        if (!\class_exists(JsonCrawler::class)) {
+            throw new \LogicException('"symfony/json-path" is required to search JSON with JSONPath (composer require --dev symfony/json-path).');
+        }
+    }
+
     /**
      * @return list<mixed>
      */
     private function find(string $expression): array
     {
-        if (!\class_exists(JsonCrawler::class)) {
-            throw new \LogicException('"symfony/json-path" is required to search JSON with JSONPath (composer require --dev symfony/json-path).');
-        }
+        self::assertJsonPathIsAvailable();
 
         if ('' === \trim($this->source)) {
             return [];
