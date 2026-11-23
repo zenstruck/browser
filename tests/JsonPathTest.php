@@ -217,6 +217,33 @@ class JsonPathTest extends TestCase
     }
 
     /**
+     * The callback is called once per SELECTED NODE, and the expression is what decides those: `$.foo`
+     * selects the single node holding the array, so the callback sees the array itself, while `$.foo[*]`
+     * selects each element. Pinned because the two read alike and do not behave alike.
+     *
+     * @test
+     */
+    #[Test]
+    public function assert_that_each_iterates_the_selected_nodes(): void
+    {
+        $seen = [];
+
+        (new Json('{"foo":[1, 2]}'))->usingJsonPath()
+            ->assertThatEach('$.foo', static function(Json $json) use (&$seen) { $seen[] = $json->decoded(); })
+        ;
+
+        self::assertSame([[1, 2]], $seen);
+
+        $seen = [];
+
+        (new Json('{"foo":[1, 2]}'))->usingJsonPath()
+            ->assertThatEach('$.foo[*]', static function(Json $json) use (&$seen) { $seen[] = $json->decoded(); })
+        ;
+
+        self::assertSame([1, 2], $seen);
+    }
+
+    /**
      * @test
      *
      * @dataProvider noNodesProvider

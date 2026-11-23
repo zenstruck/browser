@@ -174,6 +174,10 @@ final class Json implements \Stringable
     }
 
     /**
+     * With JSONPath the callback is called once per SELECTED NODE, which is what the expression
+     * decides: `$.foo[*]` selects each element of `foo` and calls back for each, while `$.foo`
+     * selects the one node holding the array and calls back once with it.
+     *
      * @param callable(Json):mixed $assert
      */
     public function assertThatEach(string $selector, callable $assert): self
