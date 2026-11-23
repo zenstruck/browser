@@ -91,7 +91,7 @@ final class Json implements \Stringable
     public function assertHas(string $selector): self
     {
         if ($this->jsonPath) {
-            Assert::that([] !== $this->find($selector))
+            Assert::that([] !== $this->findWithJsonPath($selector))
                 ->equals(true, 'Element with selector "{selector}" not found.', ['selector' => $selector])
             ;
 
@@ -116,7 +116,7 @@ final class Json implements \Stringable
     public function assertMissing(string $selector): self
     {
         if ($this->jsonPath) {
-            Assert::that([] !== $this->find($selector))
+            Assert::that([] !== $this->findWithJsonPath($selector))
                 ->equals(false, 'Element with selector "{selector}" exists but it should not.', ['selector' => $selector])
             ;
 
@@ -145,7 +145,7 @@ final class Json implements \Stringable
     public function assertThat(string $selector, callable $assert): self
     {
         if ($this->jsonPath) {
-            $nodes = $this->find($selector);
+            $nodes = $this->findWithJsonPath($selector);
 
             Assert::that(\count($nodes))->equals(
                 1,
@@ -209,7 +209,7 @@ final class Json implements \Stringable
     public function search(string $selector)
     {
         if ($this->jsonPath) {
-            return $this->find($selector);
+            return $this->findWithJsonPath($selector);
         }
 
         if (!\function_exists('JmesPath\search')) {
@@ -256,7 +256,7 @@ final class Json implements \Stringable
     /**
      * @return list<mixed>
      */
-    private function find(string $expression): array
+    private function findWithJsonPath(string $expression): array
     {
         self::assertJsonPathIsAvailable();
 
