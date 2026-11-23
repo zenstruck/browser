@@ -148,7 +148,39 @@ class JsonPathTest extends TestCase
     public function can_perform_assertion_on_a_selected_node(): void
     {
         (new Json('{"foo":{"bar":"baz"}}'))->usingJsonPath()
-            ->assertThat('$.foo.bar', static function(Json $json) { $json->isNotEmpty()->equals(['baz']); })
+            ->assertThat('$.foo.bar', static function(Json $json) { $json->isNotEmpty()->equals('baz'); })
+        ;
+    }
+
+    /**
+     * A query selects a list of nodes, so handing that list to the callback made every assertion in
+     * it an assertion about the wrapper: `isGreaterThan(0)` on `[-5]` compares an array with an int
+     * and passes.
+     *
+     * @test
+     */
+    #[Test]
+    public function an_assertion_on_a_single_node_receives_the_node_itself(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        (new Json('{"foo":{"bar":-5}}'))->usingJsonPath()
+            ->assertThat('$.foo.bar', static function(Json $json) { $json->isGreaterThan(0); })
+        ;
+    }
+
+    /**
+     * The callback takes one node, so a query that selects several has no single value to hand it.
+     *
+     * @test
+     */
+    #[Test]
+    public function an_assertion_on_a_query_selecting_several_nodes_is_refused(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        (new Json('{"foo":[1,2]}'))->usingJsonPath()
+            ->assertThat('$.foo[*]', static function(Json $json) {})
         ;
     }
 
@@ -162,7 +194,7 @@ class JsonPathTest extends TestCase
     public function a_nested_assertion_keeps_the_json_path_engine(): void
     {
         (new Json('{"foo":{"bar":"baz"}}'))->usingJsonPath()
-            ->assertThat('$.foo', static function(Json $json) { $json->assertMatches('$[0].bar', ['baz']); })
+            ->assertThat('$.foo', static function(Json $json) { $json->assertMatches('$.bar', ['baz']); })
         ;
     }
 

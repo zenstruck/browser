@@ -134,10 +134,28 @@ final class Json implements \Stringable
     }
 
     /**
+     * The callback takes one value, so with JSONPath the query must select exactly one node and the
+     * callback is handed that node - not the one-element list holding it, against which every
+     * expectation would be an expectation about a list.
+     *
      * @param callable(Json):mixed $assert
      */
     public function assertThat(string $selector, callable $assert): self
     {
+        if ($this->jsonPath) {
+            $nodes = $this->find($selector);
+
+            Assert::that(\count($nodes))->equals(
+                1,
+                'Expected selector "{selector}" to select exactly one node, {count} selected.',
+                ['selector' => $selector, 'count' => \count($nodes)],
+            );
+
+            $assert($this->encode($nodes[0]));
+
+            return $this;
+        }
+
         $assert($this->encode($this->search($selector)));
 
         return $this;
