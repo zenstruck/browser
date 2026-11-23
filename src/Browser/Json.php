@@ -25,6 +25,10 @@ use function JmesPath\search;
  */
 final class Json implements \Stringable
 {
+    private const ENGINE_ENV_VAR = 'BROWSER_JSON_ENGINE';
+    private const ENGINE_JMESPATH = 'jmespath';
+    private const ENGINE_JSON_PATH = 'json_path';
+
     private string $source;
 
     /** @var mixed */
@@ -35,6 +39,12 @@ final class Json implements \Stringable
     public function __construct(string $source)
     {
         $this->source = $source;
+
+        if (self::jsonPathIsTheConfiguredEngine()) {
+            self::assertJsonPathIsAvailable();
+
+            $this->jsonPath = true;
+        }
     }
 
     /**
@@ -244,6 +254,30 @@ final class Json implements \Stringable
         $json->jsonPath = $this->jsonPath;
 
         return $json;
+    }
+
+    /**
+     * Whether BROWSER_JSON_ENGINE selects JSONPath for the whole suite.
+     *
+     * This is what reaches the places that build a Json themselves, where there is no call to chain
+     * {@see usingJsonPath()} onto: KernelBrowser::assertJsonMatches(), Session::dump(), and the
+     * instance handed to a use() callback.
+     */
+    private static function jsonPathIsTheConfiguredEngine(): bool
+    {
+        $engine = $_ENV[self::ENGINE_ENV_VAR] ?? $_SERVER[self::ENGINE_ENV_VAR] ?? null;
+
+        if (!\is_string($engine) || '' === \trim($engine)) {
+            return false;
+        }
+
+        // separators are ignored so "jsonpath", "json-path" and "json_path" all land, while a
+        // genuine typo still throws rather than running the suite on the other engine
+        return match (\str_replace(['_', '-'], '', \strtolower(\trim($engine)))) {
+            'jsonpath' => true,
+            'jmespath' => false,
+            default => throw new \LogicException(\sprintf('"%s" is not a valid %s: expected "%s" or "%s".', $engine, self::ENGINE_ENV_VAR, self::ENGINE_JMESPATH, self::ENGINE_JSON_PATH)),
+        };
     }
 
     private static function assertJsonPathIsAvailable(): void
