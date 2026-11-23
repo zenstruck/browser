@@ -555,11 +555,13 @@ $json->assertHas('$.foo.bar.baz'); // at least one node is selected
 $json->assertMissing('$.foo.bar.boo'); // no node is selected
 $json->search('$.foo.bar.baz'); // list<mixed> (every node the query selects)
 
-// the Json passed to a closure keeps the JSONPath engine
+// the query must select exactly one node, and the closure is handed that node
+// (the Json it receives keeps the JSONPath engine)
 // {"foo": {"bar": "baz"}}
-$json->assertThat('$.foo', fn(Json $json) => $json->assertMatches('$[0].bar', ['baz']));
+$json->assertThat('$.foo', fn(Json $json) => $json->assertMatches('$.bar', ['baz']));
 
-// iterates the selected nodes
+// iterates the selected nodes, so the expression decides what the closure sees:
+// $.foo[*] calls it per element, $.foo once with the whole array
 // {"foo": [1, 2, 3]}
 $json->assertThatEach('$.foo[*]', fn(Json $json) => $json->isGreaterThan(0));
 ```
