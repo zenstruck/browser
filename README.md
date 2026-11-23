@@ -519,6 +519,23 @@ $json = $browser
 [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) instead of JMESPath. JMESPath stays the
 default, so existing assertions are unaffected.
 
+To use JSONPath everywhere instead, set `BROWSER_JSON_ENGINE`:
+
+```dotenv
+BROWSER_JSON_ENGINE=json_path
+```
+
+This also reaches the places that build a `Json` for you, where there is no call to chain
+`usingJsonPath()` onto:
+
+- `KernelBrowser::assertJsonMatches()`
+- `Session::dump()`
+- the `Json` passed to a `use()` callback
+
+Accepted values are `jmespath` (the default) and `json_path`. Separators and case are ignored, so
+`jsonpath` and `json-path` work too. Any other value throws, so a typo cannot quietly run the suite
+on the engine you were trying to leave.
+
 > [!NOTE]
 > `symfony/json-path` is required: `composer require --dev symfony/json-path`.
 
