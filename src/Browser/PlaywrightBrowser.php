@@ -15,11 +15,9 @@ use Behat\Mink\Element\NodeElement;
 use Playwright\Console\ConsoleMessage;
 use Playwright\Page\PageInterface;
 use Playwright\Symfony\Client\PlaywrightKernelClient;
-use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Browser;
 use Zenstruck\Browser\Session\Driver\PlaywrightDriver;
-use Zenstruck\Browser\Session\Playwright\CookieJar as PlaywrightCookieJar;
 use Zenstruck\Browser\Session\Playwright\Selectors;
 
 /**
@@ -255,14 +253,6 @@ class PlaywrightBrowser extends Browser
         $element->rightClick();
 
         return $this;
-    }
-
-    /**
-     * @internal
-     */
-    protected function cookieJar(): CookieJar
-    {
-        return new PlaywrightCookieJar($this->page(), $this->client()->getBaseUrl());
     }
 
     protected function getClickableElement(string $selector): NodeElement
