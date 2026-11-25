@@ -30,6 +30,7 @@
         "playwright-php/playwright": "^1.6.0",
         "playwright-php/playwright-symfony": "^0.12",
         "symfony/console": "^6.4|^7.0|^8.0",
+        "symfony/json-path": "^7.4.23|^8.1.11",
         "symfony/mime": "^6.4|^7.0|^8.0",
         "symfony/panther": "^1.1|^2.0.1",
         "symfony/phpunit-bridge": "^6.4|^7.0|^8.0",
@@ -41,7 +42,8 @@
     },
     "suggest": {
         "justinrainbow/json-schema": "Json schema validator. Needed to use Json::assertMatchesSchema().",
-        "mtdowling/jmespath.php":  "PHP implementation for JMESPath. Needed to use Json assertions."
+        "mtdowling/jmespath.php":  "PHP implementation for JMESPath. Needed to use Json assertions.",
+        "symfony/json-path": "PHP implementation for JSONPath (RFC 9535). Needed to use Json::usingJsonPath()."
     },
     "config": {
         "preferred-install": "dist",
