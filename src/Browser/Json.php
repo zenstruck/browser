@@ -277,7 +277,7 @@ final class Json implements \Stringable
 
         // separators are ignored so "jsonpath", "json-path" and "json_path" all land, while a
         // genuine typo still throws rather than running the suite on the other engine
-        return match (\str_replace(['_', '-'], '', \strtolower(\trim($engine)))) {
+        return match (\str_replace(['_', '-'], '', \mb_strtolower(\trim($engine)))) {
             'jsonpath' => true,
             'jmespath' => false,
             default => throw new \LogicException(\sprintf('"%s" is not a valid %s: expected "%s" or "%s".', $engine, self::ENGINE_ENV_VAR, self::ENGINE_JMESPATH, self::ENGINE_JSON_PATH)),
