@@ -28,7 +28,7 @@
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^9.6.21|^10.4|^11.5|^12.0|^13.0",
         "playwright-php/playwright": "^1.6.0",
-        "playwright-php/playwright-symfony": "^0.12",
+        "playwright-php/playwright-symfony": "dev-main as 0.13.0",
         "symfony/console": "^6.4|^7.0|^8.0",
         "symfony/json-path": "^7.4.23|^8.1.11",
         "symfony/mime": "^6.4|^7.0|^8.0",
@@ -38,7 +38,7 @@
     },
     "conflict": {
         "playwright-php/playwright": "<1.6.0",
-        "playwright-php/playwright-symfony": "<0.12"
+        "playwright-php/playwright-symfony": "<0.13"
     },
     "suggest": {
         "justinrainbow/json-schema": "Json schema validator. Needed to use Json::assertMatchesSchema().",
