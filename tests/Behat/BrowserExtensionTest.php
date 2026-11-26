@@ -1,0 +1,47 @@
+<?php
+
+/*
+ * This file is part of the zenstruck/browser package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Zenstruck\Browser\Tests\Behat;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
+
+/**
+ * @group playwright
+ */
+#[Group('playwright')]
+final class BrowserExtensionTest extends TestCase
+{
+    /**
+     * @test
+     */
+    #[Test]
+    public function cleans_up_after_failed_scenarios(): void
+    {
+        $process = new Process([
+            \PHP_BINARY,
+            'vendor/bin/behat',
+            '--config=tests/Behat/behat.php',
+            '--profile=failure',
+            '--format=progress',
+            '--no-colors',
+            '--strict',
+        ], \dirname(__DIR__, 2));
+        $process->setTimeout(180);
+        $process->run();
+
+        self::assertSame(1, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
+        self::assertStringContainsString('2 scenarios (1 passed, 1 failed)', $process->getOutput());
+        self::assertStringContainsString('The text "This text does not exist" was not found anywhere in the text of the current page.', $process->getOutput());
+    }
+}

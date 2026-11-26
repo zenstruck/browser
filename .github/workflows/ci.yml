@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [8.2, 8.3, 8.4, 8.5, 8.6]
+        php: [8.2, 8.3, 8.4, 8.5]
         deps: [highest]
         symfony: [6.4.*, 7.4.*, 8.1.*, 8.2.*]
         include:
@@ -41,6 +41,9 @@ jobs:
           symfony: ${{ matrix.symfony }}
           deps: ${{ matrix.deps }}
           phpunit: paratest --functional
+
+      - name: Run Behat tests
+        run: vendor/bin/behat --config=tests/Behat/behat.php --format=progress --strict
 
   code-coverage:
     name: Code Coverage

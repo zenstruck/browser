@@ -22,7 +22,11 @@
         "zenstruck/callback": "^1.4.2"
     },
     "require-dev": {
+        "behat/behat": "^3.22|^4.0",
+        "behat/mink-browserkit-driver": "^2.0",
         "brianium/paratest": "^6.11|^7.0",
+        "friends-of-behat/mink-extension": "^2.7|^3.0@alpha",
+        "friends-of-behat/symfony-extension": "^2.0",
         "justinrainbow/json-schema": "^5.3",
         "mtdowling/jmespath.php": "^2.6",
         "phpstan/phpstan": "^2.0",

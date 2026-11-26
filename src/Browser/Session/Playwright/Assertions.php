@@ -43,6 +43,6 @@ final class Assertions
             $arguments[0] = $this->selectors->field($arguments[0]);
         }
 
-        $this->wait->condition(\file_get_contents(__DIR__.'/assertion.js'), [$name, $arguments]);
+        $this->wait->assertion($name, $arguments);
     }
 }
