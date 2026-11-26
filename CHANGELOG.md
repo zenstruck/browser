@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [v1.15.0](https://github.com/zenstruck/browser/releases/tag/v1.15.0)
+
+November 26th, 2026 - [v1.14.0...v1.15.0](https://github.com/zenstruck/browser/compare/v1.14.0...v1.15.0)
+
+* 63e7675 feat: support JSONPath expressions in `Json` (#231) by @norkunas
+* 6294741 docs: note that default http options does not apply to `visit()` (#230) by @Amoifr
+* cb70ce1 fix(playwright): include uncaught JavaScript errors in console logs (#229) by @kbond
+* 4a028af docs: add agent instructions by @kbond
+
 ## [v1.14.0](https://github.com/zenstruck/browser/releases/tag/v1.14.0)
 
 November 6th, 2026 - [v1.13.0...v1.14.0](https://github.com/zenstruck/browser/compare/v1.13.0...v1.14.0)
