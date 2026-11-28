@@ -14,7 +14,9 @@ namespace Zenstruck\Browser\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Zenstruck\Browser;
+use Zenstruck\Browser\Session\Driver;
 use Zenstruck\Browser\Test\LegacyExtension;
 
 final class NormalizationTest extends TestCase
@@ -29,7 +31,13 @@ final class NormalizationTest extends TestCase
     #[DataProvider('edgeCaseTestNames')]
     public function can_normalize_test_names(string $testName, string $expectedOutput): void
     {
-        $browser = $this->createMock(Browser::class);
+        $driver = $this->createStub(Driver::class);
+        $driver->method('client')->willReturn($this->createStub(AbstractBrowser::class));
+        $browser = $this->getMockBuilder(Browser::class)
+            ->setConstructorArgs([$driver])
+            ->onlyMethods(['saveCurrentState'])
+            ->getMock()
+        ;
         $browser
             ->expects(self::once())
             ->method('saveCurrentState')

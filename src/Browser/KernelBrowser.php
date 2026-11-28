@@ -13,8 +13,8 @@ namespace Zenstruck\Browser;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser as SymfonyKernelBrowser;
 use Zenstruck\Browser;
-use Zenstruck\Browser\Session\Driver\BrowserKitDriver;
-use Zenstruck\Callback\Parameter;
+use Zenstruck\Browser\Internal\ApiMethods;
+use Zenstruck\Browser\Internal\KernelBrowserBehavior;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -23,80 +23,52 @@ use Zenstruck\Callback\Parameter;
  *
  * @method SymfonyKernelBrowser client()
  */
-class KernelBrowser extends Browser
+abstract class KernelBrowser extends Browser
 {
-    protected ?HttpOptions $defaultHttpOptions = null;
-
-    /**
-     * @internal
-     */
-    final public function __construct(SymfonyKernelBrowser $client, array $options = [])
-    {
-        $client->followRedirects((bool) ($options['follow_redirects'] ?? true));
-
-        parent::__construct(new BrowserKitDriver($client), $options); // @phpstan-ignore argument.type
-
-        if (!($options['catch_exceptions'] ?? true)) {
-            $this->throwExceptions();
-        }
+    use ApiMethods {
+        setDefaultHttpOptions as private apiSetDefaultHttpOptions;
+        request as private apiRequest;
+        assertJson as private apiAssertJson;
+        assertXml as private apiAssertXml;
+        assertJsonMatches as private apiAssertJsonMatches;
+        json as private apiJson;
     }
+    use Htmlable {
+        useParameters as private htmlUseParameters;
+    }
+    use KernelBrowserBehavior;
 
     /**
-     * @see SymfonyKernelBrowser::disableReboot()
+     * @deprecated since 1.16, use ApiBrowser instead
      *
-     * @return static
-     */
-    final public function disableReboot(): self
-    {
-        $this->client()->disableReboot();
-
-        return $this;
-    }
-
-    /**
-     * @see SymfonyKernelBrowser::enableReboot()
-     *
-     * @return static
-     */
-    final public function enableReboot(): self
-    {
-        $this->client()->enableReboot();
-
-        return $this;
-    }
-
-    /**
      * @param HttpOptions|Options $options
      *
      * @return static
      */
     final public function setDefaultHttpOptions($options): self
     {
-        $this->defaultHttpOptions = HttpOptions::create($options);
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
 
-        return $this;
+        return $this->apiSetDefaultHttpOptions($options);
     }
 
     /**
+     * @deprecated since 1.16, use ApiBrowser instead
+     *
      * @param HttpOptions|array $options HttpOptions::DEFAULT_OPTIONS
      *
      * @return static
      */
     final public function request(string $method, string $url, $options = []): self
     {
-        if ($this->defaultHttpOptions) {
-            // clone to avoid HttpOptions::merge() mutating the default options
-            $options = (clone $this->defaultHttpOptions)->merge($options);
-        }
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
 
-        $options = HttpOptions::create($options);
-
-        $this->session()->request($method, $options->addQueryToUrl($url), $options);
-
-        return $this;
+        return $this->apiRequest($method, $url, $options);
     }
 
     /**
+     * @deprecated since 1.16, use ApiBrowser instead
+     *
      * @see request()
      *
      * @param HttpOptions|array $options
@@ -105,10 +77,14 @@ class KernelBrowser extends Browser
      */
     public function get(string $url, $options = []): self
     {
-        return $this->request('GET', $url, $options);
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
+
+        return $this->apiRequest('GET', $url, $options);
     }
 
     /**
+     * @deprecated since 1.16, use ApiBrowser instead
+     *
      * @see request()
      *
      * @param HttpOptions|array $options
@@ -117,10 +93,14 @@ class KernelBrowser extends Browser
      */
     public function post(string $url, $options = []): self
     {
-        return $this->request('POST', $url, $options);
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
+
+        return $this->apiRequest('POST', $url, $options);
     }
 
     /**
+     * @deprecated since 1.16, use ApiBrowser instead
+     *
      * @see request()
      *
      * @param HttpOptions|array $options
@@ -129,22 +109,14 @@ class KernelBrowser extends Browser
      */
     public function put(string $url, $options = []): self
     {
-        return $this->request('PUT', $url, $options);
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
+
+        return $this->apiRequest('PUT', $url, $options);
     }
 
     /**
-     * @see request()
+     * @deprecated since 1.16, use ApiBrowser instead
      *
-     * @param HttpOptions|array $options
-     *
-     * @return static
-     */
-    public function delete(string $url, $options = []): self
-    {
-        return $this->request('DELETE', $url, $options);
-    }
-
-    /**
      * @see request()
      *
      * @param HttpOptions|array $options
@@ -153,34 +125,54 @@ class KernelBrowser extends Browser
      */
     public function patch(string $url, $options = []): self
     {
-        return $this->request('PATCH', $url, $options);
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
+
+        return $this->apiRequest('PATCH', $url, $options);
     }
 
     /**
+     * @deprecated since 1.16, use ApiBrowser instead
+     *
+     * @see request()
+     *
+     * @param HttpOptions|array $options
+     *
+     * @return static
+     */
+    public function delete(string $url, $options = []): self
+    {
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
+
+        return $this->apiRequest('DELETE', $url, $options);
+    }
+
+    /**
+     * @deprecated since 1.16, use ApiBrowser instead
+     *
      * @return static
      */
     final public function assertJson(): self
     {
-        return $this->assertContentType('json');
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
+
+        return $this->apiAssertJson();
     }
 
     /**
+     * @deprecated since 1.16, use ApiBrowser instead
+     *
      * @return static
      */
     final public function assertXml(): self
     {
-        return $this->assertContentType('xml');
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
+
+        return $this->apiAssertXml();
     }
 
     /**
-     * @return static
-     */
-    final public function assertHtml(): self
-    {
-        return $this->assertContentType('html');
-    }
-
-    /**
+     * @deprecated since 1.16, use ApiBrowser instead
+     *
      * @param string $expression JMESPath expression
      * @param mixed  $expected
      *
@@ -188,21 +180,23 @@ class KernelBrowser extends Browser
      */
     final public function assertJsonMatches(string $expression, $expected): self
     {
-        $this->json()->assertMatches($expression, $expected);
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
 
-        return $this;
+        return $this->apiAssertJsonMatches($expression, $expected);
     }
 
+    /**
+     * @deprecated since 1.16, use ApiBrowser instead
+     */
     final public function json(): Json
     {
-        return $this->assertJson()->session()->json();
+        trigger_deprecation('zenstruck/browser', '1.16', '%s::%s() is deprecated, use ->api()->%s() instead.', self::class, __FUNCTION__, __FUNCTION__);
+
+        return $this->apiJson();
     }
 
     protected function useParameters(): array
     {
-        return [
-            ...parent::useParameters(),
-            Parameter::typed(Json::class, Parameter::factory(fn() => $this->json())),
-        ];
+        return [...$this->htmlUseParameters(), ...$this->apiParameters()];
     }
 }

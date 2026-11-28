@@ -32,4 +32,15 @@ final class InvalidTestCaseTest extends TestCase
 
         $this->browser();
     }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function cannot_create_api_browser(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        $this->apiBrowser();
+    }
 }

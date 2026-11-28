@@ -122,7 +122,7 @@ trait KernelBrowserTests
     #[Test]
     public function http_method_actions(): void
     {
-        $this->browser()
+        $this->apiBrowser()
             ->get('/http-method')
             ->assertSuccessful()
             ->assertContains('"method":"GET"')
@@ -175,7 +175,7 @@ trait KernelBrowserTests
     #[Test]
     public function can_set_default_http_options(): void
     {
-        $this->browser()
+        $this->apiBrowser()
             ->setDefaultHttpOptions(['headers' => ['x-foo' => 'bar']])
             ->post('/http-method')
             ->assertContains('"x-foo":["Bar"]')
@@ -191,7 +191,7 @@ trait KernelBrowserTests
     #[Test]
     public function default_http_options_are_not_mutated_by_request_options(): void
     {
-        $this->browser()
+        $this->apiBrowser()
             ->setDefaultHttpOptions(['headers' => ['x-foo' => 'bar']])
             ->post('/http-method', [
                 'headers' => ['x-foo' => 'baz'],
@@ -217,7 +217,7 @@ trait KernelBrowserTests
     #[Test]
     public function can_handle_any_content_type(): void
     {
-        $this->browser()
+        $this->apiBrowser()
             ->get('/text')
             ->assertHeaderContains('content-type', 'text/plain')
             ->assertSuccessful()
@@ -232,7 +232,7 @@ trait KernelBrowserTests
     #[Test]
     public function can_assert_json_matches(): void
     {
-        $this->browser()
+        $this->apiBrowser()
             ->post('/json', ['json' => [
                 'foo' => [
                     'bar' => ['baz' => 1],
@@ -255,14 +255,14 @@ trait KernelBrowserTests
     #[Test]
     public function assert_content_types(): void
     {
-        $this->browser()
+        $this->apiBrowser()
             ->get('/json')
             ->assertSuccessful()
             ->assertJson()
             ->get('/xml')
             ->assertXml()
             ->get('/page1')
-            ->assertHtml()
+            ->assertContentType('html')
             ->get('/zip')
             ->assertContentType('zip')
         ;
@@ -275,7 +275,7 @@ trait KernelBrowserTests
     public function can_dump_empty_json_request(): void
     {
         $output = self::catchVarDumperOutput(function() {
-            $this->browser()
+            $this->apiBrowser()
                 ->post('/json')
                 ->dump()
             ;
@@ -291,7 +291,7 @@ trait KernelBrowserTests
     public function can_dump_json_response_as_array(): void
     {
         $output = self::catchVarDumperOutput(function() {
-            $this->browser()
+            $this->apiBrowser()
                 ->post('/json', ['json' => ['foo' => 'bar']])
                 ->dump()
             ;
@@ -307,8 +307,8 @@ trait KernelBrowserTests
     public function dump_includes_headers_and_status(): void
     {
         $output = self::catchVarDumperOutput(function() {
-            $this->browser()
-                ->visit('/page1')
+            $this->apiBrowser()
+                ->get('/page1')
                 ->dump()
             ;
         });
@@ -324,7 +324,7 @@ trait KernelBrowserTests
     public function can_dump_json_array_key(): void
     {
         $output = self::catchVarDumperOutput(function() {
-            $this->browser()
+            $this->apiBrowser()
                 ->post('/json', ['json' => ['foo' => 'bar']])
                 ->dump('foo')
             ;
@@ -340,7 +340,7 @@ trait KernelBrowserTests
     public function can_dump_json_path_expression(): void
     {
         $output = self::catchVarDumperOutput(function() {
-            $this->browser()
+            $this->apiBrowser()
                 ->post('/json', ['json' => [
                     'foo' => [
                         'bar' => ['baz' => 1],
@@ -363,8 +363,8 @@ trait KernelBrowserTests
     {
         $file = self::uniqueFilename('source.txt');
         $contents = self::catchFileContents(__DIR__.'/../var/browser/source/'.$file, function() use ($file) {
-            $this->browser()
-                ->visit('/http-method')
+            $this->apiBrowser()
+                ->get('/http-method')
                 ->saveSource('/'.$file)
             ;
         });
@@ -381,8 +381,8 @@ trait KernelBrowserTests
     {
         $file = self::uniqueFilename('source.txt');
         $contents = self::catchFileContents(__DIR__.'/../var/browser/source/'.$file, function() use ($file) {
-            $this->browser()
-                ->visit('/invalid-page')
+            $this->apiBrowser()
+                ->get('/invalid-page')
                 ->assertStatus(404)
                 ->saveSource('/'.$file)
             ;
@@ -397,7 +397,7 @@ trait KernelBrowserTests
     #[Test]
     public function can_access_json_object(): void
     {
-        $json = $this->browser()
+        $json = $this->apiBrowser()
             ->post('/json', ['json' => $expected = ['foo' => 'bar']])
             ->assertSuccessful()
             ->json()
@@ -412,7 +412,7 @@ trait KernelBrowserTests
     #[Test]
     public function can_use_json_object(): void
     {
-        $this->browser()
+        $this->apiBrowser()
             ->post('/json', ['json' => ['foo' => 'bar']])
             ->assertSuccessful()
             ->use(static function(Json $json) {
@@ -428,8 +428,8 @@ trait KernelBrowserTests
     public function can_dump_xml_selector(): void
     {
         $output = self::catchVarDumperOutput(function() {
-            $this->browser()
-                ->visit('/xml')
+            $this->apiBrowser()
+                ->get('/xml')
                 ->dump('url loc')
             ;
         });
@@ -445,8 +445,8 @@ trait KernelBrowserTests
     #[Test]
     public function can_access_the_xml_crawler(): void
     {
-        $crawler = $this->browser()
-            ->visit('/xml')
+        $crawler = $this->apiBrowser()
+            ->get('/xml')
             ->crawler()
             ->filter('url loc')
         ;
@@ -460,10 +460,10 @@ trait KernelBrowserTests
     #[Test]
     public function can_expect_exception_for_http_request(): void
     {
-        $this->browser()
+        $this->apiBrowser()
             ->expectException(\Exception::class)
-            ->visit('/exception')
-            ->visit('/page1')
+            ->get('/exception')
+            ->get('/page1')
             ->assertSuccessful()
             ->expectException(\Exception::class, 'exception thrown')
             ->post('/exception')

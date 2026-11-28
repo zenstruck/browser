@@ -25,6 +25,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Panther\Client as PantherClient;
 use Symfony\Component\Panther\PantherTestCase;
 use Symfony\Component\Panther\PantherTestCaseTrait;
+use Zenstruck\Browser;
+use Zenstruck\Browser\ApiBrowser;
+use Zenstruck\Browser\HtmlBrowser;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\PantherBrowser;
 use Zenstruck\Browser\PlaywrightBrowser;
@@ -116,44 +119,35 @@ trait HasBrowser
      */
     protected function browser(array $options = [], array $server = []): KernelBrowser
     {
-        if (!$this instanceof KernelTestCase) {
-            throw new \LogicException(\sprintf('A KernelBrowser can only be created in TestCases that extend "%s".', KernelTestCase::class));
+        $class = $_SERVER['KERNEL_BROWSER_CLASS'] ?? HtmlBrowser::class;
+
+        if (!\is_a($class, KernelBrowser::class, true) || !(new \ReflectionClass($class))->isInstantiable()) {
+            throw new \LogicException(\sprintf('"KERNEL_BROWSER_CLASS" env variable must reference a concrete class that extends %s.', KernelBrowser::class));
         }
 
-        $class = $_SERVER['KERNEL_BROWSER_CLASS'] ?? KernelBrowser::class;
+        return $this->createKernelBrowser($class, $options, $server);
+    }
 
-        if (!\is_a($class, KernelBrowser::class, true)) {
-            throw new \LogicException(\sprintf('"KERNEL_BROWSER_CLASS" env variable must reference a class that extends %s.', KernelBrowser::class));
+    /**
+     * @see WebTestCase::createClient()
+     */
+    protected function htmlBrowser(array $options = [], array $server = []): KernelBrowser
+    {
+        return $this->browser($options, $server);
+    }
+
+    /**
+     * @see WebTestCase::createClient()
+     */
+    protected function apiBrowser(array $options = [], array $server = []): ApiBrowser
+    {
+        $class = $_SERVER['API_BROWSER_CLASS'] ?? ApiBrowser::class;
+
+        if (!\is_a($class, ApiBrowser::class, true) || !(new \ReflectionClass($class))->isInstantiable()) {
+            throw new \LogicException(\sprintf('"API_BROWSER_CLASS" env variable must reference a concrete class that extends %s.', ApiBrowser::class));
         }
 
-        $browserOptions = [
-            'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
-            'source_debug' => $_SERVER['BROWSER_SOURCE_DEBUG'] ?? false,
-            'follow_redirects' => (bool) ($_SERVER['BROWSER_FOLLOW_REDIRECTS'] ?? true),
-            'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
-        ];
-
-        if ($this instanceof WebTestCase) {
-            static::ensureKernelShutdown();
-
-            $browser = new $class(static::createClient($options, $server), $browserOptions); // @phpstan-ignore staticMethod.notFound
-        } else {
-            // reboot kernel before starting browser
-            static::bootKernel($options);
-
-            if (!static::getContainer()->has('test.client')) {
-                throw new \RuntimeException('The Symfony test client is not enabled.');
-            }
-
-            $client = static::getContainer()->get('test.client');
-            $client->setServerParameters($server);
-
-            $browser = new $class($client, $browserOptions);
-        }
-
-        BrowserExtension::registerBrowser($browser);
-
-        return $browser;
+        return $this->createKernelBrowser($class, $options, $server);
     }
 
     protected function playwrightBrowser(): PlaywrightBrowser
@@ -193,6 +187,54 @@ trait HasBrowser
         return $browser;
     }
 
+    /**
+     * @internal
+     *
+     * @template T of Browser
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    private function createKernelBrowser(string $class, array $options, array $server): Browser
+    {
+        if (!$this instanceof KernelTestCase) {
+            throw new \LogicException(\sprintf('A browser can only be created in TestCases that extend "%s".', KernelTestCase::class));
+        }
+
+        $browserOptions = [
+            'source_dir' => $_SERVER['BROWSER_SOURCE_DIR'] ?? './var/browser/source',
+            'source_debug' => $_SERVER['BROWSER_SOURCE_DEBUG'] ?? false,
+            'follow_redirects' => (bool) ($_SERVER['BROWSER_FOLLOW_REDIRECTS'] ?? true),
+            'catch_exceptions' => (bool) ($_SERVER['BROWSER_CATCH_EXCEPTIONS'] ?? true),
+        ];
+
+        if ($this instanceof WebTestCase) {
+            static::ensureKernelShutdown();
+
+            $browser = new $class(static::createClient($options, $server), $browserOptions); // @phpstan-ignore staticMethod.notFound
+        } else {
+            // reboot kernel before starting browser
+            static::bootKernel($options);
+
+            if (!static::getContainer()->has('test.client')) {
+                throw new \RuntimeException('The Symfony test client is not enabled.');
+            }
+
+            $client = static::getContainer()->get('test.client');
+            $client->setServerParameters($server);
+
+            $browser = new $class($client, $browserOptions);
+        }
+
+        BrowserExtension::registerBrowser($browser);
+
+        return $browser;
+    }
+
+    /**
+     * @internal
+     */
     private function playwrightClient(): PlaywrightKernelClient
     {
         $session = self::claimPlaywrightSession();
@@ -220,6 +262,9 @@ trait HasBrowser
         );
     }
 
+    /**
+     * @internal
+     */
     private static function claimPlaywrightSession(): BrowserSessionInterface
     {
         $requested = BrowserRegistry::fromEnvironment();

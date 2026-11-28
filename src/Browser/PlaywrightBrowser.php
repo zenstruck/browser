@@ -31,6 +31,11 @@ use Zenstruck\Browser\Session\Playwright\Selectors;
  */
 class PlaywrightBrowser extends Browser
 {
+    use Htmlable {
+        getClickableElement as private htmlClickableElement;
+        getField as private htmlField;
+    }
+
     private ?string $screenshotDir;
     private ?string $consoleLogDir;
 
@@ -271,7 +276,7 @@ class PlaywrightBrowser extends Browser
         $xpath = (new Selectors($this->session()->getSelectorsHandler()))->clickable($selector);
 
         if (!$this->driver()->nativeWait()->element($xpath, 'visible')) {
-            return parent::getClickableElement($selector);
+            return $this->htmlClickableElement($selector);
         }
 
         return new NodeElement($xpath, $this->session());
@@ -283,7 +288,7 @@ class PlaywrightBrowser extends Browser
         $xpath = (new Selectors($this->session()->getSelectorsHandler()))->field($selector);
 
         if (!$this->driver()->nativeWait()->element($xpath, 'attached')) {
-            return parent::getField($selector);
+            return $this->htmlField($selector);
         }
 
         return new NodeElement($xpath, $this->session());
