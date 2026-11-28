@@ -28,6 +28,8 @@ use Zenstruck\Browser\Session\Driver\PantherDriver;
  */
 class PantherBrowser extends Browser
 {
+    use Htmlable;
+
     private ?string $screenshotDir;
     private ?string $consoleLogDir;
 

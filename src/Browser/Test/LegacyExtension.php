@@ -36,7 +36,7 @@ class LegacyExtension
             return;
         }
 
-        self::$registeredBrowsers[] = $browser;
+        self::$registeredBrowsers[\spl_object_id($browser->client())] = $browser;
     }
 
     public function executeBeforeFirstTest(): void
@@ -123,7 +123,7 @@ class LegacyExtension
 
         $filename = \sprintf('%s_%s', $type, self::normalizeTestName($test));
 
-        foreach (self::$registeredBrowsers as $i => $browser) {
+        foreach (\array_values(self::$registeredBrowsers) as $i => $browser) {
             try {
                 $browser->saveCurrentState("{$filename}__{$i}");
             } catch (\Throwable $e) {

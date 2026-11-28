@@ -21,7 +21,9 @@ use Zenstruck\Browser\Test\HasBrowser;
  */
 final class ConfigureBrowserTest extends WebTestCase
 {
-    use HasBrowser;
+    use HasBrowser {
+        browser as baseBrowser;
+    }
 
     /**
      * @test
@@ -32,8 +34,22 @@ final class ConfigureBrowserTest extends WebTestCase
         $this->page1Browser()->assertOn('/page1');
     }
 
+    /**
+     * @test
+     */
+    #[Test]
+    public function html_browser_uses_the_existing_browser_override(): void
+    {
+        $this->htmlBrowser()->assertOn('/page1');
+    }
+
+    protected function browser(array $options = [], array $server = []): KernelBrowser
+    {
+        return $this->baseBrowser($options, $server)->visit('/page1');
+    }
+
     protected function page1Browser(): KernelBrowser
     {
-        return $this->browser()->visit('/page1');
+        return $this->browser();
     }
 }

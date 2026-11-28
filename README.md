@@ -84,10 +84,11 @@ This extension provides the following features:
 
 ## Usage
 
-This library provides 2 different "browsers":
+This library provides 3 different "browsers":
 
-1. [KernelBrowser](#kernelbrowser): makes requests using your Symfony Kernel *(fast)*.
-2. [PlaywrightBrowser](#playwrightbrowser): drives a real browser with `playwright-php/playwright-symfony` but passes
+1. [HtmlBrowser](#htmlbrowser): tests HTML pages using your Symfony Kernel *(fast)*.
+2. [ApiBrowser](#apibrowser): tests HTTP APIs using your Symfony Kernel *(fast)*.
+3. [PlaywrightBrowser](#playwrightbrowser): drives a real browser with `playwright-php/playwright-symfony` but passes
    its requests to your Symfony Kernel, so no webserver is required *(slow)*.
 
 You can use these Browsers in your tests by having your test class use the `HasBrowser` trait:
@@ -116,7 +117,7 @@ class MyTest extends TestCase
 }
 ```
 
-Both browsers have the following methods:
+The HTML browsers (`HtmlBrowser` and `PlaywrightBrowser`) have the following methods:
 
 ```php
 /** @var \Zenstruck\Browser $browser **/
@@ -327,7 +328,7 @@ $browser
 
 ### Redirects
 
-By default, redirects are followed. Both browsers can stop on them instead:
+By default, redirects are followed. All browsers can stop on them instead:
 
 ```php
 /** @var \Zenstruck\Browser $browser **/
@@ -363,7 +364,7 @@ $browser
 
 ### Profiling
 
-Both browsers expose the Symfony profiler:
+All browsers expose the Symfony profiler:
 
 ```php
 /** @var \Zenstruck\Browser $browser **/
@@ -381,40 +382,64 @@ $browser->use(function(\Symfony\Component\HttpKernel\DataCollector\RequestDataCo
 });
 ```
 
-### KernelBrowser
+### HtmlBrowser
 
-This browser has the following methods:
+Use `$this->htmlBrowser()` or its existing alias `$this->browser()` to test HTML pages.
+It provides the navigation, form actions and DOM assertions shown above, plus `assertHtml()`.
+Both `HtmlBrowser` and `ApiBrowser` support `disableReboot()` and `enableReboot()` to control
+whether the Symfony kernel reboots between requests.
+
+### ApiBrowser
+
+Use `$this->apiBrowser()` to test HTTP APIs. It supports the shared response, authentication,
+redirect, profiling and exception helpers, plus HTTP requests and JSON assertions. It does not
+provide `visit()`, clicking, form actions, DOM assertions or component injection.
 
 ```php
-/** @var \Zenstruck\Browser\KernelBrowser $browser **/
-
-$browser
-    // helpers for quickly checking the content type
-    ->assertJson()
-    ->assertXml()
-    ->assertHtml()
-
-    // by default, the kernel is rebooted between requests
-    // this disables this behaviour
-    ->disableReboot()
-
-    // re-enable rebooting between requests if previously disabled
-    ->enableReboot()
-
-    // exception assertions also work for the http methods below
-    ->expectException(MyException::class, 'the message')
-    ->post('/url/that/throws/exception') // fails if above exception not thrown
+$this->apiBrowser()
+    ->get('/api/me')
+    ->assertSuccessful()
+    ->assertJsonMatches('email', 'kevin@example.com')
 ;
 ```
 
+The API browser does not assume JSON: use `HttpOptions::json()` or the `json` request option
+when sending JSON. `assertXml()`, `crawler()`, `content()` and `assertContentType()` also work
+with XML and other response formats.
+
+#### Switching between HTML and API tests
+
+Switch with `->api()` and `->html()` when a test needs both views:
+
+```php
+$this->browser()
+    ->visit('/login')
+    ->fillField('Email', 'kevin@example.com')
+    ->fillField('Password', 'password')
+    ->click('Log in')
+    ->api()
+    ->get('/api/me')
+    ->assertJsonMatches('email', 'kevin@example.com')
+    ->html()
+    ->visit('/account')
+    ->assertSee('kevin@example.com')
+;
+```
+
+Both views share the same client, cookies, authentication, current response and exception
+expectations. Switching makes no request and returns the same view each time, including your
+original custom HTML browser. Default HTTP options belong to the API view and survive switches;
+they do not apply to HTML navigation. Separate factory calls create independent browser sessions.
+Switching is available between the kernel-backed HTML and API browsers.
+
 #### HTTP Requests
 
-The _KernelBrowser_ can be used for testing API endpoints. The following http methods are available:
+The _ApiBrowser_ provides `request()` and the following HTTP method helpers:
 
 ```php
 use Zenstruck\Browser\HttpOptions;
 
-/** @var \Zenstruck\Browser\KernelBrowser $browser **/
+/** @var \Zenstruck\Browser\ApiBrowser $browser **/
 
 $browser
     // http methods
@@ -467,7 +492,7 @@ See the [JMESPath Tutorials](https://jmespath.org/tutorial.html) to learn more.
 > `mtdowling/jmespath.php` is required: `composer require --dev mtdowling/jmespath.php`.
 
 ```php
-/** @var \Zenstruck\Browser\KernelBrowser $browser **/
+/** @var \Zenstruck\Browser\ApiBrowser $browser **/
 $browser
     ->get('/api/endpoint')
     ->assertJson() // ensures the content-type is application/json
@@ -579,7 +604,7 @@ $json->assertThatEach('$.foo[*]', fn(Json $json) => $json->isGreaterThan(0));
 This drives a real browser so you can test javascript, but it does not start a webserver: requests
 made by the browser are intercepted and passed to *your* booted kernel. The browser therefore talks
 to the same application instance (and container) as your test, so mocked services, an in-memory
-database and the profiler behave as they do with the [`KernelBrowser`](#kernelbrowser).
+database and the profiler behave as they do with the [`HtmlBrowser`](#htmlbrowser).
 
 It requires [playwright-php/playwright-symfony](https://github.com/playwright-php/playwright-symfony) 0.12+,
 `playwright-php/playwright` 1.6+, PHP 8.2+, Symfony 6.4+, Node.js 20+, and the Playwright browsers:
@@ -776,14 +801,31 @@ There are several environment variables available to configure:
 | `BROWSER_FOLLOW_REDIRECTS` | Whether to follow redirects by default.                                                         | `1` _(true)_                          |
 | `BROWSER_CATCH_EXCEPTIONS` | Whether to catch exceptions by default.                                                         | `1` _(true)_                          |
 | `BROWSER_DEFAULT_TIMEOUT` | Milliseconds Playwright actions and DOM/URL assertions wait before giving up.                    | `2000`                                |
-| `BROWSER_SOURCE_DEBUG`     | Whether to add request metadata to written source files (only applies to `KernelBrowser`).      | `0` _(false)_                         |
-| `KERNEL_BROWSER_CLASS`     | `KernelBrowser` class to use.                                                                   | `Zenstruck\Browser\KernelBrowser`     |
+| `BROWSER_SOURCE_DEBUG`     | Whether to add request metadata to written source files (applies to the kernel-backed HTML and API browsers).      | `0` _(false)_                         |
+| `KERNEL_BROWSER_CLASS`     | HTML browser class to use (extends `HtmlBrowser`).                                               | `Zenstruck\Browser\HtmlBrowser`       |
+| `API_BROWSER_CLASS`        | API browser class to use (extends `ApiBrowser`).                                                 | `Zenstruck\Browser\ApiBrowser`        |
 | `PLAYWRIGHT_BROWSER_CLASS` | `PlaywrightBrowser` class to use.                                                               | `Zenstruck\Browser\PlaywrightBrowser` |
 | `PLAYWRIGHT_BROWSER`       | Browser engine to use: `chromium`, `firefox` or `webkit` (only applies to `PlaywrightBrowser`). | `chromium`                            |
 | `PLAYWRIGHT_HEADLESS`      | Set to `false` to watch the browser (only applies to `PlaywrightBrowser`).                      | `true`                                |
 | `BROWSER_FILE_LINK_FORMAT` | Turns file paths seen in `Saved Browser Artifacts` into links that open in your editor.         | `file://%f#L%l`                       |
 
 ## Extending
+
+### Migrating from KernelBrowser
+
+`KernelBrowser` is now abstract. Existing custom subclasses continue to work in 1.x, but extending
+it directly is deprecated: change your custom HTML browser to extend `HtmlBrowser`. Keep using
+`KERNEL_BROWSER_CLASS` to select it.
+
+HTTP methods, `setDefaultHttpOptions()`, `assertJson()`, `assertXml()`, `assertJsonMatches()`,
+`json()` and `Json` callback injection on the HTML browser are deprecated. Use `apiBrowser()`
+for API tests, or insert `->api()` before these operations in mixed tests. Use `->html()` before
+returning to page actions and DOM assertions. Existing test-case overrides of `browser()` also
+apply to the new `htmlBrowser()` factory.
+
+When first switching an existing HTML browser to its API view, legacy default HTTP options are
+copied into the API view. Later changes to either view's defaults are independent. Move API
+configuration overrides to `apiBrowser()` when migrating your test case.
 
 ### Test Browser Configuration
 
@@ -943,7 +985,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
 
 1. Use `->setDefaultHttpOptions()` for the current browser:
    ```php
-   /** @var \Zenstruck\Browser\KernelBrowser $browser **/
+   /** @var \Zenstruck\Browser\ApiBrowser $browser **/
 
    $browser
        ->setDefaultHttpOptions(['headers' => ['X-Token' => 'my-token']])
@@ -961,18 +1003,18 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
    namespace App\Tests;
 
    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-   use Zenstruck\Browser\KernelBrowser;
+   use Zenstruck\Browser\ApiBrowser;
    use Zenstruck\Browser\Test\HasBrowser;
 
    class MyTest extends KernelTestCase
    {
        use HasBrowser {
-           browser as baseKernelBrowser;
+           apiBrowser as baseApiBrowser;
        }
 
        public function testDemo(): void
        {
-           $this->browser()
+           $this->apiBrowser()
                // all http requests in this test class will have the X-Token header
                ->get('/endpoint')
 
@@ -981,9 +1023,9 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
            ;
        }
 
-       protected function browser(): KernelBrowser
+       protected function apiBrowser(): ApiBrowser
        {
-           return $this->baseKernelBrowser()
+           return $this->baseApiBrowser()
                ->setDefaultHttpOptions(['headers' => ['X-Token' => 'my-token']])
            ;
        }
@@ -1012,7 +1054,7 @@ If you find yourself creating a lot of [http requests](#http-requests) with the 
    ```php
    use Zenstruck\Browser\HttpOptions;
 
-   /** @var \Zenstruck\Browser\KernelBrowser $browser **/
+   /** @var \Zenstruck\Browser\ApiBrowser $browser **/
 
    $browser
        // instead of
@@ -1034,9 +1076,9 @@ add your own actions/assertions by using the base browser methods.
 ```php
 namespace App\Tests;
 
-use Zenstruck\Browser\KernelBrowser;
+use Zenstruck\Browser\HtmlBrowser;
 
-class AppBrowser extends KernelBrowser
+class AppBrowser extends HtmlBrowser
 {
     public function assertHasToolbar(): self
     {
@@ -1047,7 +1089,8 @@ class AppBrowser extends KernelBrowser
 
 Then, depending on the implementation you extended from, set the appropriate env variable:
 
-* `KernelBrowser`: `KERNEL_BROWSER_CLASS`
+* `HtmlBrowser`: `KERNEL_BROWSER_CLASS`
+* `ApiBrowser`: `API_BROWSER_CLASS`
 * `PlaywrightBrowser`: `PLAYWRIGHT_BROWSER_CLASS`
 
 For the example above, you would set `KERNEL_BROWSER_CLASS=App\Tests\AppBrowser`.
